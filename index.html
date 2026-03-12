@@ -1598,11 +1598,11 @@ function renderWdConfig() {
   // Frecuencia info
   var fi = document.getElementById('wd-info-frecuencia');
   if (fi) {
-    var dias = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+    var dias = ['Domingo','Lunes','Martes','Mi\u00E9rcoles','Jueves','Viernes','S\u00E1bado'];
     var hora = (wdCfg.hora||8)+':00';
     if (wdCfg.frecuencia==='diario')   fi.textContent = 'Diario a las '+hora;
     else if (wdCfg.frecuencia==='semanal') fi.textContent = 'Cada '+dias[wdCfg.dia_semana||1]+' a las '+hora;
-    else fi.textContent = 'El 1° de cada mes a las '+hora;
+    else fi.textContent = 'El 1\u00BA de cada mes a las '+hora;
   }
 }
 
@@ -1617,7 +1617,7 @@ function wdUpdatePreview() {
   var frec = document.getElementById('wd-frecuencia').value;
   var dia  = parseInt(document.getElementById('wd-dia').value||1);
   var hora = document.getElementById('wd-hora').value;
-  var dias = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+  var dias = ['Domingo','Lunes','Martes','Mi\u00E9rcoles','Jueves','Viernes','S\u00E1bado'];
   var txt = '';
   if (frec==='diario')   txt = 'El informe se enviará todos los días a las '+hora+':00';
   else if (frec==='semanal') txt = 'El informe se enviará todos los '+dias[dia]+' a las '+hora+':00';
