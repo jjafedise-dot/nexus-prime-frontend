@@ -822,8 +822,16 @@ async function apiFetch(path, opts) {
   var res = await fetch(API+path, Object.assign({}, opts, {
     headers: Object.assign({'Content-Type':'application/json','Authorization':'Bearer '+G.token}, opts.headers||{})
   }));
-  if (res.status===401){ doLogout(); throw new Error('Sesión expirada'); }
-  return res.json();
+  if (res.status===401){ doLogout(); throw new Error('Sesion expirada'); }
+  var text = await res.text();
+  try {
+    return JSON.parse(text);
+  } catch(e) {
+    if (text.trim().startsWith('<')) {
+      throw new Error('El servidor esta iniciando, espera unos segundos e intenta de nuevo');
+    }
+    throw new Error('Respuesta inesperada del servidor');
+  }
 }
 
 // ── NAVIGATION ─────────────────────────────────────
