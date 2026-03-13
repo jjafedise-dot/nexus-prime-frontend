@@ -1619,9 +1619,9 @@ function wdUpdatePreview() {
   var hora = document.getElementById('wd-hora').value;
   var dias = ['Domingo','Lunes','Martes','Mi\u00E9rcoles','Jueves','Viernes','S\u00E1bado'];
   var txt = '';
-  if (frec==='diario')   txt = 'El informe se enviará todos los días a las '+hora+':00';
-  else if (frec==='semanal') txt = 'El informe se enviará todos los '+dias[dia]+' a las '+hora+':00';
-  else txt = 'El informe se enviará el 1° de cada mes a las '+hora+':00';
+  if (frec==='diario')   txt = 'El informe se enviara todos los dias a las '+hora+':00';
+  else if (frec==='semanal') txt = 'El informe se enviara todos los '+dias[dia]+' a las '+hora+':00';
+  else txt = 'El informe se enviara el 1er dia de cada mes a las '+hora+':00';
   var el = document.getElementById('wd-preview-txt');
   if (el) el.textContent = txt;
 }
