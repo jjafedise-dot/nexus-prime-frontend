@@ -975,18 +975,25 @@ function filterInventario() {
 
 function renderInvTable(data) {
   if (!data.length){ document.getElementById('inv-table-wrap').innerHTML='<div class="empty-state"><i class="fas fa-warehouse"></i><p>Sin productos</p></div>'; return; }
-  var h='<table><thead><tr><th>Código</th><th>Nombre</th><th>Grupo</th><th>Stock</th><th>Mínimo</th><th>Estado</th><th>Acciones</th></tr></thead><tbody>';
+  var h='<table><thead><tr><th>Código</th><th>Nombre</th><th>Grupo</th><th>Stock</th><th>Mínimo</th><th>Estado</th><th>Docs</th><th>Acciones</th></tr></thead><tbody>';
   data.forEach(function(p){
     var est = p.estado_stock;
     var badge = est==='OK' ? '<span class="stock-badge badge-ok"><i class="fas fa-check-circle"></i> OK</span>'
               : est==='SIN_STOCK' ? '<span class="stock-badge badge-crit"><i class="fas fa-circle-xmark"></i> SIN STOCK</span>'
               : est==='STOCK_BAJO' ? '<span class="stock-badge badge-warn"><i class="fas fa-triangle-exclamation"></i> BAJO</span>'
-              : '<span class="stock-badge badge-nmin">SIN MÍN</span>';
+              : '<span class="stock-badge badge-nmin">SIN MIN</span>';
     var pj = JSON.stringify(p).replace(/"/g,'&quot;');
+    var docBtn = p.doc_url
+      ? '<a href="'+p.doc_url+'" target="_blank" class="btn btn-sm" style="background:rgba(251,113,133,.1);border:1px solid rgba(251,113,133,.3);color:#fb7185;padding:4px 8px" title="Ver PDF"><i class="fas fa-file-pdf"></i></a> '
+      : '<button class="btn btn-secondary btn-sm" onclick="subirArchivo(\'' + p.codigo + '\',\'pdf\')" title="Subir OC PDF"><i class="fas fa-file-arrow-up"></i></button> ';
+    var fotoBtn = p.foto_url
+      ? '<a href="'+p.foto_url+'" target="_blank" class="btn btn-sm" style="background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.3);color:#34d399;padding:4px 8px" title="Ver Foto"><i class="fas fa-image"></i></a>'
+      : '<button class="btn btn-secondary btn-sm" onclick="subirArchivo(\'' + p.codigo + '\',\'foto\')" title="Subir Foto"><i class="fas fa-camera"></i></button>';
     h+='<tr><td class="mono">'+p.codigo+'</td><td style="font-weight:600">'+p.nombre+'</td><td style="color:var(--tx3);font-size:12px">'+p.grupo+'</td>'+
       '<td style="font-weight:700;color:'+(p.stock_actual<=0?'var(--rose)':p.estado_stock==='STOCK_BAJO'?'var(--amber)':'var(--emerald)')+'">'+p.stock_actual+' <small style="font-weight:400;color:var(--tx3)">'+p.unidad+'</small></td>'+
       '<td style="color:var(--tx2)">'+p.stock_minimo+'</td><td>'+badge+'</td>'+
-      '<td style="white-space:nowrap"><button class="btn btn-secondary btn-sm" onclick="abrirAjuste('+pj+')" title="Ajuste rápido"><i class="fas fa-sliders"></i></button> '+
+      '<td style="white-space:nowrap">'+docBtn+fotoBtn+'</td>'+
+      '<td style="white-space:nowrap"><button class="btn btn-secondary btn-sm" onclick="abrirAjuste('+pj+')" title="Ajuste rapido"><i class="fas fa-sliders"></i></button> '+
       '<button class="btn btn-secondary btn-sm" onclick="abrirEditar('+pj+')" title="Editar"><i class="fas fa-pen"></i></button></td></tr>';
   });
   h+='</tbody></table>';
@@ -1692,6 +1699,41 @@ async function loadWdPreview() {
     var m=document.getElementById('prev-sinmin');   if(m) m.textContent=sinMin;
     var t=document.getElementById('prev-total');    if(t) t.textContent=total;
   } catch(e){}
+}
+
+// -- ARCHIVOS (PDF y Foto)
+function subirArchivo(codigo, tipo) {
+  var accept = tipo === 'pdf' ? '.pdf' : '.jpg,.jpeg,.png,.webp';
+  var label  = tipo === 'pdf' ? 'Orden de Compra (PDF)' : 'Fotografia del producto';
+  var inp = document.createElement('input');
+  inp.type = 'file';
+  inp.accept = accept;
+  inp.onchange = async function() {
+    var file = inp.files[0];
+    if (!file) return;
+    var maxMB = tipo === 'pdf' ? 10 : 5;
+    if (file.size > maxMB * 1024 * 1024) { toast('Archivo muy grande (max ' + maxMB + 'MB)', 'error'); return; }
+    toast('Subiendo ' + label + '...', 'info', 8000);
+    var fd = new FormData();
+    fd.append('file', file);
+    try {
+      var res = await fetch(API + '/api/archivos/' + tipo + '/' + codigo, {
+        method: 'POST',
+        headers: { 'Authorization': 'Bearer ' + G.token },
+        body: fd
+      });
+      var text = await res.text();
+      var data;
+      try { data = JSON.parse(text); } catch(e) { throw new Error('Respuesta inesperada'); }
+      if (data.status === 'success') {
+        toast('Archivo subido correctamente', 'success');
+        loadInventario();
+      } else {
+        toast(data.message || 'Error subiendo archivo', 'error');
+      }
+    } catch(e) { toast('Error: ' + e.message, 'error'); }
+  };
+  inp.click();
 }
 
 // ── TOAST ─────────────────────────────────────────
