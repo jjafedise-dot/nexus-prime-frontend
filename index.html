@@ -780,18 +780,39 @@ async function doLogin() {
   var pass  = document.getElementById('l-pass').value;
   var err   = document.getElementById('login-err');
   var btn   = document.getElementById('btn-login');
-  if (!email||!pass){ err.textContent='Ingresa email y contraseña'; err.style.display='block'; return; }
-  btn.classList.add('off'); err.style.display='none';
+  if (!email||!pass){ err.textContent='Ingresa email y contrasena'; err.style.display='block'; return; }
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner" style="width:18px;height:18px;display:inline-block;vertical-align:middle;margin-right:8px"></div> Accediendo...';
+  err.style.display='none';
   try {
     var res = await fetch(API+'/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password:pass})});
-    var data = await res.json();
+    var text = await res.text();
+    var data;
+    try { data = JSON.parse(text); } catch(e) {
+      // Backend durmiendo - esperar y reintentar
+      btn.innerHTML = '<div class="spinner" style="width:18px;height:18px;display:inline-block;vertical-align:middle;margin-right:8px"></div> Iniciando servidor...';
+      await new Promise(function(r){ setTimeout(r, 8000); });
+      var res2 = await fetch(API+'/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password:pass})});
+      data = await res2.json();
+    }
     if (data.status==='success') {
+      btn.innerHTML = '<i class="fas fa-check"></i> Bienvenido';
+      btn.style.background = 'var(--emerald)';
       G.token=data.data.token; G.user=data.data.usuario;
       localStorage.setItem('nxw',JSON.stringify({token:G.token,user:G.user}));
-      showApp();
-    } else { err.textContent=data.message||'Credenciales incorrectas'; err.style.display='block'; }
-  } catch(e){ err.textContent='Error de conexión al servidor'; err.style.display='block'; }
-  btn.classList.remove('off');
+      setTimeout(function(){ showApp(); }, 400);
+    } else {
+      err.textContent=data.message||'Credenciales incorrectas';
+      err.style.display='block';
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fas fa-arrow-right-to-bracket"></i> Ingresar al Sistema';
+    }
+  } catch(e){
+    err.textContent='Sin conexion al servidor. Intenta de nuevo en unos segundos.';
+    err.style.display='block';
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-arrow-right-to-bracket"></i> Ingresar al Sistema';
+  }
 }
 
 function doLogout() {
