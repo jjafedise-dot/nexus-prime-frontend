@@ -984,11 +984,11 @@ function renderInvTable(data) {
               : '<span class="stock-badge badge-nmin">SIN MIN</span>';
     var pj = JSON.stringify(p).replace(/"/g,'&quot;');
     var docBtn = p.doc_url
-      ? '<a href="'+p.doc_url+'" target="_blank" class="btn btn-sm" style="background:rgba(251,113,133,.1);border:1px solid rgba(251,113,133,.3);color:#fb7185;padding:4px 8px" title="Ver PDF"><i class="fas fa-file-pdf"></i></a> '
-      : '<button class="btn btn-secondary btn-sm" onclick="subirArchivo(\'' + p.codigo + '\',\'pdf\')" title="Subir OC PDF"><i class="fas fa-file-arrow-up"></i></button> ';
+      ? '<a href="'+p.doc_url+'" target="_blank" class="btn btn-sm" style="background:rgba(251,113,133,.1);border:1px solid rgba(251,113,133,.3);color:#fb7185;padding:4px 8px" title="Ver OC PDF"><i class="fas fa-file-pdf"></i></a> '
+      : '<span style="color:var(--tx3);font-size:11px;padding:4px 6px" title="Sin PDF"><i class="fas fa-file-pdf" style="opacity:.25"></i></span> ';
     var fotoBtn = p.foto_url
       ? '<a href="'+p.foto_url+'" target="_blank" class="btn btn-sm" style="background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.3);color:#34d399;padding:4px 8px" title="Ver Foto"><i class="fas fa-image"></i></a>'
-      : '<button class="btn btn-secondary btn-sm" onclick="subirArchivo(\'' + p.codigo + '\',\'foto\')" title="Subir Foto"><i class="fas fa-camera"></i></button>';
+      : '<span style="color:var(--tx3);font-size:11px;padding:4px 6px" title="Sin foto"><i class="fas fa-image" style="opacity:.25"></i></span>';
     h+='<tr><td class="mono">'+p.codigo+'</td><td style="font-weight:600">'+p.nombre+'</td><td style="color:var(--tx3);font-size:12px">'+p.grupo+'</td>'+
       '<td style="font-weight:700;color:'+(p.stock_actual<=0?'var(--rose)':p.estado_stock==='STOCK_BAJO'?'var(--amber)':'var(--emerald)')+'">'+p.stock_actual+' <small style="font-weight:400;color:var(--tx3)">'+p.unidad+'</small></td>'+
       '<td style="color:var(--tx2)">'+p.stock_minimo+'</td><td>'+badge+'</td>'+
@@ -1096,10 +1096,17 @@ function filterProductos() {
   var q = (document.getElementById('prod-search').value||'').toLowerCase();
   var data = q ? G.prodData.filter(function(p){ return p.codigo.toLowerCase().includes(q)||p.nombre.toLowerCase().includes(q); }) : G.prodData;
   if (!data.length){ document.getElementById('prod-table-wrap').innerHTML='<div class="empty-state"><i class="fas fa-box"></i><p>Sin productos</p></div>'; return; }
-  var h='<table><thead><tr><th>Código</th><th>Nombre</th><th>Unidad</th><th>Grupo</th><th>Stock</th><th>Mínimo</th><th>Acciones</th></tr></thead><tbody>';
+  var h='<table><thead><tr><th>Código</th><th>Nombre</th><th>Unidad</th><th>Grupo</th><th>Stock</th><th>Mínimo</th><th>OC / Foto</th><th>Acciones</th></tr></thead><tbody>';
   data.forEach(function(p){
     var pj=JSON.stringify(p).replace(/"/g,'&quot;');
+    var pDocBtn = p.doc_url
+      ? '<a href="'+p.doc_url+'" target="_blank" class="btn btn-sm" style="background:rgba(251,113,133,.15);border:1px solid rgba(251,113,133,.35);color:#fb7185;padding:4px 8px" title="Ver OC PDF"><i class="fas fa-file-pdf"></i></a> '
+      : '<button class="btn btn-secondary btn-sm" onclick="subirArchivo(''+p.codigo+'','pdf')" title="Subir OC PDF"><i class="fas fa-file-arrow-up" style="color:var(--rose)"></i></button> ';
+    var pFotoBtn = p.foto_url
+      ? '<a href="'+p.foto_url+'" target="_blank" class="btn btn-sm" style="background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.3);color:#34d399;padding:4px 8px" title="Ver Foto"><i class="fas fa-image"></i></a>'
+      : '<button class="btn btn-secondary btn-sm" onclick="subirArchivo(''+p.codigo+'','foto')" title="Subir Foto"><i class="fas fa-camera" style="color:var(--emerald)"></i></button>';
     h+='<tr><td class="mono">'+p.codigo+'</td><td>'+p.nombre+'</td><td style="color:var(--tx2)">'+p.unidad+'</td><td style="color:var(--tx3)">'+p.grupo+'</td><td style="font-weight:600">'+p.stock_actual+'</td><td>'+p.stock_minimo+'</td>'+
+      '<td style="white-space:nowrap">'+pDocBtn+pFotoBtn+'</td>'+
       '<td><button class="btn btn-secondary btn-sm" onclick="abrirEditar('+pj+')"><i class="fas fa-pen"></i></button></td></tr>';
   });
   h+='</tbody></table>';
@@ -1177,18 +1184,25 @@ async function loadHistorial() {
 
 function renderHistTable(data) {
   if (!data.length){ document.getElementById('hist-table-wrap').innerHTML='<div class="empty-state"><i class="fas fa-clock-rotate-left"></i><p>Sin registros</p></div>'; return; }
-  var h='<table><thead><tr><th>Fecha</th><th>Código</th><th>Producto</th><th>Tipo</th><th>Cantidad</th><th>Stock Res.</th><th>Usuario</th><th>Responsable</th><th>Observaciones</th></tr></thead><tbody>';
+  var h='<table><thead><tr><th>Fecha</th><th>Código</th><th>Producto</th><th>Tipo</th><th>Cantidad</th><th>Stock Res.</th><th>Usuario</th><th>Responsable</th><th>Observaciones</th><th>OC/Foto</th></tr></thead><tbody>';
   data.forEach(function(m){
     var isIn=m.tipo==='INGRESO',isAdj=m.tipo==='AJUSTE';
     var col=isIn?'var(--emerald)':isAdj?'var(--neon)':'var(--rose)';
     var badge='<span class="stock-badge '+(isIn?'badge-ok':isAdj?'':'badge-crit')+'">'+m.tipo+'</span>';
+    var mDocBtn = m.doc_url
+      ? '<a href="'+m.doc_url+'" target="_blank" class="btn btn-sm" style="background:rgba(251,113,133,.1);border:1px solid rgba(251,113,133,.3);color:#fb7185;padding:3px 7px" title="Ver OC PDF"><i class="fas fa-file-pdf"></i></a> '
+      : '<button class="btn btn-secondary btn-sm" onclick="subirArchivo(''+m.codigo+'','pdf')" title="Subir OC PDF" style="padding:3px 7px"><i class="fas fa-file-arrow-up" style="color:var(--rose)"></i></button> ';
+    var mFotoBtn = m.foto_url
+      ? '<a href="'+m.foto_url+'" target="_blank" class="btn btn-sm" style="background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.3);color:#34d399;padding:3px 7px" title="Ver Foto"><i class="fas fa-image"></i></a>'
+      : '<button class="btn btn-secondary btn-sm" onclick="subirArchivo(''+m.codigo+'','foto')" title="Subir Foto" style="padding:3px 7px"><i class="fas fa-camera" style="color:var(--emerald)"></i></button>';
     h+='<tr><td style="font-size:12px;color:var(--tx2);white-space:nowrap">'+m.fecha+'</td><td class="mono" style="font-size:11px">'+m.codigo+'</td>'+
       '<td style="font-size:13px">'+m.producto+'</td><td>'+badge+'</td>'+
       '<td style="font-weight:700;color:'+col+'">'+(isIn?'+':isAdj?'±':'-')+m.cantidad+'</td>'+
       '<td style="color:var(--tx2)">'+m.stock_resultante+'</td>'+
       '<td style="font-size:11px;color:var(--tx3)">'+m.usuario+'</td>'+
       '<td style="font-size:12px">'+m.responsable+'</td>'+
-      '<td style="font-size:11px;color:var(--tx3);max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+m.observaciones+'</td></tr>';
+      '<td style="font-size:11px;color:var(--tx3);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+m.observaciones+'</td>'+
+      '<td style="white-space:nowrap">'+mDocBtn+mFotoBtn+'</td></tr>';
   });
   h+='</tbody></table>';
   document.getElementById('hist-table-wrap').innerHTML=h;
