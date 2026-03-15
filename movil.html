@@ -155,7 +155,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 .foto-btn{display:none;width:100%;padding:11px;background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.25);border-radius:var(--r-sm);color:var(--neon);font-size:13px;cursor:pointer;font-family:var(--f-d);font-weight:700;letter-spacing:1px;text-transform:uppercase;text-align:center;margin-bottom:8px}
 
 /* ── BOTTOM SHEET CONFIRM ── */
-.sheet-bg{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.7);display:flex;align-items:flex-end;opacity:0;pointer-events:none;transition:opacity .25s}
+.sheet-bg{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.7);display:flex;align-items:flex-end;opacity:0;pointer-events:none;transition:opacity .25s}#firma-sheet-bg{z-index:600}
 .sheet-bg.on{opacity:1;pointer-events:all}
 .sheet{background:var(--ink2);border:1px solid var(--wire2);border-radius:var(--r-xl) var(--r-xl) 0 0;padding:20px 20px calc(20px + var(--sib));width:100%;transform:translateY(100%);transition:transform .3s cubic-bezier(.22,1,.36,1)}
 .sheet-bg.on .sheet{transform:none}
@@ -371,7 +371,6 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
   <div class="scan-type-row">
     <div class="scan-type-btn in-active" id="stype-in" onclick="setScanTipo('in')"><i class="fas fa-arrow-down"></i> Ingreso</div>
     <div class="scan-type-btn" id="stype-out" onclick="setScanTipo('out')"><i class="fas fa-arrow-up"></i> Salida</div>
-    <div class="scan-type-btn" id="stype-adj" onclick="setScanTipo('adj')"><i class="fas fa-sliders"></i> Ajuste</div>
   </div>
   <div class="mode-tabs">
     <div class="mode-tab on" id="tab-cam" onclick="setMode('cam')"><i class="fas fa-camera"></i> Cámara</div>
@@ -827,7 +826,7 @@ function updQueueBadge() {
 function goScan(tipo) {
   S.tipo = tipo; S.prod = null; S._fotoRespaldo = null;
   document.getElementById('scan-title').textContent = tipo==='in' ? 'INGRESO' : tipo==='out' ? 'SALIDA' : 'AJUSTE';
-  updateScanTypeUI();
+  updateScanBanner();
   resetScanUI();
   S.navStack = ['s-home'];
   go('s-scan');
@@ -837,23 +836,43 @@ function goScan(tipo) {
 function setScanTipo(t) {
   S.tipo = t;
   document.getElementById('scan-title').textContent = t==='in' ? 'INGRESO' : t==='out' ? 'SALIDA' : 'AJUSTE';
-  updateScanTypeUI();
+  updateScanBanner();
   resetScanUI();
   if (S.prod) renderProd(S.prod, t);
 }
 
-function updateScanTypeUI() {
-  ['in','out','adj'].forEach(function(t){
-    var el = document.getElementById('stype-'+t);
-    el.className = 'scan-type-btn';
-    if (t === S.tipo) el.classList.add(t+'-active');
-  });
+function updateScanTypeUI() { updateScanBanner(); }
+
+function updateScanBanner() {
+  var isIn = S.tipo==='in';
+  var isOut = S.tipo==='out';
+  var banner = document.getElementById('scan-tipo-banner');
+  var icon   = document.getElementById('scan-tipo-icon');
+  var txt    = document.getElementById('scan-tipo-txt');
+  if (banner) {
+    if (isIn) {
+      banner.style.background = 'rgba(52,211,153,.1)';
+      banner.style.border = '1px solid rgba(52,211,153,.3)';
+      banner.style.color = 'var(--emerald)';
+      icon.className = 'fas fa-arrow-down';
+      txt.textContent = 'Registrar Ingreso de Stock';
+    } else {
+      banner.style.background = 'rgba(251,113,133,.1)';
+      banner.style.border = '1px solid rgba(251,113,133,.3)';
+      banner.style.color = 'var(--rose)';
+      icon.className = 'fas fa-arrow-up';
+      txt.textContent = 'Registrar Salida de Stock';
+    }
+  }
   var confirmBtn = document.getElementById('confirm-btn');
   if (confirmBtn) {
-    confirmBtn.className = 'btn ' + (S.tipo==='in' ? 'btn-green' : S.tipo==='out' ? 'btn-rose' : 'btn-amber');
+    confirmBtn.className = 'btn ' + (isIn ? 'btn-green' : 'btn-rose');
+    confirmBtn.innerHTML = isIn
+      ? '<i class="fas fa-check"></i> Confirmar Ingreso'
+      : '<i class="fas fa-check"></i> Confirmar Salida';
   }
   var qtyLbl = document.getElementById('qty-label');
-  if (qtyLbl) qtyLbl.textContent = S.tipo==='in' ? 'Cantidad a Ingresar' : S.tipo==='out' ? 'Cantidad a Retirar' : 'Nuevo Stock (Ajuste)';
+  if (qtyLbl) qtyLbl.textContent = isIn ? 'Cantidad a Ingresar' : 'Cantidad a Retirar';
 }
 
 function setMode(m) {
