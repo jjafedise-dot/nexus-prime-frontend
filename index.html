@@ -285,6 +285,7 @@ select.form-ctrl option{background:var(--ink3)}
         <div class="nav-item" onclick="showPanel('buscar',this)"><i class="fas fa-magnifying-glass"></i> Buscar</div>
         <div class="nav-item" onclick="showPanel('historial',this)"><i class="fas fa-clock-rotate-left"></i> Historial</div>
         <div class="nav-item" onclick="showPanel('rfp',this)"><i class="fas fa-hand-holding-box"></i> RFP <span class="nav-badge" id="rfp-badge">0</span></div>
+        <div class="nav-item" onclick="showPanel('documentos',this)"><i class="fas fa-file-invoice"></i> Documentos</div>
         <div class="sb-section-lbl"><i class="fas fa-circle" style="font-size:4px"></i> Avanzado</div>
         <div class="nav-item" onclick="showPanel('reportes',this)"><i class="fas fa-file-csv"></i> Reportes</div>
         <div class="nav-item" onclick="showPanel('ubicaciones',this)"><i class="fas fa-location-dot"></i> Ubicaciones</div>
@@ -700,10 +701,244 @@ select.form-ctrl option{background:var(--ink3)}
           </div>
         </div>
 
+
+        <!-- ── DOCUMENTOS ── -->
+        <div class="panel" id="panel-documentos">
+          <!-- NUEVO DOCUMENTO -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title"><i class="fas fa-file-invoice" style="color:var(--neon)"></i> Nuevo Documento</div>
+            </div>
+            <div class="grid-2">
+              <div class="form-group">
+                <label class="form-label">Tipo *</label>
+                <select class="form-ctrl" id="doc-tipo">
+                  <option value="OC">Orden de Compra (OC)</option>
+                  <option value="GUIA">Guia de Despacho</option>
+                  <option value="FACTURA">Factura</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Numero *</label>
+                <input class="form-ctrl" id="doc-numero" type="text" placeholder="Ej: 001234"/>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Proveedor *</label>
+                <input class="form-ctrl" id="doc-proveedor" type="text" placeholder="Nombre del proveedor"/>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Fecha *</label>
+                <input class="form-ctrl" id="doc-fecha" type="date"/>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Observaciones</label>
+              <textarea class="form-ctrl" id="doc-obs" rows="2" placeholder="Notas adicionales..."></textarea>
+            </div>
+            <div class="grid-2">
+              <div class="form-group">
+                <label class="form-label"><i class="fas fa-file-pdf" style="color:var(--rose)"></i> PDF del Documento</label>
+                <input class="form-ctrl" id="doc-pdf" type="file" accept=".pdf" style="padding:6px"/>
+              </div>
+              <div class="form-group">
+                <label class="form-label"><i class="fas fa-camera" style="color:var(--emerald)"></i> Foto de Recepcion</label>
+                <input class="form-ctrl" id="doc-foto" type="file" accept=".jpg,.jpeg,.png,.webp" style="padding:6px"/>
+              </div>
+            </div>
+            <!-- ITEMS -->
+            <div class="card-header" style="margin-top:8px;margin-bottom:12px">
+              <div class="card-title" style="font-size:13px"><i class="fas fa-boxes-stacked"></i> Productos del Documento</div>
+              <button class="btn btn-secondary btn-sm" onclick="docAgregarItem()"><i class="fas fa-plus"></i> Agregar Producto</button>
+            </div>
+            <div id="doc-items-wrap" style="margin-bottom:12px">
+              <div class="msg msg-info" style="font-size:12px">Agrega los productos incluidos en este documento. El stock se actualizara automaticamente.</div>
+            </div>
+            <button class="btn btn-primary" id="btn-doc-save" onclick="guardarDocumento()"><i class="fas fa-save"></i> Registrar Documento y Actualizar Stock</button>
+          </div>
+
+          <!-- HISTORIAL DOCUMENTOS -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title"><i class="fas fa-clock-rotate-left"></i> Documentos Registrados</div>
+              <button class="btn btn-secondary btn-sm" onclick="loadDocumentos()"><i class="fas fa-rotate"></i> Actualizar</button>
+            </div>
+            <div id="doc-hist-wrap"><div class="loading-state"><div class="spinner"></div></div></div>
+          </div>
+        </div>
+
       </div><!-- /main-content -->
     </div><!-- /main -->
   </div><!-- /layout -->
 </div><!-- /app -->
+
+<!-- ── MODAL FIRMA ── -->
+<style>
+/* Firma modal mobile-first */
+#modal-firma .modal {
+  width: 100%;
+  max-width: 600px;
+  margin: 0;
+  border-radius: 0;
+  max-height: 100vh;
+  overflow-y: auto;
+}
+@media(min-width:640px){
+  #modal-firma .modal {
+    border-radius: var(--r-xl);
+    margin: auto;
+    max-height: 95vh;
+  }
+}
+#modal-firma .modal-bg {
+  align-items: flex-end;
+}
+@media(min-width:640px){
+  #modal-firma .modal-bg { align-items: center; }
+}
+.firma-canvas-wrap {
+  position: relative;
+  border: 2px dashed var(--neon);
+  border-radius: var(--r-md);
+  overflow: hidden;
+  background: #fff;
+  cursor: crosshair;
+}
+.firma-canvas-wrap canvas {
+  display: block;
+  width: 100%;
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+.firma-paso {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 0;
+  font-size: 12px;
+  color: var(--tx3);
+  border-bottom: 1px solid var(--wire);
+  margin-bottom: 12px;
+}
+.firma-num {
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  background: var(--neon);
+  color: #000;
+  font-size: 11px;
+  font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.firma-campo-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+@media(max-width:480px){
+  .firma-campo-row { grid-template-columns: 1fr; }
+}
+</style>
+<div class="modal-bg" id="modal-firma">
+  <div class="modal" style="padding:0;display:flex;flex-direction:column">
+    <!-- Header -->
+    <div style="display:flex;align-items:center;padding:16px 20px;border-bottom:1px solid var(--wire);flex-shrink:0;background:linear-gradient(135deg,rgba(30,60,114,.3),rgba(0,229,255,.05))">
+      <div>
+        <div style="font-family:var(--f-hd);font-size:16px;font-weight:700;letter-spacing:1px"><i class="fas fa-signature" style="color:var(--neon);margin-right:8px"></i>Firma de Retiro</div>
+        <div style="font-size:11px;color:var(--tx3);margin-top:2px" id="firma-info"></div>
+      </div>
+      <button class="modal-close" style="margin-left:auto" onclick="closeModal('modal-firma')"><i class="fas fa-xmark"></i></button>
+    </div>
+
+    <!-- Body -->
+    <div style="padding:16px 20px;overflow-y:auto;flex:1">
+
+      <!-- PASO 1: Datos -->
+      <div class="firma-paso"><span class="firma-num">1</span> Datos de quien retira</div>
+      <div class="firma-campo-row">
+        <div class="form-group">
+          <label class="form-label">Nombre Completo *</label>
+          <input class="form-ctrl" id="firma-nombre" type="text" placeholder="Nombre completo" autocomplete="name" style="font-size:16px"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">RUT</label>
+          <input class="form-ctrl" id="firma-rut" type="text" placeholder="12.345.678-9" autocomplete="off" style="font-size:16px"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Cargo / Empresa</label>
+          <input class="form-ctrl" id="firma-cargo" type="text" placeholder="Cargo o empresa" style="font-size:16px"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Telefono</label>
+          <input class="form-ctrl" id="firma-tel" type="tel" placeholder="+56 9 1234 5678" autocomplete="tel" style="font-size:16px"/>
+        </div>
+      </div>
+
+      <!-- PASO 2: Firma -->
+      <div class="firma-paso" style="margin-top:8px"><span class="firma-num">2</span> Firma digital — dibuja con el dedo</div>
+      <div class="firma-canvas-wrap" id="firma-canvas-wrap">
+        <canvas id="firma-canvas" width="600" height="200"></canvas>
+        <div style="position:absolute;top:0;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:center;pointer-events:none" id="firma-placeholder">
+          <div style="text-align:center;opacity:.3">
+            <i class="fas fa-signature" style="font-size:32px;color:#888;display:block;margin-bottom:6px"></i>
+            <div style="font-size:12px;color:#888">Firma aqui con el dedo o mouse</div>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
+        <div style="font-size:11px;color:var(--tx3)"><i class="fas fa-hand-pointer" style="margin-right:4px"></i>Arrastra para firmar</div>
+        <button onclick="limpiarFirma()" style="background:var(--s3);border:1px solid var(--wire2);color:var(--tx2);padding:5px 12px;border-radius:var(--r);font-size:12px;cursor:pointer;display:flex;align-items:center;gap:6px"><i class="fas fa-eraser"></i> Limpiar</button>
+      </div>
+
+      <!-- Omitir -->
+      <div style="margin-top:14px;padding:10px 14px;background:var(--s2);border:1px solid var(--wire);border-radius:var(--r-md)">
+        <label style="display:flex;align-items:center;gap:10px;cursor:pointer">
+          <input type="checkbox" id="firma-omitir" onchange="toggleOmitirFirma(this)" style="width:18px;height:18px"/>
+          <div>
+            <div style="font-size:13px;color:var(--tx2);font-weight:500">Omitir firma</div>
+            <div style="font-size:11px;color:var(--tx3)">Si no hay firma disponible en este momento</div>
+          </div>
+        </label>
+      </div>
+    </div>
+
+    <!-- Footer sticky -->
+    <div style="padding:14px 20px;border-top:1px solid var(--wire);display:flex;gap:10px;flex-shrink:0;background:var(--s1)">
+      <button class="btn btn-secondary" style="flex:1" onclick="closeModal('modal-firma')">Cancelar</button>
+      <button class="btn btn-primary" id="btn-firma-confirm" style="flex:2;font-size:15px;padding:13px" onclick="confirmarConFirma()">
+        <i class="fas fa-check-circle"></i> Confirmar Retiro
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ── MODAL AGREGAR ITEM DOCUMENTO ── -->
+<div class="modal-bg" id="modal-doc-item">
+  <div class="modal modal-sm">
+    <div class="modal-header">
+      <div class="modal-title">Agregar Producto</div>
+      <button class="modal-close" onclick="closeModal('modal-doc-item')"><i class="fas fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Codigo del Producto *</label>
+        <input class="form-ctrl" id="ditem-codigo" type="text" placeholder="Busca o escribe el codigo" oninput="this.value=this.value.toUpperCase()"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Cantidad *</label>
+        <input class="form-ctrl" id="ditem-cantidad" type="number" min="0.01" step="0.01" placeholder="0"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Precio Unitario (opcional)</label>
+        <input class="form-ctrl" id="ditem-precio" type="number" min="0" step="0.01" placeholder="0"/>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-doc-item')">Cancelar</button>
+      <button class="btn btn-primary" onclick="docConfirmarItem()"><i class="fas fa-plus"></i> Agregar</button>
+    </div>
+  </div>
+</div>
 
 <!-- ── MODAL AJUSTE RÁPIDO ── -->
 <div class="modal-bg" id="modal-ajuste">
@@ -869,7 +1104,7 @@ function showPanel(name, el) {
     dashboard:'Dashboard', inventario:'Inventario', movimientos:'Movimientos', productos:'Productos',
     buscar:'Buscar', historial:'Historial de Movimientos', rfp:'RFP · Préstamos',
     reportes:'Reportes y Exportación', ubicaciones:'Ubicaciones de Bodega',
-    auditoria:'Auditoría del Sistema', usuarios:'Gestión de Usuarios', watchdog:'Watchdog · Alertas por Email'
+    auditoria:'Auditoría del Sistema', usuarios:'Gestión de Usuarios', documentos:'Documentos · OC / Guias / Facturas', watchdog:'Watchdog · Alertas por Email'
   }[name] || name;
   if (name==='inventario')  loadInventario();
   if (name==='historial')   loadHistorial();
@@ -877,6 +1112,7 @@ function showPanel(name, el) {
   if (name==='auditoria')   loadAuditoria();
   if (name==='usuarios')    loadUsuarios();
   if (name==='watchdog')    loadWatchdog();
+  if (name==='documentos')  loadDocumentos();
   if (name==='productos')   loadProductos();
   closeSidebar();
 }
@@ -1070,20 +1306,54 @@ async function registrarMovimiento() {
   var cant   = parseFloat(document.getElementById('mov-cantidad').value);
   var resp   = document.getElementById('mov-responsable').value.trim();
   var obs    = document.getElementById('mov-obs').value.trim();
-  if (!codigo){ toast('Código obligatorio','error'); return; }
-  if (!cant||cant<=0){ toast('Cantidad inválida','error'); return; }
+  if (!codigo){ toast('Codigo obligatorio','error'); return; }
+  if (!cant||cant<=0){ toast('Cantidad invalida','error'); return; }
   if (!resp){ toast('Responsable obligatorio','error'); return; }
+
+  // If SALIDA, request firma first
+  if (tipo === 'SALIDA') {
+    var prodNombre = '';
+    var pi = document.getElementById('mov-prod-info');
+    if (pi && pi.style.display!=='none') {
+      var pn = pi.querySelector('.ac-name');
+      if (pn) prodNombre = pn.textContent.split(' ·')[0];
+    }
+    abrirFirma(
+      '<strong>'+tipo+':</strong> '+codigo+(prodNombre?' - '+prodNombre:'')+' &mdash; Cantidad: <strong>'+cant+'</strong>',
+      async function(firmaData) {
+        await ejecutarMovimiento(codigo, tipo, cant, resp, obs, firmaData);
+      }
+    );
+    return;
+  }
+  await ejecutarMovimiento(codigo, tipo, cant, resp, obs, null);
+}
+
+async function ejecutarMovimiento(codigo, tipo, cant, resp, obs, firmaData) {
   var btn = document.getElementById('btn-mov'); btn.classList.add('off');
   try {
     var res = await apiFetch('/api/movimientos',{method:'POST',body:JSON.stringify({codigo,tipo,cantidad:cant,responsable:resp,observaciones:obs})});
     if (res.status==='success') {
-      toast('✅ '+tipo+' registrado · Stock: '+(res.data?.stock_resultante??'?'),'success');
+      // Save firma if provided
+      if (firmaData && res.data) {
+        var movId = res.data.movimiento_id || res.data.id;
+        await guardarFirma(firmaData, movId, 'SALIDA', null);
+        // Generate comprobante
+        generarComprobantePDF({
+          nombre: firmaData.nombre, rut: firmaData.rut,
+          cargo: firmaData.cargo, telefono: firmaData.telefono,
+          firmaImg: firmaData.firmaImg, codigo: codigo,
+          producto: resp, cantidad: cant, tipo: tipo,
+          fecha: new Date().toLocaleDateString('es-CL')
+        });
+      }
+      toast('Movimiento registrado · Stock: '+(res.data?.stock_resultante??'?'),'success');
       ['mov-codigo','mov-cantidad','mov-obs'].forEach(function(id){ document.getElementById(id).value=''; });
       document.getElementById('mov-prod-info').style.display='none';
       document.getElementById('mov-ac').style.display='none';
       loadMovRecientes(); loadDashboard();
     } else toast(res.message||'Error','error');
-  } catch(e){ toast('Error de conexión','error'); }
+  } catch(e){ toast('Error de conexion','error'); }
   btn.classList.remove('off');
 }
 
@@ -1601,6 +1871,336 @@ function closeModalQR() {
 function openModal(id){ document.getElementById(id).classList.add('open'); }
 function closeModal(id){ document.getElementById(id).classList.remove('open'); if(id==='modal-qr') closeModalQR(); }
 document.addEventListener('keydown', function(e){ if(e.key==='Escape') document.querySelectorAll('.modal-bg.open').forEach(function(m){ closeModal(m.id); }); });
+
+// -- DOCUMENTOS ─────────────────────────────────────
+var docItems = []; // [{codigo,cantidad,precio}]
+
+async function loadDocumentos() {
+  document.getElementById('doc-hist-wrap').innerHTML = '<div class="loading-state"><div class="spinner"></div></div>';
+  // Set today as default date
+  var fd = document.getElementById('doc-fecha');
+  if (fd && !fd.value) fd.value = new Date().toISOString().slice(0,10);
+  try {
+    var res = await apiFetch('/api/documentos?limit=100');
+    renderDocHistorial(res.data||[]);
+  } catch(e) { document.getElementById('doc-hist-wrap').innerHTML='<div class="msg msg-error">Error cargando documentos</div>'; }
+}
+
+function renderDocHistorial(data) {
+  var wrap = document.getElementById('doc-hist-wrap');
+  if (!data.length) { wrap.innerHTML='<div class="empty-state"><i class="fas fa-file-invoice"></i><p>Sin documentos registrados</p></div>'; return; }
+  var tipoColors = {OC:'rgba(0,229,255,.1);color:var(--neon);border-color:rgba(0,229,255,.2)', GUIA:'rgba(0,230,118,.08);color:var(--emerald);border-color:rgba(0,230,118,.2)', FACTURA:'rgba(255,179,0,.08);color:var(--amber);border-color:rgba(255,179,0,.2)'};
+  var h = '<table><thead><tr><th>Fecha</th><th>Tipo</th><th>Numero</th><th>Proveedor</th><th>Items</th><th>Monto</th><th>Archivos</th></tr></thead><tbody>';
+  data.forEach(function(d) {
+    var tc = tipoColors[d.tipo] || tipoColors.OC;
+    var pdfBtn = d.pdf_url ? '<a href="'+d.pdf_url+'" target="_blank" class="btn btn-sm" style="background:rgba(251,113,133,.1);border:1px solid rgba(251,113,133,.3);color:#fb7185;padding:3px 7px" title="Ver PDF"><i class="fas fa-file-pdf"></i></a> ' : '';
+    var fotoBtn = d.foto_url ? '<a href="'+d.foto_url+'" target="_blank" class="btn btn-sm" style="background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.3);color:#34d399;padding:3px 7px" title="Ver Foto"><i class="fas fa-image"></i></a>' : '';
+    var monto = parseFloat(d.total_monto||0) > 0 ? '$'+parseFloat(d.total_monto).toLocaleString('es-CL') : '-';
+    h += '<tr>';
+    h += '<td style="font-size:12px;color:var(--tx2);white-space:nowrap">'+(d.fecha||'')+'</td>';
+    h += '<td><span class="stock-badge" style="background:'+tc+'">'+d.tipo+'</span></td>';
+    h += '<td style="font-family:var(--f-mono);font-size:12px;color:var(--neon)">'+(d.numero||'')+'</td>';
+    h += '<td style="font-size:13px">'+(d.proveedor||'')+'</td>';
+    h += '<td style="font-family:var(--f-mono);text-align:center">'+(d.total_items||0)+'</td>';
+    h += '<td style="font-family:var(--f-mono);font-size:12px">'+monto+'</td>';
+    h += '<td style="white-space:nowrap">'+pdfBtn+fotoBtn+'</td>';
+    h += '</tr>';
+  });
+  h += '</tbody></table>';
+  wrap.innerHTML = h;
+}
+
+function docAgregarItem() {
+  document.getElementById('ditem-codigo').value = '';
+  document.getElementById('ditem-cantidad').value = '';
+  document.getElementById('ditem-precio').value = '';
+  document.getElementById('modal-doc-item').classList.add('open');
+  setTimeout(function(){ document.getElementById('ditem-codigo').focus(); }, 100);
+}
+
+function docConfirmarItem() {
+  var codigo = document.getElementById('ditem-codigo').value.trim().toUpperCase();
+  var cantidad = parseFloat(document.getElementById('ditem-cantidad').value)||0;
+  var precio = parseFloat(document.getElementById('ditem-precio').value)||0;
+  if (!codigo) { toast('Codigo obligatorio','error'); return; }
+  if (cantidad <= 0) { toast('Cantidad debe ser mayor a 0','error'); return; }
+  // Check duplicate
+  var exists = docItems.find(function(i){ return i.codigo===codigo; });
+  if (exists) { toast('El codigo '+codigo+' ya esta en la lista','warning'); closeModal('modal-doc-item'); return; }
+  docItems.push({codigo, cantidad, precio});
+  renderDocItems();
+  closeModal('modal-doc-item');
+}
+
+function renderDocItems() {
+  var wrap = document.getElementById('doc-items-wrap');
+  if (!docItems.length) {
+    wrap.innerHTML = '<div class="msg msg-info" style="font-size:12px">Agrega los productos incluidos en este documento.</div>';
+    return;
+  }
+  var h = '<table><thead><tr><th>Codigo</th><th>Cantidad</th><th>Precio Unit.</th><th></th></tr></thead><tbody>';
+  docItems.forEach(function(item, idx) {
+    h += '<tr>';
+    h += '<td class="mono" style="color:var(--neon)">'+item.codigo+'</td>';
+    h += '<td style="font-family:var(--f-mono)">'+item.cantidad+'</td>';
+    h += '<td style="font-family:var(--f-mono)">'+(item.precio>0?'$'+item.precio.toLocaleString('es-CL'):'-')+'</td>';
+    h += '<td><button class="btn btn-sm" style="background:rgba(255,77,109,.1);border:1px solid rgba(255,77,109,.3);color:var(--rose);padding:3px 8px" onclick="docRemoveItem('+idx+')"><i class="fas fa-xmark"></i></button></td>';
+    h += '</tr>';
+  });
+  h += '</tbody></table>';
+  wrap.innerHTML = h;
+}
+
+function docRemoveItem(idx) {
+  docItems.splice(idx, 1);
+  renderDocItems();
+}
+
+async function guardarDocumento() {
+  var numero = document.getElementById('doc-numero').value.trim();
+  var tipo   = document.getElementById('doc-tipo').value;
+  var prov   = document.getElementById('doc-proveedor').value.trim();
+  var fecha  = document.getElementById('doc-fecha').value;
+  var obs    = document.getElementById('doc-obs').value.trim();
+  if (!numero||!prov||!fecha) { toast('Completa los campos obligatorios','error'); return; }
+  if (!docItems.length) { toast('Agrega al menos un producto','error'); return; }
+  var btn = document.getElementById('btn-doc-save');
+  btn.disabled = true; btn.innerHTML = '<div class="spinner" style="width:16px;height:16px;display:inline-block;vertical-align:middle;margin-right:6px"></div> Guardando...';
+  try {
+    var fd = new FormData();
+    fd.append('numero', numero);
+    fd.append('tipo', tipo);
+    fd.append('proveedor', prov);
+    fd.append('fecha', fecha);
+    fd.append('observaciones', obs);
+    fd.append('items', JSON.stringify(docItems));
+    var pdfFile = document.getElementById('doc-pdf').files[0];
+    var fotoFile = document.getElementById('doc-foto').files[0];
+    if (pdfFile) fd.append('pdf', pdfFile);
+    if (fotoFile) fd.append('foto', fotoFile);
+    var res = await fetch(API+'/api/documentos', {
+      method:'POST', headers:{'Authorization':'Bearer '+G.token}, body: fd
+    });
+    var text = await res.text();
+    var data; try { data=JSON.parse(text); } catch(e){ throw new Error('Error del servidor'); }
+    if (data.status==='success') {
+      toast('Documento registrado y stock actualizado','success',4000);
+      // Reset form
+      document.getElementById('doc-numero').value='';
+      document.getElementById('doc-proveedor').value='';
+      document.getElementById('doc-obs').value='';
+      document.getElementById('doc-pdf').value='';
+      document.getElementById('doc-foto').value='';
+      docItems = [];
+      renderDocItems();
+      loadDocumentos();
+      if (data.data.errores && data.data.errores.length) {
+        toast('Errores: '+data.data.errores.join(', '),'warning',6000);
+      }
+    } else { toast(data.message||'Error','error'); }
+  } catch(e) { toast('Error: '+e.message,'error'); }
+  btn.disabled=false; btn.innerHTML='<i class="fas fa-save"></i> Registrar Documento y Actualizar Stock';
+}
+
+// -- FIRMAS ───────────────────────────────────────────
+var firmaState = { canvas:null, ctx:null, drawing:false, pendingAction:null, omitir:false };
+
+function initFirmaCanvas() {
+  var canvas = document.getElementById('firma-canvas');
+  if (!canvas) return;
+  // Always re-init to ensure fresh state
+  firmaState.canvas = canvas;
+  firmaState.hasFirma = false;
+  // Adjust canvas size to actual rendered size for crisp drawing on mobile
+  var wrap = document.getElementById('firma-canvas-wrap');
+  if (wrap) {
+    var w = wrap.clientWidth || 600;
+    canvas.width = w * (window.devicePixelRatio || 1);
+    canvas.height = 200 * (window.devicePixelRatio || 1);
+    canvas.style.height = '200px';
+  }
+  firmaState.ctx = canvas.getContext('2d');
+  firmaState.ctx.scale(window.devicePixelRatio||1, window.devicePixelRatio||1);
+  firmaState.ctx.strokeStyle = '#1e3c72';
+  firmaState.ctx.lineWidth = 2.5;
+  firmaState.ctx.lineCap = 'round';
+  firmaState.ctx.lineJoin = 'round';
+
+  function getPos(e) {
+    var rect = canvas.getBoundingClientRect();
+    var src = e.touches ? e.touches[0] : e;
+    return {
+      x: (src.clientX - rect.left),
+      y: (src.clientY - rect.top)
+    };
+  }
+
+  function startDraw(e) {
+    e.preventDefault();
+    firmaState.drawing = true;
+    var p = getPos(e);
+    firmaState.ctx.beginPath();
+    firmaState.ctx.moveTo(p.x, p.y);
+    // Hide placeholder
+    var ph = document.getElementById('firma-placeholder');
+    if (ph) ph.style.display = 'none';
+    firmaState.hasFirma = true;
+  }
+  function draw(e) {
+    e.preventDefault();
+    if (!firmaState.drawing) return;
+    var p = getPos(e);
+    firmaState.ctx.lineTo(p.x, p.y);
+    firmaState.ctx.stroke();
+  }
+  function endDraw(e) {
+    e.preventDefault();
+    firmaState.drawing = false;
+  }
+
+  // Remove old listeners by cloning
+  var newCanvas = canvas.cloneNode(true);
+  canvas.parentNode.replaceChild(newCanvas, canvas);
+  firmaState.canvas = newCanvas;
+  firmaState.ctx = newCanvas.getContext('2d');
+  firmaState.ctx.scale(window.devicePixelRatio||1, window.devicePixelRatio||1);
+  firmaState.ctx.strokeStyle = '#1e3c72';
+  firmaState.ctx.lineWidth = 3;
+  firmaState.ctx.lineCap = 'round';
+  firmaState.ctx.lineJoin = 'round';
+
+  newCanvas.addEventListener('mousedown', startDraw);
+  newCanvas.addEventListener('mousemove', draw);
+  newCanvas.addEventListener('mouseup', endDraw);
+  newCanvas.addEventListener('mouseleave', endDraw);
+  newCanvas.addEventListener('touchstart', startDraw, {passive:false});
+  newCanvas.addEventListener('touchmove', draw, {passive:false});
+  newCanvas.addEventListener('touchend', endDraw, {passive:false});
+}
+
+function limpiarFirma() {
+  if (firmaState.canvas && firmaState.ctx) {
+    var c = firmaState.canvas;
+    firmaState.ctx.clearRect(0, 0, c.width, c.height);
+    firmaState.hasFirma = false;
+    var ph = document.getElementById('firma-placeholder');
+    if (ph) ph.style.display = 'flex';
+  }
+}
+
+function toggleOmitirFirma(cb) {
+  firmaState.omitir = cb.checked;
+  var canvas = document.getElementById('firma-canvas');
+  var limpiarBtn = canvas.parentElement.querySelector('button');
+  canvas.style.opacity = cb.checked ? '0.3' : '1';
+  canvas.style.pointerEvents = cb.checked ? 'none' : 'auto';
+}
+
+function abrirFirma(info, action) {
+  firmaState.pendingAction = action;
+  firmaState.omitir = false;
+  document.getElementById('firma-omitir').checked = false;
+  document.getElementById('firma-nombre').value = '';
+  document.getElementById('firma-rut').value = '';
+  document.getElementById('firma-cargo').value = '';
+  document.getElementById('firma-tel').value = '';
+  document.getElementById('firma-info').innerHTML = info;
+  var canvas = document.getElementById('firma-canvas');
+  canvas.style.opacity = '1';
+  canvas.style.pointerEvents = 'auto';
+  firmaState.canvas = null; // reset so initFirmaCanvas re-inits
+  document.getElementById('modal-firma').classList.add('open');
+  setTimeout(initFirmaCanvas, 100);
+  limpiarFirma();
+}
+
+async function confirmarConFirma() {
+  var nombre = document.getElementById('firma-nombre').value.trim();
+  if (!nombre && !firmaState.omitir) { toast('El nombre es obligatorio','error'); return; }
+  var btn = document.getElementById('btn-firma-confirm');
+  btn.disabled=true; btn.innerHTML='<div class="spinner" style="width:16px;height:16px;display:inline-block;vertical-align:middle;margin-right:6px"></div> Procesando...';
+
+  var firmaData = null;
+  if (!firmaState.omitir && nombre) {
+    firmaData = {
+      nombre: nombre,
+      rut: document.getElementById('firma-rut').value.trim(),
+      cargo: document.getElementById('firma-cargo').value.trim(),
+      telefono: document.getElementById('firma-tel').value.trim(),
+      firmaImg: firmaState.canvas ? firmaState.canvas.toDataURL('image/png') : null
+    };
+  }
+
+  closeModal('modal-firma');
+  btn.disabled=false; btn.innerHTML='<i class="fas fa-check"></i> Confirmar Retiro';
+
+  // Execute the pending action with firma data
+  if (firmaState.pendingAction) {
+    await firmaState.pendingAction(firmaData);
+    firmaState.pendingAction = null;
+  }
+}
+
+async function guardarFirma(firmaData, movimiento_id, tipo, rfp_id) {
+  if (!firmaData) return;
+  try {
+    var fd = new FormData();
+    fd.append('nombre', firmaData.nombre||'');
+    fd.append('rut', firmaData.rut||'');
+    fd.append('cargo', firmaData.cargo||'');
+    fd.append('telefono', firmaData.telefono||'');
+    fd.append('tipo', tipo||'SALIDA');
+    if (movimiento_id) fd.append('movimiento_id', movimiento_id);
+    if (rfp_id) fd.append('rfp_id', rfp_id||'');
+    // Convert base64 to blob
+    if (firmaData.firmaImg) {
+      var arr = firmaData.firmaImg.split(',');
+      var bstr = atob(arr[1]);
+      var n = bstr.length;
+      var u8 = new Uint8Array(n);
+      for (var i=0; i<n; i++) u8[i] = bstr.charCodeAt(i);
+      var blob = new Blob([u8], {type:'image/png'});
+      fd.append('firma', blob, 'firma.png');
+    }
+    await fetch(API+'/api/firmas', { method:'POST', headers:{'Authorization':'Bearer '+G.token}, body:fd });
+  } catch(e) { console.error('Error guardando firma:', e); }
+}
+
+// -- COMPROBANTE PDF (generado en browser) ──────────
+function generarComprobantePDF(datos) {
+  // datos: {nombre, rut, cargo, tel, firmaImg, producto, cantidad, tipo, fecha}
+  var html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Comprobante</title><style>body{font-family:Arial,sans-serif;padding:40px;max-width:600px;margin:0 auto}h1{color:#1e3c72;font-size:20px;border-bottom:2px solid #1e3c72;padding-bottom:8px}.logo{font-size:24px;font-weight:700;letter-spacing:2px;color:#1e3c72;margin-bottom:4px}.sub{font-size:11px;letter-spacing:3px;color:#888;margin-bottom:20px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:16px 0}.field{background:#f8f9fa;padding:10px 14px;border-radius:6px}.field label{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:#888;display:block;margin-bottom:3px}.field span{font-weight:600;color:#1e3c72;font-size:14px}.firma-box{border:1px solid #ddd;border-radius:8px;padding:12px;text-align:center;margin-top:16px}.footer{margin-top:24px;font-size:11px;color:#aaa;text-align:center;border-top:1px solid #eee;padding-top:12px}</style></head><body>';
+  html += '<div class="logo">NEXUS<span style="color:#00bcd4">PRIME</span></div>';
+  html += '<div class="sub">COMPROBANTE DE RETIRO</div>';
+  html += '<h1>'+datos.tipo+' de Bodega</h1>';
+  html += '<div class="grid">';
+  html += '<div class="field"><label>Fecha</label><span>'+(datos.fecha||new Date().toLocaleDateString('es-CL'))+'</span></div>';
+  html += '<div class="field"><label>Codigo</label><span>'+(datos.codigo||'-')+'</span></div>';
+  html += '<div class="field"><label>Producto</label><span>'+(datos.producto||'-')+'</span></div>';
+  html += '<div class="field"><label>Cantidad</label><span>'+(datos.cantidad||'-')+'</span></div>';
+  html += '</div>';
+  if (datos.nombre) {
+    html += '<div class="grid">';
+    html += '<div class="field"><label>Nombre</label><span>'+(datos.nombre||'-')+'</span></div>';
+    html += '<div class="field"><label>RUT</label><span>'+(datos.rut||'-')+'</span></div>';
+    html += '<div class="field"><label>Cargo / Empresa</label><span>'+(datos.cargo||'-')+'</span></div>';
+    html += '<div class="field"><label>Telefono</label><span>'+(datos.telefono||'-')+'</span></div>';
+    html += '</div>';
+    if (datos.firmaImg) {
+      html += '<div class="firma-box"><div style="font-size:11px;color:#888;margin-bottom:8px;letter-spacing:1px">FIRMA DEL RETIRANTE</div>';
+      html += '<img src="'+datos.firmaImg+'" style="max-width:260px;max-height:100px;border-bottom:1px solid #333;padding-bottom:4px"/></div>';
+    }
+  }
+  html += '<div class="footer">Documento generado automaticamente por NEXUS PRIME &mdash; '+new Date().toLocaleString('es-CL')+'</div>';
+  html += '</body></html>';
+  var blob = new Blob([html], {type:'text/html'});
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = 'comprobante_'+datos.codigo+'_'+new Date().toISOString().slice(0,10)+'.html';
+  a.click();
+  setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
+}
 
 // ── WATCHDOG ──────────────────────────────────────
 var wdCfg = {};
