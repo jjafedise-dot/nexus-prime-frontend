@@ -29,7 +29,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 .scr{position:absolute;inset:0;display:flex;flex-direction:column;opacity:0;transform:translateY(24px);pointer-events:none;transition:opacity .3s ease,transform .3s cubic-bezier(.22,1,.36,1);overflow:hidden}
 .scr.on{opacity:1;transform:none;pointer-events:all}
 .scr.out{opacity:0;transform:translateY(-16px);transition-duration:.18s;pointer-events:none}
-.body{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding:16px 16px calc(80px + var(--sib));width:100%}
+.body{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding:16px 16px calc(80px + var(--sib));width:100%}#s-scan .body{padding-left:0;padding-right:0;padding-top:0}
 .body::-webkit-scrollbar{display:none}
 
 /* ── TOP BAR ── */
@@ -144,7 +144,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 .qty-label{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--tx3);margin-bottom:10px}
 .qty-row{display:flex;align-items:center;gap:10px;margin-bottom:12px}
 .qty-btn{width:44px;height:44px;border-radius:var(--r-sm);border:1px solid var(--wire2);background:var(--ink4);color:var(--tx1);font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.qty-inp{flex:1;text-align:center;background:var(--ink2);border:1px solid var(--wire2);border-radius:var(--r-sm);color:var(--tx1);font-family:var(--f-d);font-size:32px;font-weight:800;padding:8px;outline:none}
+.qty-inp{flex:1;text-align:center;background:var(--ink2);border:1px solid var(--wire2);border-radius:var(--r-sm);color:var(--tx1);font-family:var(--f-d);font-size:32px;font-weight:800;padding:8px;outline:none;min-width:0}
 .qty-resp{display:flex;align-items:center;gap:8px;margin-bottom:10px}
 .qty-resp-inp{flex:1;padding:10px 12px;background:var(--ink2);border:1px solid var(--wire2);border-radius:var(--r-sm);color:var(--tx1);font-family:var(--f-b);font-size:13px;outline:none}
 .qty-resp-inp:focus{border-color:var(--neon)}
@@ -426,7 +426,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
     </div>
     <button class="btn-scan-otro" id="btn-scan-otro" onclick="resetScan()"><i class="fas fa-barcode"></i> Escanear otro producto</button>
     <div class="scan-bar" id="scan-bar">
-      <button class="btn btn-ghost" onclick="resetScan()"><i class="fas fa-xmark"></i></button>
+      <button class="btn btn-ghost" onclick="resetScan()"><i class="fas fa-xmark"></i> Cancelar</button>
       <button class="btn btn-green" id="confirm-btn" onclick="askConfirm()"><i class="fas fa-check"></i> Confirmar</button>
     </div>
   </div>
@@ -1027,7 +1027,10 @@ async function execMov() {
       responsable: resp, observaciones: obs || 'SALIDA via app bodega'
     };
     if (S._fotoRespaldo) S._pendingPayload.fotoBase64 = S._fotoRespaldo;
-    movilAbrirFirma(p.nombre + ' — Cantidad: ' + qty + ' ' + p.unidad);
+    // Small delay to let confirm sheet close first
+    setTimeout(function(){
+      movilAbrirFirma(p.nombre + ' — Cantidad: ' + qty + ' ' + p.unidad);
+    }, 300);
     return;
   }
 
