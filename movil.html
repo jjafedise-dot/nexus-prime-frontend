@@ -567,6 +567,56 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
   </div>
 </div>
 
+<!-- ══ SHEET FIRMA ══ -->
+<div class="sheet-bg" id="firma-sheet-bg">
+  <div class="sheet" style="max-height:95vh;overflow-y:auto">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title"><i class="fas fa-signature" style="color:var(--neon);margin-right:8px"></i>Firma de Retiro</div>
+    <div style="padding:0 16px 4px;font-size:12px;color:var(--tx3);background:rgba(0,229,255,.06);border-radius:var(--r-md);margin:0 4px 14px;padding:10px 14px" id="movil-firma-info"></div>
+
+    <!-- Datos -->
+    <div style="padding:0 4px">
+      <div style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--tx3);margin-bottom:10px;display:flex;align-items:center;gap:8px"><span style="width:18px;height:18px;border-radius:50%;background:var(--neon);color:#000;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center">1</span>Datos de quien retira</div>
+      <input class="form-ctrl" id="movil-firma-nombre" type="text" placeholder="Nombre completo *" autocomplete="name" style="font-size:16px;margin-bottom:10px;width:100%;padding:12px;background:var(--ink3);border:1px solid var(--wire);border-radius:var(--r-md);color:var(--tx1);outline:none"/>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+        <input class="form-ctrl" id="movil-firma-rut" type="text" placeholder="RUT" style="font-size:16px;padding:12px;background:var(--ink3);border:1px solid var(--wire);border-radius:var(--r-md);color:var(--tx1);outline:none"/>
+        <input class="form-ctrl" id="movil-firma-tel" type="tel" placeholder="Telefono" autocomplete="tel" style="font-size:16px;padding:12px;background:var(--ink3);border:1px solid var(--wire);border-radius:var(--r-md);color:var(--tx1);outline:none"/>
+      </div>
+      <input class="form-ctrl" id="movil-firma-cargo" type="text" placeholder="Cargo / Empresa" style="font-size:16px;margin-bottom:14px;width:100%;padding:12px;background:var(--ink3);border:1px solid var(--wire);border-radius:var(--r-md);color:var(--tx1);outline:none"/>
+
+      <!-- Canvas firma -->
+      <div style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--tx3);margin-bottom:10px;display:flex;align-items:center;gap:8px"><span style="width:18px;height:18px;border-radius:50%;background:var(--neon);color:#000;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center">2</span>Firma con el dedo</div>
+      <div style="position:relative;border:2px dashed var(--neon);border-radius:var(--r-md);overflow:hidden;background:#fff;margin-bottom:8px" id="movil-firma-wrap">
+        <canvas id="movil-firma-canvas" style="display:block;width:100%;touch-action:none;-webkit-user-select:none;cursor:crosshair"></canvas>
+        <div id="movil-firma-ph" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;opacity:.3">
+          <i class="fas fa-signature" style="font-size:28px;color:#888;margin-bottom:6px"></i>
+          <div style="font-size:12px;color:#888">Firma aqui con el dedo</div>
+        </div>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+        <div style="font-size:11px;color:var(--tx3)">Dibuja tu firma en el area de arriba</div>
+        <button onclick="movilLimpiarFirma()" style="background:var(--ink3);border:1px solid var(--wire);color:var(--tx2);padding:6px 12px;border-radius:var(--r-md);font-size:12px;cursor:pointer"><i class="fas fa-eraser"></i> Limpiar</button>
+      </div>
+
+      <!-- Omitir -->
+      <label style="display:flex;align-items:center;gap:12px;cursor:pointer;background:var(--ink3);padding:12px;border-radius:var(--r-md);border:1px solid var(--wire);margin-bottom:16px">
+        <input type="checkbox" id="movil-firma-omitir" style="width:20px;height:20px"/>
+        <div>
+          <div style="font-size:13px;color:var(--tx2);font-weight:500">Sin firma disponible</div>
+          <div style="font-size:11px;color:var(--tx3)">Continuar sin firma</div>
+        </div>
+      </label>
+    </div>
+
+    <div class="sheet-btns" style="padding:0 4px 4px">
+      <button class="btn btn-ghost" style="flex:1" onclick="movilCerrarFirma()"><i class="fas fa-xmark"></i> Cancelar</button>
+      <button class="btn btn-rose" style="flex:2;font-size:15px;padding:14px" onclick="movilConfirmarFirma()">
+        <i class="fas fa-check-circle"></i> Confirmar Retiro
+      </button>
+    </div>
+  </div>
+</div>
+
 <!-- ══ MODAL QR ══ -->
 <div class="modal-full" id="modal-qr">
   <div class="modal-card">
@@ -969,18 +1019,40 @@ async function execMov() {
   var resp = document.getElementById('resp-inp').value.trim();
   var obs  = document.getElementById('obs-inp').value.trim();
   closeSheet();
+
+  // Si es SALIDA, pedir firma primero
+  if (S.tipo === 'out') {
+    S._pendingPayload = {
+      codigo: p.codigo, tipo: 'SALIDA', cantidad: qty,
+      responsable: resp, observaciones: obs || 'SALIDA via app bodega'
+    };
+    if (S._fotoRespaldo) S._pendingPayload.fotoBase64 = S._fotoRespaldo;
+    movilAbrirFirma(p.nombre + ' — Cantidad: ' + qty + ' ' + p.unidad);
+    return;
+  }
+
   var tipoMap = {in:'INGRESO',out:'SALIDA',adj:'AJUSTE'};
-  var payload = {codigo:p.codigo, tipo:tipoMap[S.tipo], cantidad:qty, responsable:resp, observaciones:obs || (tipoMap[S.tipo]+' vía app bodega')};
+  var payload = {codigo:p.codigo, tipo:tipoMap[S.tipo], cantidad:qty, responsable:resp, observaciones:obs || (tipoMap[S.tipo]+' via app bodega')};
   if (S._fotoRespaldo) payload.fotoBase64 = S._fotoRespaldo;
+  await ejecutarPayload(payload);
+}
+
+async function ejecutarPayload(payload, firmaData) {
   var btn = document.getElementById('confirm-btn'); btn.classList.add('btn-off');
   if (!navigator.onLine) {
     S.queue.push(Object.assign({},payload,{_ts:Date.now()})); saveQueue();
-    toast('Guardado sin conexión · se sincronizará','wrn'); btn.classList.remove('btn-off'); resetScan(); return;
+    toast('Guardado sin conexion · se sincronizara','wrn'); btn.classList.remove('btn-off'); resetScan(); return;
   }
   try {
     var res = await apiFetch('/api/movimientos',{method:'POST',body:JSON.stringify(payload)});
     if (res.status==='success') {
-      toast((payload.tipo==='INGRESO'?'✅ Ingreso':'payload.tipo'==='SALIDA'?'✅ Salida':'✅ Ajuste')+' registrado · Stock: '+(res.data?.stock_resultante??'?'),'ok');
+      // Guardar firma si existe
+      if (firmaData && firmaData.nombre) {
+        var movId = res.data?.movimiento_id || res.data?.id;
+        movilGuardarFirma(firmaData, movId);
+        movilGenerarComprobante(firmaData, payload);
+      }
+      toast((payload.tipo==='INGRESO'?'Ingreso':payload.tipo==='SALIDA'?'Salida':'Ajuste')+' registrado · Stock: '+(res.data?.stock_resultante??'?'),'ok');
       loadStats();
     } else toast(res.message||'Error al registrar','err');
   } catch(e) {
@@ -988,6 +1060,148 @@ async function execMov() {
     toast('Error de red · guardado en cola','wrn');
   }
   btn.classList.remove('btn-off'); resetScan();
+}
+
+// ── FIRMA MOVIL ──────────────────────────────────────
+var movilFirmaCanvas = null;
+var movilFirmaCtx = null;
+var movilFirmaDrawing = false;
+var movilFirmaHasFirma = false;
+
+function movilAbrirFirma(info) {
+  document.getElementById('movil-firma-info').textContent = info;
+  document.getElementById('movil-firma-nombre').value = '';
+  document.getElementById('movil-firma-rut').value = '';
+  document.getElementById('movil-firma-cargo').value = '';
+  document.getElementById('movil-firma-tel').value = '';
+  document.getElementById('movil-firma-omitir').checked = false;
+  document.getElementById('firma-sheet-bg').classList.add('on');
+  setTimeout(movilInitCanvas, 150);
+}
+
+function movilCerrarFirma() {
+  document.getElementById('firma-sheet-bg').classList.remove('on');
+  S._pendingPayload = null;
+}
+
+function movilInitCanvas() {
+  var wrap = document.getElementById('movil-firma-wrap');
+  var canvas = document.getElementById('movil-firma-canvas');
+  if (!canvas || !wrap) return;
+  var w = wrap.clientWidth;
+  var dpr = window.devicePixelRatio || 1;
+  canvas.width = w * dpr;
+  canvas.height = 180 * dpr;
+  canvas.style.height = '180px';
+  movilFirmaCanvas = canvas;
+  movilFirmaCtx = canvas.getContext('2d');
+  movilFirmaCtx.scale(dpr, dpr);
+  movilFirmaCtx.strokeStyle = '#1e3c72';
+  movilFirmaCtx.lineWidth = 3;
+  movilFirmaCtx.lineCap = 'round';
+  movilFirmaCtx.lineJoin = 'round';
+  movilFirmaHasFirma = false;
+
+  var newCanvas = canvas.cloneNode(false);
+  wrap.replaceChild(newCanvas, canvas);
+  movilFirmaCanvas = newCanvas;
+  movilFirmaCtx = newCanvas.getContext('2d');
+  movilFirmaCtx.scale(dpr, dpr);
+  movilFirmaCtx.strokeStyle = '#1e3c72';
+  movilFirmaCtx.lineWidth = 3;
+  movilFirmaCtx.lineCap = 'round';
+  movilFirmaCtx.lineJoin = 'round';
+
+  function getPos(e) {
+    var rect = newCanvas.getBoundingClientRect();
+    var src = e.touches ? e.touches[0] : e;
+    return { x: src.clientX - rect.left, y: src.clientY - rect.top };
+  }
+  function start(e) { e.preventDefault(); movilFirmaDrawing=true; var p=getPos(e); movilFirmaCtx.beginPath(); movilFirmaCtx.moveTo(p.x,p.y); document.getElementById('movil-firma-ph').style.display='none'; movilFirmaHasFirma=true; }
+  function move(e)  { e.preventDefault(); if(!movilFirmaDrawing) return; var p=getPos(e); movilFirmaCtx.lineTo(p.x,p.y); movilFirmaCtx.stroke(); }
+  function end(e)   { e.preventDefault(); movilFirmaDrawing=false; }
+  newCanvas.addEventListener('mousedown', start);
+  newCanvas.addEventListener('mousemove', move);
+  newCanvas.addEventListener('mouseup', end);
+  newCanvas.addEventListener('touchstart', start, {passive:false});
+  newCanvas.addEventListener('touchmove', move, {passive:false});
+  newCanvas.addEventListener('touchend', end, {passive:false});
+}
+
+function movilLimpiarFirma() {
+  if (movilFirmaCtx && movilFirmaCanvas) {
+    movilFirmaCtx.clearRect(0,0,movilFirmaCanvas.width,movilFirmaCanvas.height);
+    movilFirmaHasFirma = false;
+    document.getElementById('movil-firma-ph').style.display = 'flex';
+  }
+}
+
+async function movilConfirmarFirma() {
+  var omitir = document.getElementById('movil-firma-omitir').checked;
+  var nombre = document.getElementById('movil-firma-nombre').value.trim();
+  if (!nombre && !omitir) { toast('El nombre es obligatorio','err'); document.getElementById('movil-firma-nombre').focus(); return; }
+  
+  var firmaData = null;
+  if (!omitir && nombre) {
+    firmaData = {
+      nombre: nombre,
+      rut: document.getElementById('movil-firma-rut').value.trim(),
+      cargo: document.getElementById('movil-firma-cargo').value.trim(),
+      telefono: document.getElementById('movil-firma-tel').value.trim(),
+      firmaImg: movilFirmaCanvas ? movilFirmaCanvas.toDataURL('image/png') : null
+    };
+  }
+  document.getElementById('firma-sheet-bg').classList.remove('on');
+  var payload = S._pendingPayload;
+  S._pendingPayload = null;
+  if (payload) await ejecutarPayload(payload, firmaData);
+}
+
+async function movilGuardarFirma(firmaData, movId) {
+  try {
+    var fd = new FormData();
+    fd.append('nombre', firmaData.nombre||'');
+    fd.append('rut', firmaData.rut||'');
+    fd.append('cargo', firmaData.cargo||'');
+    fd.append('telefono', firmaData.telefono||'');
+    fd.append('tipo', 'SALIDA');
+    if (movId) fd.append('movimiento_id', movId);
+    if (firmaData.firmaImg) {
+      var arr = firmaData.firmaImg.split(',');
+      var bstr = atob(arr[1]);
+      var u8 = new Uint8Array(bstr.length);
+      for (var i=0; i<bstr.length; i++) u8[i] = bstr.charCodeAt(i);
+      fd.append('firma', new Blob([u8],{type:'image/png'}), 'firma.png');
+    }
+    await fetch(API+'/api/firmas',{method:'POST',headers:{'Authorization':'Bearer '+S.token},body:fd});
+  } catch(e) { console.error('Error firma:', e); }
+}
+
+function movilGenerarComprobante(firmaData, payload) {
+  var html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Comprobante Retiro</title><style>body{font-family:Arial,sans-serif;padding:24px;max-width:480px;margin:0 auto;font-size:14px}.logo{font-size:22px;font-weight:700;letter-spacing:2px;color:#1e3c72}.sub{font-size:10px;letter-spacing:3px;color:#888;margin-bottom:20px}h2{color:#1e3c72;border-bottom:2px solid #1e3c72;padding-bottom:6px;font-size:16px}.field{background:#f8f9fa;padding:10px;border-radius:6px;margin-bottom:8px}.lbl{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:#888}.val{font-weight:600;color:#1e3c72;font-size:15px}.firma-box{border:1px solid #ddd;border-radius:8px;padding:12px;text-align:center;margin:16px 0}.footer{font-size:10px;color:#aaa;text-align:center;border-top:1px solid #eee;padding-top:12px;margin-top:16px}@media print{body{padding:10px}button{display:none}}</style></head><body>';
+  html += '<div class="logo">NEXUS<span style="color:#00bcd4">PRIME</span></div><div class="sub">COMPROBANTE DE RETIRO DE BODEGA</div>';
+  html += '<h2>Retiro de Material</h2>';
+  html += '<div class="field"><div class="lbl">Fecha</div><div class="val">'+new Date().toLocaleString('es-CL')+'</div></div>';
+  html += '<div class="field"><div class="lbl">Producto</div><div class="val">'+payload.codigo+'</div></div>';
+  html += '<div class="field"><div class="lbl">Cantidad</div><div class="val">'+payload.cantidad+'</div></div>';
+  if (firmaData.nombre) {
+    html += '<h2 style="margin-top:16px">Datos del Retirante</h2>';
+    html += '<div class="field"><div class="lbl">Nombre</div><div class="val">'+firmaData.nombre+'</div></div>';
+    if (firmaData.rut) html += '<div class="field"><div class="lbl">RUT</div><div class="val">'+firmaData.rut+'</div></div>';
+    if (firmaData.cargo) html += '<div class="field"><div class="lbl">Cargo / Empresa</div><div class="val">'+firmaData.cargo+'</div></div>';
+    if (firmaData.telefono) html += '<div class="field"><div class="lbl">Telefono</div><div class="val">'+firmaData.telefono+'</div></div>';
+    if (firmaData.firmaImg) {
+      html += '<div class="firma-box"><div style="font-size:10px;color:#888;margin-bottom:8px;letter-spacing:1px">FIRMA DEL RETIRANTE</div>';
+      html += '<img src="'+firmaData.firmaImg+'" style="max-width:240px;max-height:90px;border-bottom:1px solid #333;padding-bottom:4px"/></div>';
+    }
+  }
+  html += '<div class="footer">Generado por NEXUS PRIME &mdash; '+new Date().toLocaleString('es-CL')+'</div>';
+  html += '<br><button onclick="window.print()" style="width:100%;padding:12px;background:#1e3c72;color:#fff;border:none;border-radius:8px;font-size:14px;cursor:pointer">Imprimir / Guardar PDF</button>';
+  html += '</body></html>';
+  var blob = new Blob([html],{type:'text/html'});
+  var url = URL.createObjectURL(blob);
+  window.open(url, '_blank');
+  setTimeout(function(){ URL.revokeObjectURL(url); }, 3000);
 }
 
 // ── OFFLINE QUEUE ──────────────────────────────────
