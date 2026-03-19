@@ -10,6 +10,7 @@
 <title>NEXUS PRIME | Sistema de Inventario</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Rajdhani:wght@500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
@@ -341,6 +342,12 @@ select.form-ctrl option{background:var(--ink3)}
               <option value="OK">OK</option>
             </select>
             <div class="toolbar-spacer"></div>
+            <div id="qr-sel-info" style="display:none;align-items:center;gap:8px;font-size:12px;color:var(--neon);background:rgba(0,229,255,.08);border:1px solid rgba(0,229,255,.2);border-radius:var(--r);padding:5px 12px">
+              <i class="fas fa-check-square"></i> <span id="qr-sel-count">0</span> seleccionados
+              <button onclick="clearQRSel()" style="background:none;border:none;color:var(--tx3);cursor:pointer;font-size:11px;padding:0 4px"><i class="fas fa-xmark"></i></button>
+            </div>
+            <button class="btn btn-secondary btn-sm" onclick="selAllQR()" id="btn-sel-all" title="Seleccionar todos"><i class="fas fa-check-double"></i></button>
+            <button class="btn btn-warning btn-sm" id="btn-gen-qr" onclick="generarEtiquetasQR()" style="display:none"><i class="fas fa-qrcode"></i> Generar PDF QR</button>
             <button class="btn btn-secondary btn-sm" onclick="exportCSV('inventario')"><i class="fas fa-file-csv"></i> Exportar</button>
             <button class="btn btn-primary btn-sm" onclick="loadInventario()"><i class="fas fa-rotate"></i> Actualizar</button>
           </div>
@@ -1235,7 +1242,7 @@ function filterInventario() {
 
 function renderInvTable(data) {
   if (!data.length){ document.getElementById('inv-table-wrap').innerHTML='<div class="empty-state"><i class="fas fa-warehouse"></i><p>Sin productos</p></div>'; return; }
-  var h='<table><thead><tr><th>Código</th><th>Nombre</th><th>Grupo</th><th>Stock</th><th>Mínimo</th><th>Estado</th><th>Docs</th><th>Acciones</th></tr></thead><tbody>';
+  var h='<table><thead><tr><th style="width:36px"><input type="checkbox" id="inv-chk-all" onchange="toggleAllQR(this)" title="Seleccionar todos"/></th><th>Código</th><th>Nombre</th><th>Grupo</th><th>Stock</th><th>Mínimo</th><th>Estado</th><th>Docs</th><th>Acciones</th></tr></thead><tbody>';
   data.forEach(function(p){
     var est = p.estado_stock;
     var badge = est==='OK' ? '<span class="stock-badge badge-ok"><i class="fas fa-check-circle"></i> OK</span>'
@@ -1249,7 +1256,7 @@ function renderInvTable(data) {
     var fotoBtn = p.foto_url
       ? '<a href="'+p.foto_url+'" target="_blank" class="btn btn-sm" style="background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.3);color:#34d399;padding:4px 8px" title="Ver Foto"><i class="fas fa-image"></i></a>'
       : '<span style="color:var(--tx3);font-size:11px;padding:4px 6px" title="Sin foto"><i class="fas fa-image" style="opacity:.25"></i></span>';
-    h+='<tr><td class="mono">'+p.codigo+'</td><td style="font-weight:600">'+p.nombre+'</td><td style="color:var(--tx3);font-size:12px">'+p.grupo+'</td>'+
+    h+='<tr><td><input type="checkbox" class="qr-chk" value="'+p.codigo+'" data-nombre="'+p.nombre.replace(/"/g,"&quot;")+'"|data-grupo="'+p.grupo+'" onchange="onQRChk(this)"/></td><td class="mono">'+p.codigo+'</td><td style="font-weight:600">'+p.nombre+'</td><td style="color:var(--tx3);font-size:12px">'+p.grupo+'</td>'+
       '<td style="font-weight:700;color:'+(p.stock_actual<=0?'var(--rose)':p.estado_stock==='STOCK_BAJO'?'var(--amber)':'var(--emerald)')+'">'+p.stock_actual+' <small style="font-weight:400;color:var(--tx3)">'+p.unidad+'</small></td>'+
       '<td style="color:var(--tx2)">'+p.stock_minimo+'</td><td>'+badge+'</td>'+
       '<td style="white-space:nowrap">'+docBtn+fotoBtn+'</td>'+
@@ -1869,7 +1876,7 @@ function closeModalQR() {
 
 // ── MODALS ────────────────────────────────────────
 function openModal(id){ document.getElementById(id).classList.add('open'); }
-function closeModal(id){ document.getElementById(id).classList.remove('open'); if(id==='modal-qr') closeModalQR(); }
+function closeModal(id){ document.getElementById(id).classList.remove('open'); }
 document.addEventListener('keydown', function(e){ if(e.key==='Escape') document.querySelectorAll('.modal-bg.open').forEach(function(m){ closeModal(m.id); }); });
 
 // -- DOCUMENTOS ─────────────────────────────────────
@@ -2200,6 +2207,125 @@ function generarComprobantePDF(datos) {
   a.download = 'comprobante_'+datos.codigo+'_'+new Date().toISOString().slice(0,10)+'.html';
   a.click();
   setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
+}
+
+// -- QR ETIQUETAS ─────────────────────────────────
+var qrSeleccionados = {}; // {codigo: {codigo, nombre, grupo}}
+
+function onQRChk(cb) {
+  var codigo = cb.value;
+  var nombre = cb.getAttribute('data-nombre') || '';
+  var grupo  = cb.getAttribute('data-grupo') || '';
+  if (cb.checked) qrSeleccionados[codigo] = {codigo, nombre, grupo};
+  else delete qrSeleccionados[codigo];
+  updQRSelUI();
+}
+
+function toggleAllQR(masterCb) {
+  var chks = document.querySelectorAll('.qr-chk');
+  chks.forEach(function(cb) {
+    cb.checked = masterCb.checked;
+    var codigo = cb.value;
+    var nombre = cb.getAttribute('data-nombre') || '';
+    var grupo  = cb.getAttribute('data-grupo') || '';
+    if (masterCb.checked) qrSeleccionados[codigo] = {codigo, nombre, grupo};
+    else delete qrSeleccionados[codigo];
+  });
+  updQRSelUI();
+}
+
+function selAllQR() {
+  var chks = document.querySelectorAll('.qr-chk');
+  chks.forEach(function(cb) {
+    cb.checked = true;
+    qrSeleccionados[cb.value] = {
+      codigo: cb.value,
+      nombre: cb.getAttribute('data-nombre')||'',
+      grupo:  cb.getAttribute('data-grupo')||''
+    };
+  });
+  updQRSelUI();
+}
+
+function clearQRSel() {
+  qrSeleccionados = {};
+  document.querySelectorAll('.qr-chk').forEach(function(cb){ cb.checked=false; });
+  var master = document.getElementById('inv-chk-all');
+  if (master) master.checked = false;
+  updQRSelUI();
+}
+
+function updQRSelUI() {
+  var count = Object.keys(qrSeleccionados).length;
+  var info = document.getElementById('qr-sel-info');
+  var btnQR = document.getElementById('btn-gen-qr');
+  var countEl = document.getElementById('qr-sel-count');
+  if (info) info.style.display = count > 0 ? 'flex' : 'none';
+  if (btnQR) btnQR.style.display = count > 0 ? 'inline-flex' : 'none';
+  if (countEl) countEl.textContent = count;
+}
+
+function generarEtiquetasQR() {
+  var prods = Object.values(qrSeleccionados);
+  if (!prods.length) { toast('Selecciona al menos un producto','warning'); return; }
+  toast('Generando etiquetas QR...', 'info', 3000);
+
+  // Build HTML with QR codes - 3 per row, ~15 per page
+  var html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Etiquetas QR - NEXUS PRIME</title><style>';
+  html += 'body{margin:0;padding:10px;font-family:Arial,sans-serif;background:#fff}';
+  html += '@page{size:A4;margin:10mm}';
+  html += '.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:4px}';
+  html += '.etiqueta{border:1px dashed #ccc;border-radius:6px;padding:10px;text-align:center;page-break-inside:avoid;display:flex;flex-direction:column;align-items:center;gap:4px}';
+  html += '.logo{font-size:10px;font-weight:700;letter-spacing:2px;color:#1e3c72;margin-bottom:2px}';
+  html += '.logo em{color:#00bcd4;font-style:normal}';
+  html += '.qr-wrap{width:120px;height:120px;margin:4px auto}';
+  html += '.prod-codigo{font-family:monospace;font-size:14px;font-weight:700;color:#1e3c72;margin-top:4px}';
+  html += '.prod-nombre{font-size:10px;color:#333;margin-top:2px;word-break:break-word;max-width:150px;line-height:1.3}';
+  html += '.prod-grupo{font-size:9px;color:#888;margin-top:2px;letter-spacing:.5px;text-transform:uppercase}';
+  html += '@media print{.no-print{display:none}body{padding:0}}';
+  html += '</style></head><body>';
+  html += '<div class="no-print" style="padding:10px;background:#1e3c72;color:#fff;display:flex;align-items:center;gap:12px;margin-bottom:10px;border-radius:6px">';
+  html += '<strong style="flex:1">NEXUS PRIME — Etiquetas QR ('+prods.length+' productos)</strong>';
+  html += '<button onclick="window.print()" style="background:#00bcd4;color:#000;border:none;padding:8px 20px;border-radius:6px;font-weight:700;cursor:pointer;font-size:13px"><i>🖨️</i> Imprimir / Guardar PDF</button>';
+  html += '</div>';
+  html += '<div class="grid" id="qr-grid"></div>';
+  html += '<script>';
+  // Embed product data
+  html += 'var prods = ' + JSON.stringify(prods) + ';';
+  html += 'var grid = document.getElementById("qr-grid");';
+  html += 'prods.forEach(function(p) {';
+  html += '  var div = document.createElement("div");';
+  html += '  div.className = "etiqueta";';
+  html += '  div.innerHTML = "<div class=\"logo\">NEXUS<em>PRIME</em></div>";';
+  html += '  var qrWrap = document.createElement("div");';
+  html += '  qrWrap.className = "qr-wrap";';
+  html += '  qrWrap.id = "qr-" + p.codigo;';
+  html += '  div.appendChild(qrWrap);';
+  html += '  div.innerHTML += "<div class=\"prod-codigo\">" + p.codigo + "</div>";';
+  html += '  div.innerHTML += "<div class=\"prod-nombre\">" + p.nombre + "</div>";';
+  html += '  div.innerHTML += "<div class=\"prod-grupo\">" + p.grupo + "</div>";';
+  html += '  grid.appendChild(div);';
+  html += '});';
+  html += 'function loadQRLib() {';
+  html += '  var s = document.createElement("script");';
+  html += '  s.src = "https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js";';
+  html += '  s.onload = function() {';
+  html += '    prods.forEach(function(p) {';
+  html += '      var el = document.getElementById("qr-" + p.codigo);';
+  html += '      if (el) new QRCode(el, {text:p.codigo, width:120, height:120, colorDark:"#1e3c72", colorLight:"#ffffff"});';
+  html += '    });';
+  html += '  };';
+  html += '  document.head.appendChild(s);';
+  html += '}';
+  html += 'loadQRLib();';
+  html += '<\/script></body></html>';
+
+  // Open in new window
+  var blob = new Blob([html], {type: 'text/html'});
+  var url = URL.createObjectURL(blob);
+  var win = window.open(url, '_blank');
+  setTimeout(function(){ URL.revokeObjectURL(url); }, 5000);
+  toast('Etiquetas generadas — usa Ctrl+P para imprimir/PDF','success', 5000);
 }
 
 // ── WATCHDOG ──────────────────────────────────────
