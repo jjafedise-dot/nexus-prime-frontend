@@ -823,9 +823,19 @@ function updQueueBadge() {
 }
 
 // ── SCAN ───────────────────────────────────────────
+function updateStypeButtons(t) {
+  var btnIn  = document.getElementById('stype-in');
+  var btnOut = document.getElementById('stype-out');
+  var btnAdj = document.getElementById('stype-adj');
+  if (btnIn)  { btnIn.classList.toggle('in-active',  t==='in');  }
+  if (btnOut) { btnOut.classList.toggle('out-active', t==='out'); }
+  if (btnAdj) { btnAdj.classList.toggle('adj-active', t==='adj'); }
+}
+
 function goScan(tipo) {
   S.tipo = tipo; S.prod = null; S._fotoRespaldo = null;
   document.getElementById('scan-title').textContent = tipo==='in' ? 'INGRESO' : tipo==='out' ? 'SALIDA' : 'AJUSTE';
+  updateStypeButtons(tipo);
   updateScanBanner();
   resetScanUI();
   S.navStack = ['s-home'];
@@ -836,13 +846,7 @@ function goScan(tipo) {
 function setScanTipo(t) {
   S.tipo = t;
   document.getElementById('scan-title').textContent = t==='in' ? 'INGRESO' : t==='out' ? 'SALIDA' : 'AJUSTE';
-  // Actualizar clases activas en los botones de tipo
-  var btnIn  = document.getElementById('stype-in');
-  var btnOut = document.getElementById('stype-out');
-  var btnAdj = document.getElementById('stype-adj');
-  if (btnIn)  { btnIn.classList.toggle('in-active',  t==='in');  }
-  if (btnOut) { btnOut.classList.toggle('out-active', t==='out'); }
-  if (btnAdj) { btnAdj.classList.toggle('adj-active', t==='adj'); }
+  updateStypeButtons(t);
   updateScanBanner();
   resetScanUI();
   if (S.prod) renderProd(S.prod, t);
