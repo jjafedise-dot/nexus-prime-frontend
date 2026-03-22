@@ -1375,7 +1375,7 @@ html, body {
 <script>
 
 
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyYTSOIzYkiKO8Atu_A_2JISyW-iKcCsGgj1b9X0mKCwS6ACGuDpSOBogXjfnvvHYPkbw/exec';
+const API = 'https://nexus-prime-backend.onrender.com';
 
 // ── STARFIELD BACKGROUND ─────────────────────────
 (function() {
@@ -1428,18 +1428,14 @@ function updQ() {
   if (b) b.classList.toggle('on', n > 0);
 }
 
-// ── API via fetch (text/plain evita preflight CORS) ──
-function api(action, payload) {
-  return fetch(SCRIPT_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'text/plain' },
-    body: JSON.stringify({ action: action, payload: payload || {}, token: S.token })
-  })
-  .then(function(r) { return r.json(); })
-  .then(function(r) {
-    if (r.status === 'error') throw new Error(r.message);
-    return r.data !== undefined ? r.data : r;
-  });
+// ── API via fetch → Supabase backend ──
+async function apiFetch(path, opts) {
+  opts = opts || {};
+  var res = await fetch(API + path, Object.assign({}, opts, {
+    headers: Object.assign({ 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + S.token }, opts.headers || {})
+  }));
+  if (res.status === 401) { logout(); throw new Error('Sesión expirada'); }
+  return res.json();
 }
 
 // ── SCREENS ──────────────────────────────────────
@@ -1497,7 +1493,7 @@ function dateStr() {
 }
 
 // ── AUTH ─────────────────────────────────────────
-function login() {
+async function login() {
   var email = document.getElementById('lEmail').value.trim();
   var pass  = document.getElementById('lPass').value;
   var btn   = document.getElementById('lBtn');
@@ -1506,28 +1502,21 @@ function login() {
   if (!email || !pass) { showErr('Completa todos los campos'); return; }
   btn.classList.add('btn-off');
   btn.innerHTML = '<div class="spin" style="width:20px;height:20px;border-width:2px"></div> Verificando...';
-  fetch(SCRIPT_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'text/plain' },
-    body: JSON.stringify({ action: 'login', payload: { email: email, password: pass }, token: null })
-  })
-  .then(function(r) { return r.json(); })
-  .then(function(r) {
-    console.log('SERVIDOR ROL:', JSON.stringify(r));
-    btn.classList.remove('btn-off');
-    btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> INGRESAR AL SISTEMA';
-    if (r.status !== 'success') { showErr(r.message || 'Credenciales incorrectas'); return; }
-    var d = r.user || r.data;
-    if (!d || (d.rol !== 'BODEGA' && d.rol !== 'ADMIN')) { showErr('Rol sin acceso: [' + (d ? d.rol : 'null') + ']'); return; }
-    S.token = r.token || d.token; S.user = d;
-    localStorage.setItem('nxs', JSON.stringify({ token: r.token || d.token, user: d }));
-    initHome();
-  })
-  .catch(function(e) {
-    btn.classList.remove('btn-off');
-    btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> INGRESAR AL SISTEMA';
-    showErr(e.message || 'Error de conexión');
-  });
+  try {
+    var res  = await fetch(API + '/api/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: email, password: pass }) });
+    var data = await res.json();
+    if (data.status === 'success') {
+      S.token = data.data.token; S.user = data.data.usuario;
+      localStorage.setItem('nxs', JSON.stringify({ token: S.token, user: S.user }));
+      go('s-home'); initHome();
+    } else {
+      showErr(data.message || 'Credenciales incorrectas');
+    }
+  } catch(e) {
+    showErr('Error de conexión');
+  }
+  btn.classList.remove('btn-off');
+  btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> INGRESAR AL SISTEMA';
 }
 
 function showErr(msg) {
@@ -1537,7 +1526,9 @@ function showErr(msg) {
 
 function logout() {
   if (!confirm('¿Cerrar sesión?')) return;
-  stopScan(); S.token = null; S.user = null;
+  stopScan();
+  if (S.token) apiFetch('/api/logout', { method: 'POST' }).catch(function() {});
+  S.token = null; S.user = null;
   localStorage.removeItem('nxs');
   go('s-login');
   toast('Sesión cerrada', 'inf');
@@ -1557,7 +1548,7 @@ function initHome() {
 }
 
 function loadStats() {
-  api('obtenerResumen').then(function(d) {
+  apiFetch('/api/resumen').then(function(d) {
     document.getElementById('sTotal').textContent    = d.totalProductos || '—';
     document.getElementById('sSinStock').textContent = d.sinStock        || '0';
     document.getElementById('sBajo').textContent     = d.stockBajo       || '0';
@@ -1573,14 +1564,7 @@ function updOffline() {
 function goScan(tipo) {
   S.tipo = tipo; S.prod = null;
   var isIn = tipo === 'in';
-  var color = isIn ? 'var(--emerald)' : 'var(--rose)';
-  // Título con color según tipo
-  var titleEl = document.getElementById('scanTitle');
-  titleEl.textContent = isIn ? 'INGRESO' : 'SALIDA';
-  titleEl.style.color = color;
-  // Borde inferior del topbar con color del tipo
-  var tbar = document.querySelector('#s-scan .tbar');
-  if (tbar) tbar.style.borderBottom = '2px solid ' + color;
+  document.getElementById('scanTitle').textContent     = isIn ? 'INGRESO' : 'SALIDA';
   document.getElementById('scanSub').textContent       = 'Escanea o ingresa el código';
   document.getElementById('qLbl').textContent          = isIn ? 'ingresar' : 'retirar';
   document.getElementById('confirmBtnTxt').textContent = isIn ? 'CONFIRMAR INGRESO' : 'CONFIRMAR SALIDA';
@@ -1686,7 +1670,7 @@ function searchManualLive(val) {
   var sugg = document.getElementById('scanSuggestions');
   if (!val || val.length < 2) { sugg.style.display = 'none'; return; }
   _scanSuggTimer = setTimeout(function() {
-    api('buscarProductoMovil', { texto: val, limite: 10 })
+    apiFetch('/api/productos/buscar?q='+encodeURIComponent(val)+'&limit=10')
     .then(function(rs) {
       if (!rs || !rs.length) { sugg.style.display = 'none'; return; }
       sugg.innerHTML = rs.map(function(p) {
@@ -1725,7 +1709,7 @@ function fetchProd(code) {
   document.getElementById('qtyCard').classList.add('hidden');
   document.getElementById('scanBar').style.display = 'none';
   document.getElementById('scanSub').textContent = 'Buscando...';
-  api('buscarProductoPorCodigo', { codigo: code })
+  apiFetch('/api/productos/'+encodeURIComponent(code.toUpperCase()))
   .then(function(p) {
     if (!p || !p.codigo) throw new Error('Producto no encontrado');
     S.prod = p;
@@ -1806,7 +1790,7 @@ function rfpMobCargarSelect() {
   var sel = document.getElementById('rfpMobSelect');
   if (!sel) return;
   sel.innerHTML = '<option value="">— Cargando... —</option>';
-  api('rfpObtenerPendientes', {}).then(function(data) {
+  apiFetch('/api/rfp/historial?limit=100').then(function(data) {
     sel.innerHTML = '<option value="">— Seleccione un préstamo —</option>';
     (data || []).forEach(function(p) {
       var pend = p.cantidad - (p.devuelto || 0);
@@ -1824,7 +1808,7 @@ function rfpMobCargarPrestamo(id) {
   var info = document.getElementById('rfpMobInfoPrestamo');
   var cantInput = document.getElementById('rfpMobCantDev');
   if (!id) { if (info) info.style.display = 'none'; return; }
-  api('rfpObtenerPrestamo', { id: id }).then(function(p) {
+  apiFetch('/api/rfp/'+id).then(function(p) {
     if (!p || !info) return;
     var pend = p.cantidad - (p.devuelto || 0);
     info.style.display = '';
@@ -1865,7 +1849,7 @@ function rfpMobGuardar() {
     if (!codigoRfp) { toast('Ingresa el código RFP del producto', 'err'); btn.classList.remove('btn-off'); return; }
     var payload = { codigoRfp, nombre, cantidad, unidad, fecha, autorizado: autoriza, responsable: resp, observaciones: obs };
     if (_rfpFotoBase64) payload.fotoBase64 = _rfpFotoBase64;
-    api('rfpRegistrarRetiro', payload)
+    apiFetch('/api/rfp', {method:'POST', body:JSON.stringify(payload)})
       .then(function(r) {
         toast('✅ Retiro RFP registrado · ID: ' + (r && r.id ? r.id : ''), 'ok');
         // Clear form
@@ -1895,7 +1879,7 @@ function rfpMobGuardar() {
     if (!id)     { toast('Selecciona un préstamo', 'err'); btn.classList.remove('btn-off'); return; }
     if (!cantDev){ toast('Ingresa la cantidad a devolver', 'err'); btn.classList.remove('btn-off'); return; }
 
-    api('rfpRegistrarDevolucion', { id, cantidadDevuelta: cantDev, responsable: respDev })
+    apiFetch('/api/rfp/'+id+'/devolucion', {method:'POST', body:JSON.stringify({cantidad_devuelta:cantDev, responsable:respDev})})
       .then(function(r) {
         var msg = (r && r.mensaje) ? r.mensaje : '✅ Devolución registrada';
         toast(msg, 'ok');
@@ -1985,7 +1969,7 @@ function execMov() {
     payload.fotoBase64  = S._fotoRespaldo;
   }
 
-  api('registrarMovimiento', payload)
+  apiFetch('/api/movimientos', {method:'POST', body:JSON.stringify(payload)})
   .then(function() {
     var fotoMsg = S._fotoRespaldo ? ' · foto guardada' : '';
     toast((isIn ? '✅ Ingreso' : '✅ Salida') + ' de ' + qty + ' ' + p.unidad + ' registrado' + fotoMsg, 'ok');
@@ -2008,7 +1992,7 @@ function syncQ() {
   // Show progress in offBar
   var pendEl = document.getElementById('pendN');
   if (pendEl) pendEl.textContent = total + ' sincronizando...';
-  api('registrarMovimiento', item)
+  apiFetch('/api/movimientos', {method:'POST', body:JSON.stringify(item)})
   .then(function() {
     S.queue.shift();
     saveQ();
@@ -2048,7 +2032,7 @@ function qSearch() {
   if (!q) return;
   clearTimeout(_qTimer);
   _qTimer = setTimeout(function() {
-    api('buscarProductoMovil', { texto: q, limite: 30 })
+    apiFetch('/api/productos/buscar?q='+encodeURIComponent(q)+'&limit=30')
     .then(function(rs) {
       if (!rs || !rs.length) {
         document.getElementById('qResults').innerHTML =
@@ -2109,26 +2093,11 @@ function showQDetail(p) {
 }
 
 // ── NAVEGAR A INGRESO/SALIDA DESDE CONSULTA ─────────
-function _applyTipoStyle(tipo) {
-  var isIn  = tipo === 'in';
-  var color = isIn ? 'var(--emerald)' : 'var(--rose)';
-  var titleEl = document.getElementById('scanTitle');
-  if (titleEl) { titleEl.textContent = isIn ? 'INGRESO' : 'SALIDA'; titleEl.style.color = color; }
-  var tbar = document.querySelector('#s-scan .tbar');
-  if (tbar) tbar.style.borderBottom = '2px solid ' + color;
-  var cb = document.getElementById('confirmBtn');
-  if (cb) cb.className = 'btn ' + (isIn ? 'btn-green' : 'btn-rose');
-  var txt = document.getElementById('confirmBtnTxt');
-  if (txt) txt.textContent = isIn ? 'CONFIRMAR INGRESO' : 'CONFIRMAR SALIDA';
-  var qLbl = document.getElementById('qLbl');
-  if (qLbl) qLbl.textContent = isIn ? 'ingresar' : 'retirar';
-}
-
 function goFromQuery(tipo) {
   var p = S._qProd;
   if (!p) return;
   S.tipo = tipo === 'in' ? 'in' : 'out';
-  _applyTipoStyle(S.tipo);
+  document.getElementById('scanTitle').textContent = tipo === 'in' ? 'INGRESO' : 'SALIDA';
   resetScanUI();
   // Clear stack and set home as the back destination when coming from query
   if (!S.navStack) S.navStack = [];
@@ -2149,7 +2118,7 @@ function goFromQuery(tipo) {
 function goFromList(p, tipo) {
   S.tipo = tipo === 'in' ? 'in' : 'out';
   S.prod = null;
-  _applyTipoStyle(S.tipo);
+  document.getElementById('scanTitle').textContent = tipo === 'in' ? 'INGRESO' : 'SALIDA';
   resetScanUI();
   // Clear stack — back always goes to home
   if (!S.navStack) S.navStack = [];
@@ -2171,7 +2140,7 @@ function goFromList(p, tipo) {
 function goHist() {
   go('s-hist');
   document.getElementById('histList').innerHTML = '<div class="loading"><div class="spin"></div><span>Cargando...</span></div>';
-  api('obtenerHistorial', { limite: 40 })
+  apiFetch('/api/auditoria?limit=40')
   .then(function(movs) { renderHist(movs); })
   .catch(function() { document.getElementById('histList').innerHTML = '<div class="empty"><i class="fas fa-circle-exclamation"></i><p>No se pudo cargar</p></div>'; });
 }
@@ -2250,7 +2219,7 @@ function loteBuscar(val) {
   var sugg = document.getElementById('loteSugg');
   if (!val || val.length < 2) { sugg.style.display = 'none'; return; }
   _loteSuggTimer = setTimeout(function() {
-    api('buscarProductoMovil', { texto: val, limite: 8 })
+    apiFetch('/api/productos/buscar?q='+encodeURIComponent(val)+'&limit=8')
     .then(function(rs) {
       if (!rs || !rs.length) { sugg.style.display = 'none'; return; }
       sugg.innerHTML = rs.map(function(p) {
@@ -2283,7 +2252,7 @@ function loteSelProd(p) {
 function loteAgregarManual() {
   var val = document.getElementById('loteSearch').value.trim();
   if (!val) return;
-  api('buscarProductoMovil', { texto: val, limite: 1 })
+  apiFetch('/api/productos/buscar?q='+encodeURIComponent(val)+'&limit=1')
   .then(function(rs) {
     if (rs && rs.length) loteSelProd(rs[0]);
     else toast('Producto no encontrado', 'err');
@@ -2375,7 +2344,7 @@ async function loteGuardarTodo() {
         S.queue.push(Object.assign({}, payload, { _ts: Date.now() })); saveQ(); ok++;
       } else {
         await new Promise(function(resolve, reject) {
-          api('registrarMovimiento', payload).then(function() { ok++; resolve(); }).catch(function() { fail++; resolve(); });
+          apiFetch('/api/movimientos', {method:'POST', body:JSON.stringify(payload)}).then(function() { ok++; resolve(); }).catch(function() { fail++; resolve(); });
         });
         await new Promise(function(r){ setTimeout(r, 300); });
       }
