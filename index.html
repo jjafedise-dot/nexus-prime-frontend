@@ -287,12 +287,13 @@ select.form-ctrl option{background:var(--ink3)}
         <div class="nav-item" onclick="showPanel('historial',this)"><i class="fas fa-clock-rotate-left"></i> Historial</div>
         <div class="nav-item" onclick="showPanel('rfp',this)"><i class="fas fa-hand-holding-box"></i> RFP <span class="nav-badge" id="rfp-badge">0</span></div>
         <div class="nav-item" onclick="showPanel('documentos',this)"><i class="fas fa-file-invoice"></i> Documentos</div>
-        <div class="sb-section-lbl"><i class="fas fa-circle" style="font-size:4px"></i> Avanzado</div>
-        <div class="nav-item" onclick="showPanel('reportes',this)"><i class="fas fa-file-csv"></i> Reportes</div>
-        <div class="nav-item" onclick="showPanel('ubicaciones',this)"><i class="fas fa-location-dot"></i> Ubicaciones</div>
+        <div class="sb-section-lbl" id="nav-section-avanzado"><i class="fas fa-circle" style="font-size:4px"></i> Avanzado</div>
+        <div class="nav-item" onclick="showPanel('reportes',this)" id="nav-reportes"><i class="fas fa-file-csv"></i> Reportes</div>
+        <div class="nav-item" onclick="showPanel('ubicaciones',this)" id="nav-ubicaciones"><i class="fas fa-location-dot"></i> Ubicaciones</div>
         <div class="nav-item" onclick="showPanel('auditoria',this)" id="nav-audit"><i class="fas fa-shield-halved"></i> Auditoría</div>
         <div class="nav-item" onclick="showPanel('usuarios',this)" id="nav-users"><i class="fas fa-users"></i> Usuarios</div>
         <div class="nav-item" onclick="showPanel('watchdog',this)" id="nav-watchdog"><i class="fas fa-dog"></i> Watchdog <span class="nav-badge" id="wd-badge" style="background:var(--emerald)">ON</span></div>
+        <div class="nav-item" onclick="showPanel('reset',this)" id="nav-reset" style="color:var(--rose)"><i class="fas fa-trash-can"></i> Reset Sistema</div>
       </nav>
       <div class="sb-footer">
         <button class="btn btn-secondary" style="width:100%;font-size:12px" onclick="doLogout()"><i class="fas fa-right-from-bracket"></i> Cerrar Sesión</button>
@@ -773,6 +774,81 @@ select.form-ctrl option{background:var(--ink3)}
           </div>
         </div>
 
+
+        <!-- ── RESET SISTEMA ── -->
+        <div class="panel" id="panel-reset">
+          <div class="card" style="border-color:rgba(255,77,109,.2)">
+            <div class="card-header">
+              <div class="card-title" style="color:var(--rose)"><i class="fas fa-triangle-exclamation"></i> Reset del Sistema</div>
+            </div>
+            <div class="msg msg-error" style="margin-bottom:20px">
+              <i class="fas fa-exclamation-circle"></i>
+              <strong>Zona de peligro.</strong> Esta acción elimina permanentemente los datos seleccionados. 
+              Úsala solo cuando vayas a usar el sistema en una nueva bodega o quieras empezar desde cero.
+              <strong>Esta acción no se puede deshacer.</strong>
+            </div>
+            <div style="margin-bottom:20px">
+              <label class="form-label" style="margin-bottom:12px">Selecciona qué datos eliminar:</label>
+              <div style="display:flex;flex-direction:column;gap:10px">
+                <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:12px;background:var(--ink2);border:1px solid var(--wire);border-radius:var(--r-md)">
+                  <input type="checkbox" id="rst-productos" style="width:18px;height:18px"/>
+                  <div>
+                    <div style="font-weight:600;font-size:13px">Productos</div>
+                    <div style="font-size:11px;color:var(--tx3)">Elimina todos los productos del inventario</div>
+                  </div>
+                </label>
+                <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:12px;background:var(--ink2);border:1px solid var(--wire);border-radius:var(--r-md)">
+                  <input type="checkbox" id="rst-movimientos" style="width:18px;height:18px"/>
+                  <div>
+                    <div style="font-weight:600;font-size:13px">Movimientos e Historial</div>
+                    <div style="font-size:11px;color:var(--tx3)">Elimina todos los ingresos, salidas y ajustes</div>
+                  </div>
+                </label>
+                <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:12px;background:var(--ink2);border:1px solid var(--wire);border-radius:var(--r-md)">
+                  <input type="checkbox" id="rst-documentos" style="width:18px;height:18px"/>
+                  <div>
+                    <div style="font-weight:600;font-size:13px">Documentos (OC, Guías, Facturas)</div>
+                    <div style="font-size:11px;color:var(--tx3)">Elimina todos los documentos registrados</div>
+                  </div>
+                </label>
+                <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:12px;background:var(--ink2);border:1px solid var(--wire);border-radius:var(--r-md)">
+                  <input type="checkbox" id="rst-rfp" style="width:18px;height:18px"/>
+                  <div>
+                    <div style="font-weight:600;font-size:13px">RFP — Préstamos</div>
+                    <div style="font-size:11px;color:var(--tx3)">Elimina todos los préstamos y devoluciones</div>
+                  </div>
+                </label>
+                <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:12px;background:var(--ink2);border:1px solid var(--wire);border-radius:var(--r-md)">
+                  <input type="checkbox" id="rst-ubicaciones" style="width:18px;height:18px"/>
+                  <div>
+                    <div style="font-weight:600;font-size:13px">Ubicaciones</div>
+                    <div style="font-size:11px;color:var(--tx3)">Elimina todas las ubicaciones de bodega</div>
+                  </div>
+                </label>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label" style="color:var(--rose)">Escribe <strong>BORRAR TODO</strong> para confirmar</label>
+              <input class="form-ctrl" id="rst-confirm-txt" type="text" placeholder="Escribe BORRAR TODO" oninput="checkResetConfirm()"/>
+            </div>
+            <button class="btn btn-danger" id="btn-reset-exec" onclick="ejecutarReset()" disabled style="width:100%;padding:14px;font-size:15px;font-weight:700;opacity:.4;cursor:not-allowed">
+              <i class="fas fa-trash-can"></i> EJECUTAR RESET
+            </button>
+          </div>
+
+          <div class="card" style="border-color:rgba(0,229,255,.15)">
+            <div class="card-header"><div class="card-title"><i class="fas fa-circle-info" style="color:var(--neon)"></i> Después del Reset</div></div>
+            <div style="font-size:13px;color:var(--tx2);line-height:1.8">
+              <p style="margin-bottom:8px">Una vez limpiado el sistema puedes:</p>
+              <div style="display:flex;flex-direction:column;gap:8px">
+                <div style="display:flex;align-items:center;gap:10px"><span style="width:24px;height:24px;border-radius:50%;background:rgba(0,229,255,.1);border:1px solid rgba(0,229,255,.2);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--neon);flex-shrink:0">1</span><span>Usar la app <strong>nexus-carga-productos.html</strong> para cargar los nuevos productos desde un CSV</span></div>
+                <div style="display:flex;align-items:center;gap:10px"><span style="width:24px;height:24px;border-radius:50%;background:rgba(0,229,255,.1);border:1px solid rgba(0,229,255,.2);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--neon);flex-shrink:0">2</span><span>Configurar las ubicaciones de la nueva bodega</span></div>
+                <div style="display:flex;align-items:center;gap:10px"><span style="width:24px;height:24px;border-radius:50%;background:rgba(0,229,255,.1);border:1px solid rgba(0,229,255,.2);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--neon);flex-shrink:0">3</span><span>Los usuarios administradores y operadores <strong>no se eliminan</strong></span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
       </div><!-- /main-content -->
     </div><!-- /main -->
   </div><!-- /layout -->
@@ -1073,8 +1149,9 @@ function showApp() {
   document.getElementById('sb-uname').textContent = G.user.nombre||G.user.email||'—';
   document.getElementById('sb-role').textContent = G.user.rol||'OPERADOR';
   if (G.user.rol !== 'ADMIN') {
-    var n = document.getElementById('nav-users'); if(n) n.style.display='none';
-    var w = document.getElementById('nav-watchdog'); if(w) w.style.display='none';
+    // Hide entire Avanzado section for non-admins
+    var adminOnlyIds = ['nav-section-avanzado','nav-reportes','nav-ubicaciones','nav-audit','nav-users','nav-watchdog','nav-reset'];
+    adminOnlyIds.forEach(function(id){ var el=document.getElementById(id); if(el) el.style.display='none'; });
   }
   loadListas();
   loadDashboard();
@@ -1111,7 +1188,7 @@ function showPanel(name, el) {
     dashboard:'Dashboard', inventario:'Inventario', movimientos:'Movimientos', productos:'Productos',
     buscar:'Buscar', historial:'Historial de Movimientos', rfp:'RFP · Préstamos',
     reportes:'Reportes y Exportación', ubicaciones:'Ubicaciones de Bodega',
-    auditoria:'Auditoría del Sistema', usuarios:'Gestión de Usuarios', documentos:'Documentos · OC / Guias / Facturas', watchdog:'Watchdog · Alertas por Email'
+    auditoria:'Auditoría del Sistema', usuarios:'Gestión de Usuarios', documentos:'Documentos · OC / Guias / Facturas', reset:'Reset del Sistema', watchdog:'Watchdog · Alertas por Email'
   }[name] || name;
   if (name==='inventario')  loadInventario();
   if (name==='historial')   loadHistorial();
