@@ -433,13 +433,13 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
     <div class="topbar-title" id="scan-title">INGRESO</div>
     <div class="topbar-badge" id="scan-badge">Bodega</div>
   </div>
-  <div class="scan-type-row">
-    <div class="scan-type-btn in-active" id="stype-in" onclick="setScanTipo('in')"><i class="fas fa-arrow-down"></i> Ingreso</div>
-    <div class="scan-type-btn" id="stype-out" onclick="setScanTipo('out')"><i class="fas fa-arrow-up"></i> Salida</div>
-  </div>
-  <div class="mode-tabs">
-    <div class="mode-tab on" id="tab-cam" onclick="setMode('cam')"><i class="fas fa-camera"></i> Cámara</div>
-    <div class="mode-tab" id="tab-man" onclick="setMode('man')"><i class="fas fa-keyboard"></i> Manual</div>
+
+  <div style="display:flex;align-items:center;padding:8px 16px;gap:8px;flex-shrink:0">
+    <div id="scan-tipo-pill" style="flex:1;padding:8px 12px;border-radius:var(--r-sm);font-family:var(--f-d);font-size:13px;font-weight:700;letter-spacing:1px;text-align:center">INGRESO</div>
+    <div class="mode-tabs" style="flex:1">
+      <div class="mode-tab on" id="tab-cam" onclick="setMode('cam')"><i class="fas fa-camera"></i> Camara</div>
+      <div class="mode-tab" id="tab-man" onclick="setMode('man')"><i class="fas fa-keyboard"></i> Manual</div>
+    </div>
   </div>
   <div class="man-row" id="man-row">
     <div class="man-inp-wrap" style="position:relative">
@@ -924,25 +924,25 @@ function updateScanTypeUI() { updateScanBanner(); }
 
 function updateScanBanner() {
   var isIn = S.tipo==='in';
-  var isOut = S.tipo==='out';
-  var banner = document.getElementById('scan-tipo-banner');
-  var icon   = document.getElementById('scan-tipo-icon');
-  var txt    = document.getElementById('scan-tipo-txt');
-  if (banner) {
+  // Update topbar title
+  var title = document.getElementById('scan-title');
+  if (title) title.textContent = isIn ? 'INGRESO' : 'SALIDA';
+  // Update pill
+  var pill = document.getElementById('scan-tipo-pill');
+  if (pill) {
     if (isIn) {
-      banner.style.background = 'rgba(52,211,153,.1)';
-      banner.style.border = '1px solid rgba(52,211,153,.3)';
-      banner.style.color = 'var(--emerald)';
-      icon.className = 'fas fa-arrow-down';
-      txt.textContent = 'Registrar Ingreso de Stock';
+      pill.style.background = 'rgba(52,211,153,.12)';
+      pill.style.border = '1px solid rgba(52,211,153,.35)';
+      pill.style.color = 'var(--emerald)';
+      pill.innerHTML = '<i class="fas fa-arrow-down" style="margin-right:6px"></i>INGRESO';
     } else {
-      banner.style.background = 'rgba(251,113,133,.1)';
-      banner.style.border = '1px solid rgba(251,113,133,.3)';
-      banner.style.color = 'var(--rose)';
-      icon.className = 'fas fa-arrow-up';
-      txt.textContent = 'Registrar Salida de Stock';
+      pill.style.background = 'rgba(251,113,133,.12)';
+      pill.style.border = '1px solid rgba(251,113,133,.35)';
+      pill.style.color = 'var(--rose)';
+      pill.innerHTML = '<i class="fas fa-arrow-up" style="margin-right:6px"></i>SALIDA';
     }
   }
+  // Update confirm button
   var confirmBtn = document.getElementById('confirm-btn');
   if (confirmBtn) {
     confirmBtn.className = 'btn ' + (isIn ? 'btn-green' : 'btn-rose');
@@ -950,8 +950,12 @@ function updateScanBanner() {
       ? '<i class="fas fa-check"></i> Confirmar Ingreso'
       : '<i class="fas fa-check"></i> Confirmar Salida';
   }
+  // Update qty label
   var qtyLbl = document.getElementById('qty-label');
   if (qtyLbl) qtyLbl.textContent = isIn ? 'Cantidad a Ingresar' : 'Cantidad a Retirar';
+  // Update p-card color
+  var pCard = document.getElementById('p-card');
+  if (pCard && S.prod) renderProd(S.prod, S.tipo);
 }
 
 function setMode(m) {
