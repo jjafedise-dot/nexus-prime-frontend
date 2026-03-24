@@ -757,7 +757,7 @@ document.addEventListener('DOMContentLoaded', function() {
     var saved = JSON.parse(localStorage.getItem('nxb') || 'null');
     if (saved && saved.token && saved.user) {
       S.token = saved.token; S.user = saved.user;
-      loadQueue(); go('s-home'); initHome();
+      loadQueue(); go('s-home'); initHome(); if(!AL_M.active) initAutoLogoutMovil(); initAutoLogoutMovil();
       return;
     }
   } catch(e) {}
@@ -823,7 +823,7 @@ async function doLogin() {
     if (data.status === 'success') {
       S.token = data.data.token; S.user = data.data.usuario;
       localStorage.setItem('nxb', JSON.stringify({token:S.token, user:S.user}));
-      go('s-home'); initHome();
+      go('s-home'); initHome(); if(!AL_M.active) initAutoLogoutMovil();
     } else {
       errEl.textContent = data.message || 'Credenciales incorrectas'; errEl.style.display='block';
     }
@@ -1696,6 +1696,56 @@ function toast(msg, type, dur) {
 var _idleTimer=null;
 function resetIdle(){ clearTimeout(_idleTimer); if(!S.token) return; _idleTimer=setTimeout(function(){ doLogout(); toast('Sesión cerrada por inactividad','wrn',4000); },5*60*1000); }
 ['touchstart','touchend','click','keydown'].forEach(function(e){ document.addEventListener(e,resetIdle,{passive:true}); });
+
+// ── AUTO LOGOUT MOVIL (5 min) ────────────────────────
+var AL_M = { timer: null, warnTimer: null, countdown: null, active: false };
+var AL_TIMEOUT = 5 * 60 * 1000; // 5 minutos
+var AL_WARNING = 30;             // 30 segundos de aviso
+
+function initAutoLogoutMovil() {
+  AL_M.active = true;
+  var events = ['touchstart','touchmove','mousedown','keydown','scroll','click'];
+  events.forEach(function(e){ document.addEventListener(e, resetALMovil, {passive:true}); });
+  resetALMovil();
+}
+
+function resetALMovil() {
+  if (!AL_M.active) return;
+  clearTimeout(AL_M.timer);
+  clearInterval(AL_M.countdown);
+  // Remove warning banner if showing
+  var banner = document.getElementById('al-banner');
+  if (banner) banner.style.display = 'none';
+  AL_M.timer = setTimeout(showALWarningMovil, AL_TIMEOUT - AL_WARNING * 1000);
+}
+
+function showALWarningMovil() {
+  // Show countdown banner
+  var banner = document.getElementById('al-banner');
+  if (!banner) {
+    banner = document.createElement('div');
+    banner.id = 'al-banner';
+    banner.style.cssText = 'position:fixed;bottom:80px;left:16px;right:16px;z-index:9999;background:rgba(251,113,133,.15);border:1px solid rgba(251,113,133,.4);border-radius:12px;padding:12px 16px;display:flex;align-items:center;gap:12px;backdrop-filter:blur(8px)';
+    banner.innerHTML = '<i class="fas fa-clock" style="color:var(--rose);font-size:18px;flex-shrink:0"></i>' +
+      '<div style="flex:1"><div style="color:var(--rose);font-family:var(--f-d);font-size:13px;font-weight:700">Sesion por vencer</div>' +
+      '<div style="color:var(--tx2);font-size:11px">Cerrando en <span id="al-secs">30</span>s</div></div>' +
+      '<button onclick="resetALMovil()" style="background:var(--neon);color:#000;border:none;border-radius:8px;padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--f-d)">SEGUIR</button>';
+    document.body.appendChild(banner);
+  }
+  banner.style.display = 'flex';
+  var secs = AL_WARNING;
+  var secsEl = document.getElementById('al-secs');
+  if (secsEl) secsEl.textContent = secs;
+  AL_M.countdown = setInterval(function() {
+    secs--;
+    if (secsEl) secsEl.textContent = secs;
+    if (secs <= 0) {
+      clearInterval(AL_M.countdown);
+      banner.style.display = 'none';
+      doLogout();
+    }
+  }, 1000);
+}
 </script>
 </body>
 </html>
