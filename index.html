@@ -921,6 +921,32 @@ select.form-ctrl option{background:var(--ink3)}
 @media(max-width:480px){
   .firma-campo-row { grid-template-columns: 1fr; }
 }
+
+/* ── AUTO LOGOUT ── */
+#modal-autologout { display:none }
+#modal-autologout.open { display:flex }
+.autologout-timer {
+  font-family:var(--f-hd);
+  font-size:64px;
+  font-weight:800;
+  color:var(--rose);
+  text-align:center;
+  line-height:1;
+  margin:16px 0;
+}
+.autologout-bar {
+  height:6px;
+  background:var(--s3);
+  border-radius:6px;
+  overflow:hidden;
+  margin-bottom:16px;
+}
+.autologout-bar-fill {
+  height:100%;
+  background:var(--rose);
+  border-radius:6px;
+  transition:width 1s linear;
+}
 </style>
 <div class="modal-bg" id="modal-firma">
   <div class="modal" style="padding:0;display:flex;flex-direction:column">
@@ -1070,7 +1096,7 @@ select.form-ctrl option{background:var(--ink3)}
 <script>
 const API = 'https://nexus-prime-backend.onrender.com';
 
-// ── STATE ──────────────────────────────────────────
+// // -- STATE ------------------------------------------
 var G = {
   token: null, user: null,
   invData: [], prodData: [], histData: [], auditData: [],
@@ -1081,7 +1107,7 @@ var G = {
   charts: {}
 };
 
-// ── INIT ───────────────────────────────────────────
+// // -- INIT -------------------------------------------
 document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('l-pass').addEventListener('keydown', function(e){ if(e.key==='Enter') doLogin(); });
   try {
@@ -1095,7 +1121,7 @@ document.addEventListener('DOMContentLoaded', function() {
   ['hist-hasta','audit-hasta'].forEach(function(id){ var el=document.getElementById(id); if(el) el.value=today; });
 });
 
-// ── AUTH ───────────────────────────────────────────
+// // -- AUTH -------------------------------------------
 async function doLogin() {
   var email = document.getElementById('l-email').value.trim();
   var pass  = document.getElementById('l-pass').value;
@@ -1159,7 +1185,7 @@ function showApp() {
   loadRfpKpis();
 }
 
-// ── API ────────────────────────────────────────────
+// // -- API --------------------------------------------
 async function apiFetch(path, opts) {
   opts = opts || {};
   var res = await fetch(API+path, Object.assign({}, opts, {
@@ -1177,7 +1203,7 @@ async function apiFetch(path, opts) {
   }
 }
 
-// ── NAVIGATION ─────────────────────────────────────
+// // -- NAVIGATION -------------------------------------
 function showPanel(name, el) {
   document.querySelectorAll('.panel').forEach(function(p){ p.classList.remove('active'); });
   var panel = document.getElementById('panel-'+name);
@@ -1204,7 +1230,7 @@ function showPanel(name, el) {
 function toggleSidebar(){ document.getElementById('sidebar').classList.toggle('open'); document.getElementById('sb-overlay').classList.toggle('show'); }
 function closeSidebar(){ document.getElementById('sidebar').classList.remove('open'); document.getElementById('sb-overlay').classList.remove('show'); }
 
-// ── LISTAS ─────────────────────────────────────────
+// // -- LISTAS -----------------------------------------
 async function loadListas() {
   try {
     var res = await apiFetch('/api/listas');
@@ -1220,7 +1246,7 @@ async function loadListas() {
   } catch(e){}
 }
 
-// ── DASHBOARD ──────────────────────────────────────
+// // -- DASHBOARD --------------------------------------
 async function loadDashboard() {
   try {
     var [prods, movs, rfp] = await Promise.all([
@@ -1296,7 +1322,7 @@ function drawHBar(id, labels, data, colors) {
   G.charts[id] = new Chart(el, {type:'bar',data:{labels,datasets:[{data,backgroundColor:colors.map(function(c){ return c+'44'; }),borderColor:colors,borderWidth:1,borderRadius:3}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#3d4f6b',font:{size:10}},grid:{color:'rgba(255,255,255,.04)'},beginAtZero:true},y:{ticks:{color:'#8b9ab8',font:{size:10,family:"'JetBrains Mono',monospace"}},grid:{color:'rgba(255,255,255,.04)'}}}}});
 }
 
-// ── INVENTARIO ──────────────────────────────────────
+// // -- INVENTARIO --------------------------------------
 async function loadInventario() {
   document.getElementById('inv-table-wrap').innerHTML = '<div class="loading-state"><div class="spinner"></div> Cargando...</div>';
   try {
@@ -1344,7 +1370,7 @@ function renderInvTable(data) {
   document.getElementById('inv-table-wrap').innerHTML=h;
 }
 
-// ── MOVIMIENTOS ────────────────────────────────────
+// // -- MOVIMIENTOS ------------------------------------
 function onMovTipoChange() {
   var tipo = document.getElementById('mov-tipo').value;
   var btn  = document.getElementById('btn-mov');
@@ -1460,7 +1486,7 @@ async function loadMovRecientes() {
   } catch(e){ c.innerHTML='<div class="msg msg-error">Error</div>'; }
 }
 
-// ── PRODUCTOS ─────────────────────────────────────
+// // -- PRODUCTOS -------------------------------------
 async function loadProductos() {
   document.getElementById('prod-table-wrap').innerHTML='<div class="loading-state"><div class="spinner"></div></div>';
   try {
@@ -1511,7 +1537,7 @@ async function registrarProducto() {
   btn.classList.remove('off');
 }
 
-// ── BÚSQUEDA ──────────────────────────────────────
+// // -- BÚSQUEDA --------------------------------------
 var _buscarTimer = null;
 function buscarProductos(q) {
   clearTimeout(_buscarTimer);
@@ -1543,7 +1569,7 @@ function movDesde(p, tipo) {
   onMovTipoChange(); selMovProd(p);
 }
 
-// ── HISTORIAL ─────────────────────────────────────
+// // -- HISTORIAL -------------------------------------
 async function loadHistorial() {
   document.getElementById('hist-table-wrap').innerHTML='<div class="loading-state"><div class="spinner"></div></div>';
   var tipo  = document.getElementById('hist-tipo').value;
@@ -1586,7 +1612,7 @@ function renderHistTable(data) {
   document.getElementById('hist-table-wrap').innerHTML=h;
 }
 
-// ── RFP ───────────────────────────────────────────
+// // -- RFP -------------------------------------------
 async function loadRfpKpis() {
   try {
     var res = await apiFetch('/api/rfp/kpis');
@@ -1702,7 +1728,7 @@ async function loadRfpHistorial() {
   } catch(e){ document.getElementById('rfp-hist-wrap').innerHTML='<div class="msg msg-error">Error</div>'; }
 }
 
-// ── AJUSTE RÁPIDO ──────────────────────────────────
+// // -- AJUSTE RÁPIDO ----------------------------------
 function abrirAjuste(p) {
   G.ajusteProd=p;
   document.getElementById('ajuste-title').textContent='Ajuste: '+p.codigo+' — '+p.nombre;
@@ -1729,7 +1755,7 @@ async function guardarAjuste() {
   btn.classList.remove('off');
 }
 
-// ── EDITAR PRODUCTO ────────────────────────────────
+// // -- EDITAR PRODUCTO --------------------------------
 function abrirEditar(p) {
   document.getElementById('edit-codigo-orig').value = p.codigo;
   document.getElementById('edit-codigo').value  = p.codigo;
@@ -1750,7 +1776,7 @@ async function guardarEdicion() {
   } catch(e){ toast('Error','error'); }
 }
 
-// ── USUARIOS ──────────────────────────────────────
+// // -- USUARIOS --------------------------------------
 async function loadUsuarios() {
   var c = document.getElementById('usr-table-wrap'); if(!c) return;
   c.innerHTML='<div class="loading-state"><div class="spinner"></div></div>';
@@ -1792,7 +1818,7 @@ async function eliminarUsuario(id, email) {
   } catch(e){ toast('Error','error'); }
 }
 
-// ── AUDITORÍA ─────────────────────────────────────
+// // -- AUDITORÍA -------------------------------------
 async function loadAuditoria() {
   document.getElementById('audit-table-wrap').innerHTML='<div class="loading-state"><div class="spinner"></div></div>';
   var tipo  = document.getElementById('audit-tipo').value;
@@ -1830,7 +1856,7 @@ function renderAuditTable(data) {
   document.getElementById('audit-table-wrap').innerHTML=h;
 }
 
-// ── UBICACIONES ────────────────────────────────────
+// // -- UBICACIONES ------------------------------------
 async function loadUbicaciones() {
   document.getElementById('ubic-table-wrap').innerHTML='<div class="loading-state"><div class="spinner"></div></div>';
   try {
@@ -1871,7 +1897,7 @@ async function guardarUbicacion(codigo) {
   } catch(e){ toast('Error','error'); }
 }
 
-// ── REPORTES ──────────────────────────────────────
+// // -- REPORTES --------------------------------------
 async function exportReport(tipo) {
   try {
     if (tipo==='compras') {
@@ -1919,7 +1945,7 @@ function downloadCSV(csv, name) {
   toast('✅ CSV descargado','success');
 }
 
-// ── QR SCANNER ────────────────────────────────────
+// // -- QR SCANNER ------------------------------------
 function openQRScan(targetId, acId, direct) {
   G.qrTarget=targetId; G.qrAcId=acId; G.qrDirect=direct||false;
   openModal('modal-qr');
@@ -1951,12 +1977,12 @@ function closeModalQR() {
   closeModal('modal-qr');
 }
 
-// ── MODALS ────────────────────────────────────────
+// // -- MODALS ----------------------------------------
 function openModal(id){ document.getElementById(id).classList.add('open'); }
 function closeModal(id){ document.getElementById(id).classList.remove('open'); }
 document.addEventListener('keydown', function(e){ if(e.key==='Escape') document.querySelectorAll('.modal-bg.open').forEach(function(m){ closeModal(m.id); }); });
 
-// -- DOCUMENTOS ─────────────────────────────────────
+// -- DOCUMENTOS -------------------------------------
 var docItems = []; // [{codigo,cantidad,precio}]
 
 async function loadDocumentos() {
@@ -2086,7 +2112,7 @@ async function guardarDocumento() {
   btn.disabled=false; btn.innerHTML='<i class="fas fa-save"></i> Registrar Documento y Actualizar Stock';
 }
 
-// -- FIRMAS ───────────────────────────────────────────
+// -- FIRMAS -------------------------------------------
 var firmaState = { canvas:null, ctx:null, drawing:false, pendingAction:null, omitir:false };
 
 function initFirmaCanvas() {
@@ -2250,7 +2276,7 @@ async function guardarFirma(firmaData, movimiento_id, tipo, rfp_id) {
   } catch(e) { console.error('Error guardando firma:', e); }
 }
 
-// -- COMPROBANTE PDF (generado en browser) ──────────
+// -- COMPROBANTE PDF (generado en browser) ----------
 function generarComprobantePDF(datos) {
   // datos: {nombre, rut, cargo, tel, firmaImg, producto, cantidad, tipo, fecha}
   var html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Comprobante</title><style>body{font-family:Arial,sans-serif;padding:40px;max-width:600px;margin:0 auto}h1{color:#1e3c72;font-size:20px;border-bottom:2px solid #1e3c72;padding-bottom:8px}.logo{font-size:24px;font-weight:700;letter-spacing:2px;color:#1e3c72;margin-bottom:4px}.sub{font-size:11px;letter-spacing:3px;color:#888;margin-bottom:20px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:16px 0}.field{background:#f8f9fa;padding:10px 14px;border-radius:6px}.field label{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:#888;display:block;margin-bottom:3px}.field span{font-weight:600;color:#1e3c72;font-size:14px}.firma-box{border:1px solid #ddd;border-radius:8px;padding:12px;text-align:center;margin-top:16px}.footer{margin-top:24px;font-size:11px;color:#aaa;text-align:center;border-top:1px solid #eee;padding-top:12px}</style></head><body>';
@@ -2276,7 +2302,22 @@ function generarComprobantePDF(datos) {
     }
   }
   html += '<div class="footer">Documento generado automaticamente por NEXUS PRIME &mdash; '+new Date().toLocaleString('es-CL')+'</div>';
-  html += '</body></html>';
+  html += '
+<!-- -- MODAL AUTO LOGOUT -- -->
+<div class="modal-bg" id="modal-autologout">
+  <div class="modal modal-sm" style="max-width:380px;text-align:center">
+    <div style="font-size:40px;margin-bottom:8px">!</div>
+    <div class="modal-title" style="justify-content:center;font-size:18px">Sesion por vencer</div>
+    <div style="color:var(--tx2);font-size:13px;margin:10px 0 4px">Tu sesion cerrara por inactividad en:</div>
+    <div class="autologout-timer" id="al-timer">60</div>
+    <div class="autologout-bar"><div class="autologout-bar-fill" id="al-bar" style="width:100%"></div></div>
+    <div style="display:flex;gap:10px;margin-top:4px">
+      <button class="btn btn-secondary" style="flex:1" onclick="doLogout()"><i class="fas fa-right-from-bracket"></i> Cerrar ahora</button>
+      <button class="btn btn-primary" style="flex:2" onclick="resetAutoLogout()"><i class="fas fa-rotate-right"></i> Seguir conectado</button>
+    </div>
+  </div>
+</div>
+</body></html>';
   var blob = new Blob([html], {type:'text/html'});
   var url = URL.createObjectURL(blob);
   var a = document.createElement('a');
@@ -2286,7 +2327,7 @@ function generarComprobantePDF(datos) {
   setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
 }
 
-// -- QR ETIQUETAS ─────────────────────────────────
+// -- QR ETIQUETAS ---------------------------------
 var qrSeleccionados = {}; // {codigo: {codigo, nombre, grupo}}
 
 function onQRChk(cb) {
@@ -2395,7 +2436,22 @@ function generarEtiquetasQR() {
   html += '  document.head.appendChild(s);';
   html += '}';
   html += 'loadQRLib();';
-  html += '<\/script></body></html>';
+  html += '<\/script>
+<!-- -- MODAL AUTO LOGOUT -- -->
+<div class="modal-bg" id="modal-autologout">
+  <div class="modal modal-sm" style="max-width:380px;text-align:center">
+    <div style="font-size:40px;margin-bottom:8px">!</div>
+    <div class="modal-title" style="justify-content:center;font-size:18px">Sesion por vencer</div>
+    <div style="color:var(--tx2);font-size:13px;margin:10px 0 4px">Tu sesion cerrara por inactividad en:</div>
+    <div class="autologout-timer" id="al-timer">60</div>
+    <div class="autologout-bar"><div class="autologout-bar-fill" id="al-bar" style="width:100%"></div></div>
+    <div style="display:flex;gap:10px;margin-top:4px">
+      <button class="btn btn-secondary" style="flex:1" onclick="doLogout()"><i class="fas fa-right-from-bracket"></i> Cerrar ahora</button>
+      <button class="btn btn-primary" style="flex:2" onclick="resetAutoLogout()"><i class="fas fa-rotate-right"></i> Seguir conectado</button>
+    </div>
+  </div>
+</div>
+</body></html>';
 
   // Open in new window
   var blob = new Blob([html], {type: 'text/html'});
@@ -2405,7 +2461,7 @@ function generarEtiquetasQR() {
   toast('Etiquetas generadas — usa Ctrl+P para imprimir/PDF','success', 5000);
 }
 
-// ── WATCHDOG ──────────────────────────────────────
+// // -- WATCHDOG --------------------------------------
 var wdCfg = {};
 
 async function loadWatchdog() {
@@ -2577,7 +2633,7 @@ function subirArchivo(codigo, tipo) {
   inp.click();
 }
 
-// ── TOAST ─────────────────────────────────────────
+// // -- TOAST -----------------------------------------
 function toast(msg, type, dur) {
   type=type||'info'; dur=dur||3200;
   var el=document.createElement('div');
@@ -2587,6 +2643,72 @@ function toast(msg, type, dur) {
   document.getElementById('toast-container').appendChild(el);
   setTimeout(function(){ el.style.opacity='0'; el.style.transform='translateX(10px)'; el.style.transition='all .3s'; setTimeout(function(){ el.remove(); },300); }, dur);
 }
+
+// // -- AUTO LOGOUT -------------------------------------
+var AL = {
+  timeout:  15 * 60 * 1000, // 15 min inactividad
+  warning:  60,             // 60s aviso previo
+  timer:    null,
+  warnTimer: null,
+  countdown: null,
+  active:   false
+};
+
+function initAutoLogout() {
+  AL.active = true;
+  var events = ['mousemove','mousedown','keydown','touchstart','scroll','click'];
+  events.forEach(function(e){ document.addEventListener(e, resetAutoLogout, {passive:true}); });
+  resetAutoLogout();
+}
+
+function resetAutoLogout() {
+  if (!AL.active) return;
+  // Hide warning modal if open
+  var modal = document.getElementById('modal-autologout');
+  if (modal) modal.classList.remove('open');
+  // Clear timers
+  clearTimeout(AL.timer);
+  clearInterval(AL.countdown);
+  // Set new timeout
+  AL.timer = setTimeout(showAutoLogoutWarning, AL.timeout - AL.warning * 1000);
+}
+
+function showAutoLogoutWarning() {
+  var modal = document.getElementById('modal-autologout');
+  if (!modal) return;
+  modal.classList.add('open');
+  var secs = AL.warning;
+  var timerEl = document.getElementById('al-timer');
+  var barEl = document.getElementById('al-bar');
+  if (timerEl) timerEl.textContent = secs;
+  if (barEl) barEl.style.width = '100%';
+  AL.countdown = setInterval(function() {
+    secs--;
+    if (timerEl) timerEl.textContent = secs;
+    if (barEl) barEl.style.width = Math.round((secs / AL.warning) * 100) + '%';
+    if (secs <= 0) {
+      clearInterval(AL.countdown);
+      modal.classList.remove('open');
+      toast('Sesion cerrada por inactividad', 'warning', 3000);
+      setTimeout(doLogout, 1000);
+    }
+  }, 1000);
+}
 </script>
+
+<!-- ── MODAL AUTO LOGOUT ── -->
+<div class="modal-bg" id="modal-autologout">
+  <div class="modal modal-sm" style="max-width:380px;text-align:center">
+    <div style="font-size:40px;margin-bottom:8px">⚠️</div>
+    <div class="modal-title" style="justify-content:center;font-size:18px">Sesion por vencer</div>
+    <div style="color:var(--tx2);font-size:13px;margin:10px 0 4px">Tu sesion cerrara por inactividad en:</div>
+    <div class="autologout-timer" id="al-timer">60</div>
+    <div class="autologout-bar"><div class="autologout-bar-fill" id="al-bar" style="width:100%"></div></div>
+    <div style="display:flex;gap:10px;margin-top:4px">
+      <button class="btn btn-secondary" style="flex:1" onclick="doLogout()"><i class="fas fa-right-from-bracket"></i> Cerrar ahora</button>
+      <button class="btn btn-primary" style="flex:2" onclick="resetAutoLogout()"><i class="fas fa-rotate-right"></i> Seguir conectado</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>
