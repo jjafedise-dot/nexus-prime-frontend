@@ -1303,4 +1303,24 @@ function showALWarningMovil() {
   if (!banner) {
     banner = document.createElement('div');
     banner.id = 'al-banner';
-    banner.style.cssText = 'position:fixed;bottom:80px;left:16px;right:16px
+    banner.style.cssText = 'position:fixed;bottom:80px;left:16px;right:16px;z-index:9999;background:rgba(251,113,133,.15);border:1px solid rgba(251,113,133,.4);border-radius:12px;padding:14px 18px;display:flex;align-items:center;gap:14px;backdrop-filter:blur(8px)';
+    banner.innerHTML = '<i class="fas fa-clock" style="color:var(--rose);font-size:20px;flex-shrink:0"></i><div style="flex:1"><div style="color:var(--rose);font-family:var(--f-d);font-size:13px;font-weight:700">Sesión por vencer</div><div style="color:var(--tx2);font-size:11px">Cerrando en <span id="al-secs">30</span>s</div></div><button onclick="resetIdleMovil()" style="background:var(--neon);color:#000;border:none;border-radius:8px;padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--f-d)">SEGUIR</button>';
+    document.body.appendChild(banner);
+  }
+  banner.style.display = 'flex';
+  let secs = 30;
+  const secsEl = document.getElementById('al-secs');
+  if (secsEl) secsEl.textContent = secs;
+  alCountdown = setInterval(() => {
+    secs--;
+    if (secsEl) secsEl.textContent = secs;
+    if (secs <= 0) {
+      clearInterval(alCountdown);
+      banner.style.display = 'none';
+      doLogout();
+    }
+  }, 1000);
+}
+</script>
+</body>
+</html>
