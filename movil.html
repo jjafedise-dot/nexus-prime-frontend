@@ -815,20 +815,35 @@ async function doLogin() {
   var pass  = document.getElementById('lPass').value;
   var btn   = document.getElementById('btn-login');
   var errEl = document.getElementById('login-err');
-  if (!email || !pass) { errEl.textContent='Ingresa email y contraseña'; errEl.style.display='block'; return; }
-  btn.classList.add('btn-off'); errEl.style.display='none';
+  if (!email || !pass) { errEl.textContent='Ingresa email y contrasena'; errEl.style.display='block'; return; }
+  btn.disabled = true;
+  btn.innerHTML = '<span style="display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .8s linear infinite;vertical-align:middle;margin-right:8px"></span>Accediendo...';
+  errEl.style.display='none';
   try {
     var res = await fetch(API+'/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password:pass})});
-    var data = await res.json();
+    var text = await res.text();
+    var data;
+    try { data = JSON.parse(text); } catch(e) {
+      btn.innerHTML = '<span style="display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .8s linear infinite;vertical-align:middle;margin-right:8px"></span>Iniciando servidor...';
+      await new Promise(function(r){ setTimeout(r,8000); });
+      var res2 = await fetch(API+'/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password:pass})});
+      data = await res2.json();
+    }
     if (data.status === 'success') {
+      btn.innerHTML = '<i class="fas fa-check"></i> Bienvenido';
       S.token = data.data.token; S.user = data.data.usuario;
       localStorage.setItem('nxb', JSON.stringify({token:S.token, user:S.user}));
-      go('s-home'); initHome(); if(!AL_M.active) initAutoLogoutMovil();
+      setTimeout(function(){ go('s-home'); initHome(); if(!AL_M.active) initAutoLogoutMovil(); }, 400);
     } else {
       errEl.textContent = data.message || 'Credenciales incorrectas'; errEl.style.display='block';
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fas fa-arrow-right-to-bracket"></i> Ingresar';
     }
-  } catch(e) { errEl.textContent='Error de conexión'; errEl.style.display='block'; }
-  btn.classList.remove('btn-off');
+  } catch(e) {
+    errEl.textContent='Sin conexion. Intenta de nuevo.'; errEl.style.display='block';
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-arrow-right-to-bracket"></i> Ingresar';
+  }
 }
 
 function doLogout() {
