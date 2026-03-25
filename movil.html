@@ -8,20 +8,39 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="NX Bodega">
+<meta name="description" content="NEXUS BODEGA - Control de inventario móvil">
 <title>NEXUS BODEGA</title>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <style>
 :root {
-  --ink:     #080c18; --ink2: #0d1221; --ink3: #131929; --ink4: #1c2438; --ink5: #232e47;
-  --wire:    rgba(255,255,255,0.06); --wire2: rgba(255,255,255,0.11);
-  --neon:    #38bdf8; --emerald: #34d399; --rose: #fb7185; --amber: #fbbf24; --violet: #a78bfa;
-  --tx1:#f0f4ff; --tx2:#8b9ab8; --tx3:#3d4f6b;
-  --r-sm:8px; --r-md:14px; --r-lg:20px; --r-xl:26px;
-  --f-d:'Barlow Condensed',sans-serif; --f-b:'DM Sans',sans-serif;
-  --sit:env(safe-area-inset-top,0px); --sib:env(safe-area-inset-bottom,0px);
+  --ink: #080c18;
+  --ink2: #0d1221;
+  --ink3: #131929;
+  --ink4: #1c2438;
+  --ink5: #232e47;
+  --wire: rgba(255,255,255,0.06);
+  --wire2: rgba(255,255,255,0.11);
+  --neon: #38bdf8;
+  --emerald: #34d399;
+  --rose: #fb7185;
+  --amber: #fbbf24;
+  --violet: #a78bfa;
+  --tx1: #f0f4ff;
+  --tx2: #8b9ab8;
+  --tx3: #3d4f6b;
+  --r-sm: 8px;
+  --r-md: 14px;
+  --r-lg: 20px;
+  --r-xl: 26px;
+  --f-d: 'Barlow Condensed', sans-serif;
+  --f-b: 'DM Sans', sans-serif;
+  --sit: env(safe-area-inset-top, 0px);
+  --sib: env(safe-area-inset-bottom, 0px);
+  --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
+
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;overflow:hidden;background:var(--ink);color:var(--tx1);font-family:var(--f-b);-webkit-font-smoothing:antialiased}
 body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(56,189,248,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(56,189,248,0.03) 1px,transparent 1px);background-size:32px 32px;pointer-events:none;z-index:0}
@@ -29,232 +48,244 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 .scr{position:absolute;inset:0;display:flex;flex-direction:column;opacity:0;transform:translateY(24px);pointer-events:none;transition:opacity .3s ease,transform .3s cubic-bezier(.22,1,.36,1);overflow:hidden}
 .scr.on{opacity:1;transform:none;pointer-events:all}
 .scr.out{opacity:0;transform:translateY(-16px);transition-duration:.18s;pointer-events:none}
-.body{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding:16px 16px calc(80px + var(--sib));width:100%}#s-scan .body{padding-left:0;padding-right:0;padding-top:0}
+.body{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding:16px 16px calc(80px + var(--sib));width:100%}
+#s-scan .body{padding-left:0;padding-right:0;padding-top:0}
 .body::-webkit-scrollbar{display:none}
 
-/* ── TOP BAR ── */
-.topbar{display:flex;align-items:center;gap:10px;padding:calc(var(--sit) + 12px) 16px 12px;background:linear-gradient(180deg,rgba(8,12,24,.95),rgba(8,12,24,.8));backdrop-filter:blur(12px);border-bottom:1px solid var(--wire);flex-shrink:0;z-index:10}
-.topbar-back{width:36px;height:36px;border-radius:50%;background:var(--ink4);border:1px solid var(--wire2);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--tx2);font-size:14px;flex-shrink:0}
+/* Top Bar */
+.topbar{display:flex;align-items:center;gap:12px;padding:calc(var(--sit) + 12px) 16px 12px;background:linear-gradient(180deg,rgba(8,12,24,.95),rgba(8,12,24,.8));backdrop-filter:blur(12px);border-bottom:1px solid var(--wire);flex-shrink:0;z-index:10}
+.topbar-back{width:38px;height:38px;border-radius:50%;background:var(--ink4);border:1px solid var(--wire2);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--tx2);font-size:14px;flex-shrink:0;transition:var(--transition)}
+.topbar-back:active{background:var(--ink5);transform:scale(.96)}
 .topbar-title{font-family:var(--f-d);font-size:20px;font-weight:800;letter-spacing:2px;color:var(--tx1);flex:1}
 .topbar-title em{color:var(--neon);font-style:normal}
-.topbar-badge{background:var(--ink4);border:1px solid var(--wire2);border-radius:20px;padding:4px 10px;font-size:10px;letter-spacing:1px;color:var(--tx3);font-family:var(--f-d)}
+.topbar-badge{background:var(--ink4);border:1px solid var(--wire2);border-radius:20px;padding:4px 12px;font-size:10px;letter-spacing:1px;color:var(--tx3);font-family:var(--f-d)}
 
-/* ── LOGIN ── */
+/* Login */
 #s-login{align-items:center;justify-content:center;padding:32px 20px;background:var(--ink)}
-.login-mark{display:flex;flex-direction:column;align-items:center;gap:14px;animation:riseIn .7s cubic-bezier(.34,1.56,.64,1) both;margin-bottom:8px}
+.login-mark{display:flex;flex-direction:column;align-items:center;gap:16px;animation:riseIn .7s cubic-bezier(.34,1.56,.64,1) both;margin-bottom:12px}
 @keyframes riseIn{from{opacity:0;transform:translateY(-28px) scale(.9)}to{opacity:1;transform:none}}
-.mark-hex{position:relative;width:84px;height:84px;display:flex;align-items:center;justify-content:center}
+.mark-hex{position:relative;width:88px;height:88px;display:flex;align-items:center;justify-content:center}
 .mark-hex svg{position:absolute;inset:0;width:100%;height:100%}
-.mark-hex i{position:relative;z-index:1;font-size:28px;color:var(--neon);filter:drop-shadow(0 0 12px var(--neon))}
-.mark-title{font-family:var(--f-d);font-size:34px;font-weight:800;letter-spacing:5px;text-transform:uppercase;color:var(--tx1);line-height:1}
+.mark-hex i{position:relative;z-index:1;font-size:30px;color:var(--neon);filter:drop-shadow(0 0 12px var(--neon))}
+.mark-title{font-family:var(--f-d);font-size:36px;font-weight:800;letter-spacing:5px;text-transform:uppercase;color:var(--tx1);line-height:1}
 .mark-title em{color:var(--neon);font-style:normal}
 .mark-sub{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--tx3)}
-.login-form{width:100%;max-width:360px;background:var(--ink3);border:1px solid var(--wire2);border-radius:var(--r-xl);padding:26px 22px;position:relative;overflow:hidden;animation:riseIn .5s .15s cubic-bezier(.34,1.56,.64,1) both}
+.login-form{width:100%;max-width:360px;background:var(--ink3);border:1px solid var(--wire2);border-radius:var(--r-xl);padding:28px 24px;position:relative;overflow:hidden;animation:riseIn .5s .15s cubic-bezier(.34,1.56,.64,1) both}
 .login-form::before{content:'';position:absolute;top:0;left:20%;right:20%;height:1px;background:linear-gradient(90deg,transparent,var(--neon),transparent)}
-.fld{margin-bottom:16px}
-.fld-lbl{display:block;margin-bottom:6px;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--tx3);font-weight:600}
+.fld{margin-bottom:18px}
+.fld-lbl{display:block;margin-bottom:8px;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--tx3);font-weight:600}
 .fld-row{position:relative}
 .fld-row i{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--tx3);font-size:13px}
-.fld-inp{width:100%;padding:13px 13px 13px 38px;background:var(--ink2);border:1px solid var(--wire2);border-radius:var(--r-md);color:var(--tx1);font-family:var(--f-b);font-size:14px;outline:none;transition:border-color .2s}
+.fld-inp{width:100%;padding:14px 14px 14px 42px;background:var(--ink2);border:1px solid var(--wire2);border-radius:var(--r-md);color:var(--tx1);font-family:var(--f-b);font-size:15px;outline:none;transition:var(--transition)}
 .fld-inp:focus{border-color:var(--neon)}
-.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:15px;border:none;border-radius:var(--r-md);font-family:var(--f-d);font-size:16px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:15px;border:none;border-radius:var(--r-md);font-family:var(--f-d);font-size:16px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:var(--transition);position:relative;overflow:hidden}
+.btn:active{transform:scale(.98)}
 .btn-neon{background:linear-gradient(135deg,#0ea5e9,var(--neon));color:#000}
-.btn-neon:hover{opacity:.9}
 .btn-green{background:linear-gradient(135deg,#059669,var(--emerald));color:#000}
 .btn-rose{background:linear-gradient(135deg,#e11d48,var(--rose));color:#fff}
 .btn-amber{background:linear-gradient(135deg,#d97706,var(--amber));color:#000}
 .btn-ghost{background:var(--ink4);border:1px solid var(--wire2);color:var(--tx2)}
 .btn-off{opacity:.5;pointer-events:none}
-.login-err{background:rgba(251,113,133,.1);border:1px solid rgba(251,113,133,.3);border-radius:var(--r-sm);padding:10px 14px;font-size:13px;color:var(--rose);display:none;margin-bottom:14px;text-align:center}
+.login-err{background:rgba(251,113,133,.1);border:1px solid rgba(251,113,133,.3);border-radius:var(--r-sm);padding:12px 16px;font-size:13px;color:var(--rose);display:none;margin-bottom:16px;text-align:center}
 
-/* ── HOME ── */
+/* Home */
 #s-home{background:var(--ink)}
 .home-header{padding:calc(var(--sit) + 16px) 16px 12px;background:linear-gradient(180deg,rgba(8,12,24,.95),transparent);position:relative}
-.home-brand{font-family:var(--f-d);font-size:22px;font-weight:800;letter-spacing:4px;color:var(--tx1)}
+.home-brand{font-family:var(--f-d);font-size:24px;font-weight:800;letter-spacing:4px;color:var(--tx1)}
 .home-brand em{color:var(--neon);font-style:normal}
-.home-user{font-size:11px;color:var(--tx3);margin-top:2px;letter-spacing:.5px}
-.offline-bar{background:rgba(251,191,36,.12);border:1px solid rgba(251,191,36,.3);border-radius:var(--r-sm);padding:8px 14px;margin:0 16px 12px;font-size:12px;color:var(--amber);display:none;align-items:center;gap:8px}
+.home-user{font-size:11px;color:var(--tx3);margin-top:4px;letter-spacing:.5px}
+.offline-bar{background:rgba(251,191,36,.12);border:1px solid rgba(251,191,36,.3);border-radius:var(--r-sm);padding:10px 16px;margin:0 16px 12px;font-size:12px;color:var(--amber);display:none;align-items:center;gap:10px}
 .offline-bar.show{display:flex}
-.stats-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;padding:0 16px;margin-bottom:16px}
-.stat-card{background:var(--ink3);border:1px solid var(--wire);border-radius:var(--r-md);padding:12px 10px;text-align:center;position:relative;overflow:hidden}
+.stats-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;padding:0 16px;margin-bottom:18px}
+.stat-card{background:var(--ink3);border:1px solid var(--wire);border-radius:var(--r-md);padding:14px 12px;text-align:center;position:relative;overflow:hidden}
 .stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--c,var(--neon)),transparent)}
-.stat-val{font-family:var(--f-d);font-size:28px;font-weight:800;line-height:1;color:var(--c,var(--neon))}
-.stat-lbl{font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--tx3);margin-top:3px}
-.actions-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 16px;margin-bottom:16px}
-.action-btn{background:var(--ink3);border:1px solid var(--wire);border-radius:var(--r-lg);padding:18px 16px;display:flex;flex-direction:column;align-items:center;gap:10px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
-.action-btn::before{content:'';position:absolute;inset:0;background:var(--c,var(--neon));opacity:0;transition:opacity .2s}
-.action-btn:active::before{opacity:.06}
-.action-btn .ab-icon{width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--c,var(--neon))}
-.action-btn .ab-label{font-family:var(--f-d);font-size:14px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--tx1);text-align:center}
+.stat-val{font-family:var(--f-d);font-size:30px;font-weight:800;line-height:1;color:var(--c,var(--neon))}
+.stat-lbl{font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--tx3);margin-top:4px}
+.actions-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:0 16px;margin-bottom:18px}
+.action-btn{background:var(--ink3);border:1px solid var(--wire);border-radius:var(--r-lg);padding:20px 16px;display:flex;flex-direction:column;align-items:center;gap:12px;cursor:pointer;transition:var(--transition);position:relative;overflow:hidden}
+.action-btn:active{transform:scale(.98);background:var(--ink4)}
+.action-btn .ab-icon{width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;font-size:22px;color:var(--c,var(--neon))}
+.action-btn .ab-label{font-family:var(--f-d);font-size:15px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--tx1);text-align:center}
 .action-btn .ab-sub{font-size:10px;color:var(--tx3);text-align:center}
-.action-btn-wide{grid-column:1/-1}
-.section-lbl{font-family:var(--f-d);font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--tx3);padding:0 16px;margin-bottom:8px;margin-top:4px}
+.section-lbl{font-family:var(--f-d);font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--tx3);padding:0 16px;margin-bottom:10px;margin-top:6px}
 
-/* ── SCAN ── */
-#s-scan{}
-.scan-type-row{display:flex;gap:6px;padding:0 16px 12px;flex-shrink:0}
-.scan-type-btn{flex:1;padding:10px;border-radius:var(--r-sm);border:1px solid var(--wire2);background:var(--ink4);color:var(--tx3);font-family:var(--f-d);font-size:13px;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;transition:all .2s;text-align:center}
+/* Scan */
+.scan-type-row{display:flex;gap:8px;padding:0 16px 14px;flex-shrink:0}
+.scan-type-btn{flex:1;padding:12px;border-radius:var(--r-sm);border:1px solid var(--wire2);background:var(--ink4);color:var(--tx3);font-family:var(--f-d);font-size:13px;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;transition:var(--transition);text-align:center}
+.scan-type-btn:active{transform:scale(.97)}
 .scan-type-btn.in-active{border-color:var(--emerald);color:var(--emerald);background:rgba(52,211,153,.08)}
 .scan-type-btn.out-active{border-color:var(--rose);color:var(--rose);background:rgba(251,113,133,.08)}
 .scan-type-btn.adj-active{border-color:var(--amber);color:var(--amber);background:rgba(251,191,36,.08)}
-.mode-tabs{display:flex;border:1px solid var(--wire2);border-radius:var(--r-sm);overflow:hidden;margin:0 16px 12px;flex-shrink:0}
-.mode-tab{flex:1;padding:9px;font-family:var(--f-d);font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;background:transparent;border:none;color:var(--tx3);transition:all .2s;text-align:center}
+.mode-tabs{display:flex;border:1px solid var(--wire2);border-radius:var(--r-sm);overflow:hidden;margin:0 16px 14px;flex-shrink:0}
+.mode-tab{flex:1;padding:10px;font-family:var(--f-d);font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;background:transparent;border:none;color:var(--tx3);transition:var(--transition);text-align:center}
+.mode-tab:active{background:var(--ink4)}
 .mode-tab.on{background:var(--ink4);color:var(--neon)}
-.man-row{padding:0 16px 12px;flex-shrink:0;display:none}
+.man-row{padding:0 16px 14px;flex-shrink:0;display:none}
 .man-inp-wrap{position:relative}
-.man-inp{width:100%;padding:12px 48px 12px 14px;background:var(--ink3);border:1px solid var(--wire2);border-radius:var(--r-md);color:var(--tx1);font-family:var(--f-b);font-size:15px;outline:none;transition:border-color .2s}
+.man-inp{width:100%;padding:14px 48px 14px 16px;background:var(--ink3);border:1px solid var(--wire2);border-radius:var(--r-md);color:var(--tx1);font-family:var(--f-b);font-size:15px;outline:none;transition:var(--transition)}
 .man-inp:focus{border-color:var(--neon)}
-.man-inp-btn{position:absolute;right:6px;top:50%;transform:translateY(-50%);width:34px;height:34px;background:var(--neon);border:none;border-radius:var(--r-sm);cursor:pointer;color:#000;font-size:14px;display:flex;align-items:center;justify-content:center}
-.scan-sugg{position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--ink3);border:1px solid var(--wire2);border-radius:var(--r-md);z-index:100;max-height:220px;overflow-y:auto;display:none}
-.qr-box{margin:0 16px 12px;border-radius:var(--r-lg);overflow:hidden;background:#000;position:relative;flex-shrink:0}
+.man-inp-btn{position:absolute;right:8px;top:50%;transform:translateY(-50%);width:38px;height:38px;background:var(--neon);border:none;border-radius:var(--r-sm);cursor:pointer;color:#000;font-size:14px;display:flex;align-items:center;justify-content:center;transition:var(--transition)}
+.man-inp-btn:active{transform:translateY(-50%) scale(.95)}
+.scan-sugg{position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--ink3);border:1px solid var(--wire2);border-radius:var(--r-md);z-index:100;max-height:220px;overflow-y:auto;display:none;box-shadow:0 8px 20px rgba(0,0,0,.3)}
+.qr-box{margin:0 16px 14px;border-radius:var(--r-lg);overflow:hidden;background:#000;position:relative;flex-shrink:0}
 .scan-ov{position:absolute;inset:0;pointer-events:none;z-index:5}
-.sc{position:absolute;width:20px;height:20px;border-color:var(--neon);border-style:solid;opacity:.8}
-.sc.tl{top:12px;left:12px;border-width:2px 0 0 2px;border-radius:3px 0 0 0}
-.sc.tr{top:12px;right:12px;border-width:2px 2px 0 0;border-radius:0 3px 0 0}
-.sc.bl{bottom:12px;left:12px;border-width:0 0 2px 2px;border-radius:0 0 0 3px}
-.sc.br{bottom:12px;right:12px;border-width:0 2px 2px 0;border-radius:0 0 3px 0}
-.sc-line{position:absolute;left:12px;right:12px;height:2px;background:var(--neon);opacity:.6;animation:scanLine 2s ease-in-out infinite}
-@keyframes scanLine{0%,100%{top:12px}50%{bottom:12px;top:auto}}
-.scan-sub{text-align:center;font-size:12px;color:var(--tx3);padding:0 16px 10px;flex-shrink:0;letter-spacing:.5px}
-.p-card{margin:0 16px 10px;background:var(--ink3);border:1px solid var(--wire);border-radius:var(--r-lg);padding:16px;display:none}
+.sc{position:absolute;width:22px;height:22px;border-color:var(--neon);border-style:solid;opacity:.8}
+.sc.tl{top:14px;left:14px;border-width:2px 0 0 2px;border-radius:3px 0 0 0}
+.sc.tr{top:14px;right:14px;border-width:2px 2px 0 0;border-radius:0 3px 0 0}
+.sc.bl{bottom:14px;left:14px;border-width:0 0 2px 2px;border-radius:0 0 0 3px}
+.sc.br{bottom:14px;right:14px;border-width:0 2px 2px 0;border-radius:0 0 3px 0}
+.sc-line{position:absolute;left:14px;right:14px;height:2px;background:var(--neon);opacity:.6;animation:scanLine 2s ease-in-out infinite}
+@keyframes scanLine{0%,100%{top:14px}50%{bottom:14px;top:auto}}
+.scan-sub{text-align:center;font-size:12px;color:var(--tx3);padding:0 16px 12px;flex-shrink:0;letter-spacing:.5px}
+.p-card{margin:0 16px 12px;background:var(--ink3);border:1px solid var(--wire);border-radius:var(--r-lg);padding:18px;display:none}
 .p-card.t-in{border-color:rgba(52,211,153,.3)}
 .p-card.t-out{border-color:rgba(251,113,133,.3)}
 .p-card.t-adj{border-color:rgba(251,191,36,.3)}
-.p-card-top{display:flex;align-items:center;gap:12px;margin-bottom:10px}
-.p-icon{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.p-card-top{display:flex;align-items:center;gap:14px;margin-bottom:12px}
+.p-icon{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
 .p-icon.in{background:rgba(52,211,153,.15);color:var(--emerald)}
 .p-icon.out{background:rgba(251,113,133,.15);color:var(--rose)}
 .p-icon.adj{background:rgba(251,191,36,.15);color:var(--amber)}
 .p-info{flex:1;min-width:0}
-.p-name{font-size:15px;font-weight:700;color:var(--tx1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.p-code{font-size:11px;color:var(--tx3);margin-top:2px}
-.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:20px;font-size:9px;letter-spacing:1px;text-transform:uppercase;font-weight:700}
+.p-name{font-size:16px;font-weight:700;color:var(--tx1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.p-code{font-size:11px;color:var(--tx3);margin-top:4px}
+.badge{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:20px;font-size:10px;letter-spacing:1px;text-transform:uppercase;font-weight:700}
 .b-ok{background:rgba(52,211,153,.12);color:var(--emerald);border:1px solid rgba(52,211,153,.25)}
 .b-warn{background:rgba(251,191,36,.12);color:var(--amber);border:1px solid rgba(251,191,36,.25)}
 .b-crit{background:rgba(251,113,133,.12);color:var(--rose);border:1px solid rgba(251,113,133,.25)}
 .b-nmin{background:rgba(167,139,250,.12);color:var(--violet);border:1px solid rgba(167,139,250,.25)}
-.p-stats{display:flex;gap:12px}
-.p-sb{background:var(--ink4);border-radius:var(--r-sm);padding:8px 12px;flex:1}
+.p-stats{display:flex;gap:14px}
+.p-sb{background:var(--ink4);border-radius:var(--r-sm);padding:10px 14px;flex:1}
 .p-sb-lbl{font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--tx3)}
-.p-sb-val{font-family:var(--f-d);font-size:22px;font-weight:800;line-height:1;margin-top:2px}
+.p-sb-val{font-family:var(--f-d);font-size:24px;font-weight:800;line-height:1;margin-top:4px}
 .p-sb.ok .p-sb-val{color:var(--emerald)}
 .p-sb.warn .p-sb-val{color:var(--amber)}
 .p-sb.crit .p-sb-val{color:var(--rose)}
-.qty-card{margin:0 16px 10px;background:var(--ink3);border:1px solid var(--wire);border-radius:var(--r-lg);padding:16px;display:none}
-.qty-label{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--tx3);margin-bottom:10px}
-.qty-row{display:flex;align-items:center;gap:10px;margin-bottom:12px}
-.qty-btn{width:44px;height:44px;border-radius:var(--r-sm);border:1px solid var(--wire2);background:var(--ink4);color:var(--tx1);font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.qty-inp{flex:1;text-align:center;background:var(--ink2);border:1px solid var(--wire2);border-radius:var(--r-sm);color:var(--tx1);font-family:var(--f-d);font-size:32px;font-weight:800;padding:8px;outline:none;min-width:0}
-.qty-resp{display:flex;align-items:center;gap:8px;margin-bottom:10px}
-.qty-resp-inp{flex:1;padding:10px 12px;background:var(--ink2);border:1px solid var(--wire2);border-radius:var(--r-sm);color:var(--tx1);font-family:var(--f-b);font-size:13px;outline:none}
+.qty-card{margin:0 16px 12px;background:var(--ink3);border:1px solid var(--wire);border-radius:var(--r-lg);padding:18px;display:none}
+.qty-label{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--tx3);margin-bottom:12px}
+.qty-row{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.qty-btn{width:48px;height:48px;border-radius:var(--r-sm);border:1px solid var(--wire2);background:var(--ink4);color:var(--tx1);font-size:24px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:var(--transition)}
+.qty-btn:active{transform:scale(.95)}
+.qty-inp{flex:1;text-align:center;background:var(--ink2);border:1px solid var(--wire2);border-radius:var(--r-sm);color:var(--tx1);font-family:var(--f-d);font-size:34px;font-weight:800;padding:10px;outline:none;min-width:0}
+.qty-resp{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.qty-resp-inp{flex:1;padding:12px 14px;background:var(--ink2);border:1px solid var(--wire2);border-radius:var(--r-sm);color:var(--tx1);font-family:var(--f-b);font-size:13px;outline:none}
 .qty-resp-inp:focus{border-color:var(--neon)}
-.qty-obs{width:100%;padding:10px 12px;background:var(--ink2);border:1px solid var(--wire2);border-radius:var(--r-sm);color:var(--tx1);font-family:var(--f-b);font-size:13px;outline:none;margin-bottom:10px;resize:none}
-.scan-bar{display:none;gap:8px;padding:0 16px 12px;flex-shrink:0}
+.qty-obs{width:100%;padding:12px 14px;background:var(--ink2);border:1px solid var(--wire2);border-radius:var(--r-sm);color:var(--tx1);font-family:var(--f-b);font-size:13px;outline:none;margin-bottom:12px;resize:none}
+.scan-bar{display:none;gap:10px;padding:0 16px 14px;flex-shrink:0}
 .scan-bar .btn{flex:1}
-.btn-scan-otro{display:none;margin:0 16px 10px;padding:10px;background:var(--ink4);border:1px solid var(--wire2);border-radius:var(--r-sm);color:var(--tx2);font-size:13px;cursor:pointer;text-align:center;font-family:var(--f-d);letter-spacing:1px;text-transform:uppercase}
-.foto-btn{display:none;width:100%;padding:11px;background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.25);border-radius:var(--r-sm);color:var(--neon);font-size:13px;cursor:pointer;font-family:var(--f-d);font-weight:700;letter-spacing:1px;text-transform:uppercase;text-align:center;margin-bottom:8px}
+.btn-scan-otro{display:none;margin:0 16px 12px;padding:12px;background:var(--ink4);border:1px solid var(--wire2);border-radius:var(--r-sm);color:var(--tx2);font-size:13px;cursor:pointer;text-align:center;font-family:var(--f-d);letter-spacing:1px;text-transform:uppercase;transition:var(--transition)}
+.btn-scan-otro:active{background:var(--ink5)}
+.foto-btn{display:none;width:100%;padding:12px;background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.25);border-radius:var(--r-sm);color:var(--neon);font-size:13px;cursor:pointer;font-family:var(--f-d);font-weight:700;letter-spacing:1px;text-transform:uppercase;text-align:center;margin-bottom:10px;transition:var(--transition)}
+.foto-btn:active{background:rgba(56,189,248,.15)}
 
-/* ── BOTTOM SHEET CONFIRM ── */
-.sheet-bg{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.7);display:flex;align-items:flex-end;opacity:0;pointer-events:none;transition:opacity .25s}#firma-sheet-bg{z-index:600}
+/* Bottom Sheet */
+.sheet-bg{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.7);display:flex;align-items:flex-end;opacity:0;pointer-events:none;transition:opacity .25s}
+#firma-sheet-bg{z-index:600}
 .sheet-bg.on{opacity:1;pointer-events:all}
 .sheet{background:var(--ink2);border:1px solid var(--wire2);border-radius:var(--r-xl) var(--r-xl) 0 0;padding:20px 20px calc(20px + var(--sib));width:100%;transform:translateY(100%);transition:transform .3s cubic-bezier(.22,1,.36,1)}
 .sheet-bg.on .sheet{transform:none}
-.sheet-handle{width:36px;height:4px;border-radius:2px;background:var(--wire2);margin:0 auto 18px}
-.sheet-title{font-family:var(--f-d);font-size:20px;font-weight:800;letter-spacing:2px;text-align:center;margin-bottom:14px}
-.sheet-body{text-align:center;margin-bottom:20px;line-height:1.6}
-.sheet-btns{display:flex;gap:10px}
+.sheet-handle{width:40px;height:4px;border-radius:2px;background:var(--wire2);margin:0 auto 20px}
+.sheet-title{font-family:var(--f-d);font-size:22px;font-weight:800;letter-spacing:2px;text-align:center;margin-bottom:16px}
+.sheet-body{text-align:center;margin-bottom:22px;line-height:1.6}
+.sheet-btns{display:flex;gap:12px}
 
-/* ── QUERY ── */
-#s-query .body{padding-top:8px}
-.q-inp-wrap{position:relative;margin-bottom:12px}
-.q-inp{width:100%;padding:13px 44px 13px 44px;background:var(--ink3);border:1px solid var(--wire2);border-radius:var(--r-xl);color:var(--tx1);font-family:var(--f-b);font-size:15px;outline:none}
+/* Query */
+#s-query .body{padding-top:10px}
+.q-inp-wrap{position:relative;margin-bottom:14px}
+.q-inp{width:100%;padding:14px 48px 14px 48px;background:var(--ink3);border:1px solid var(--wire2);border-radius:var(--r-xl);color:var(--tx1);font-family:var(--f-b);font-size:15px;outline:none;transition:var(--transition)}
 .q-inp:focus{border-color:var(--neon)}
-.q-inp-icon{position:absolute;left:16px;top:50%;transform:translateY(-50%);color:var(--tx3);font-size:15px}
-.q-clear{position:absolute;right:12px;top:50%;transform:translateY(-50%);width:28px;height:28px;border-radius:50%;background:var(--ink4);border:none;color:var(--tx3);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px}
-.q-detail{background:var(--ink3);border:1px solid var(--wire2);border-radius:var(--r-lg);padding:16px;margin-bottom:12px}
+.q-inp-icon{position:absolute;left:18px;top:50%;transform:translateY(-50%);color:var(--tx3);font-size:15px}
+.q-clear{position:absolute;right:14px;top:50%;transform:translateY(-50%);width:30px;height:30px;border-radius:50%;background:var(--ink4);border:none;color:var(--tx3);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px;transition:var(--transition)}
+.q-clear:active{background:var(--ink5)}
+.q-detail{background:var(--ink3);border:1px solid var(--wire2);border-radius:var(--r-lg);padding:18px;margin-bottom:14px}
 .q-detail.hidden{display:none}
-.qd-name{font-size:16px;font-weight:700;color:var(--tx1);margin-bottom:4px}
-.qd-code{font-size:11px;color:var(--tx3);margin-bottom:12px}
-.qd-stats{display:flex;gap:8px;margin-bottom:12px}
-.qd-stat{flex:1;background:var(--ink4);border-radius:var(--r-sm);padding:8px 10px;text-align:center}
+.qd-name{font-size:16px;font-weight:700;color:var(--tx1);margin-bottom:6px}
+.qd-code{font-size:11px;color:var(--tx3);margin-bottom:14px}
+.qd-stats{display:flex;gap:10px;margin-bottom:14px}
+.qd-stat{flex:1;background:var(--ink4);border-radius:var(--r-sm);padding:10px 12px;text-align:center}
 .qd-stat-lbl{font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--tx3)}
-.qd-stat-val{font-family:var(--f-d);font-size:20px;font-weight:800;line-height:1;margin-top:3px}
-.qd-btns{display:flex;gap:8px}
+.qd-stat-val{font-family:var(--f-d);font-size:22px;font-weight:800;line-height:1;margin-top:4px}
+.qd-btns{display:flex;gap:10px}
 
-/* ── HISTORIAL ── */
-#s-hist .body{padding-top:8px}
-.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 20px;color:var(--tx3);gap:12px}
-.empty i{font-size:32px;opacity:.3}
+/* Historial */
+#s-hist .body{padding-top:10px}
+.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 24px;color:var(--tx3);gap:14px}
+.empty i{font-size:40px;opacity:.3}
 .empty p{font-size:13px;text-align:center}
-.loading{display:flex;align-items:center;justify-content:center;padding:40px;gap:12px;color:var(--tx3);font-size:12px;letter-spacing:1px}
-.spin{width:20px;height:20px;border:2px solid var(--wire2);border-top-color:var(--neon);border-radius:50%;animation:spin .8s linear infinite}
+.loading{display:flex;align-items:center;justify-content:center;padding:48px;gap:14px;color:var(--tx3);font-size:12px;letter-spacing:1px}
+.spin{width:22px;height:22px;border:2px solid var(--wire2);border-top-color:var(--neon);border-radius:50%;animation:spin .8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
 
-/* ── RFP ── */
-#s-rfp .body{padding-top:8px}
-.rfp-form{background:var(--ink3);border:1px solid var(--wire2);border-radius:var(--r-lg);padding:16px;margin-bottom:12px}
-.rfp-form-title{font-family:var(--f-d);font-size:14px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--tx3);margin-bottom:14px}
-.form-fld{margin-bottom:12px}
-.form-lbl{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--tx3);display:block;margin-bottom:6px}
-.form-inp{width:100%;padding:11px 12px;background:var(--ink2);border:1px solid var(--wire2);border-radius:var(--r-sm);color:var(--tx1);font-family:var(--f-b);font-size:14px;outline:none;transition:border-color .2s}
+/* RFP */
+#s-rfp .body{padding-top:10px}
+.rfp-form{background:var(--ink3);border:1px solid var(--wire2);border-radius:var(--r-lg);padding:18px;margin-bottom:14px}
+.rfp-form-title{font-family:var(--f-d);font-size:14px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--tx3);margin-bottom:16px}
+.form-fld{margin-bottom:14px}
+.form-lbl{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--tx3);display:block;margin-bottom:8px}
+.form-inp{width:100%;padding:12px 14px;background:var(--ink2);border:1px solid var(--wire2);border-radius:var(--r-sm);color:var(--tx1);font-family:var(--f-b);font-size:14px;outline:none;transition:var(--transition)}
 .form-inp:focus{border-color:var(--neon)}
-.form-row{display:flex;gap:10px}
+.form-row{display:flex;gap:12px}
 .form-row .form-fld{flex:1}
-.rfp-info{background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.2);border-radius:var(--r-sm);padding:12px;margin-top:8px;display:none}
-.rfp-pend-list{max-height:200px;overflow-y:auto}
-.rfp-pend-item{background:var(--ink4);border:1px solid var(--wire);border-radius:var(--r-sm);padding:12px;margin-bottom:8px;cursor:pointer}
+.rfp-info{background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.2);border-radius:var(--r-sm);padding:14px;margin-top:10px;display:none}
+.rfp-pend-list{max-height:220px;overflow-y:auto}
+.rfp-pend-item{background:var(--ink4);border:1px solid var(--wire);border-radius:var(--r-sm);padding:14px;margin-bottom:10px;cursor:pointer;transition:var(--transition)}
+.rfp-pend-item:active{background:var(--ink5)}
 .rfp-pend-item.selected{border-color:var(--neon);background:rgba(56,189,248,.06)}
 
-/* ── LOTE ── */
-.lote-item{background:var(--ink3);border:1px solid var(--wire);border-radius:var(--r-md);padding:12px;margin-bottom:8px;display:flex;align-items:center;gap:10px}
+/* Lote */
+.lote-item{background:var(--ink3);border:1px solid var(--wire);border-radius:var(--r-md);padding:14px;margin-bottom:10px;display:flex;align-items:center;gap:12px}
 .lote-item-info{flex:1;min-width:0}
 .lote-item-name{font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.lote-item-code{font-size:11px;color:var(--tx3);margin-top:2px}
-.lote-item-qty{font-family:var(--f-d);font-size:20px;font-weight:800;color:var(--neon);margin:0 8px}
-.lote-item-del{width:30px;height:30px;border-radius:50%;background:rgba(251,113,133,.1);border:1px solid rgba(251,113,133,.2);color:var(--rose);font-size:12px;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.lote-item-code{font-size:11px;color:var(--tx3);margin-top:4px}
+.lote-item-qty{font-family:var(--f-d);font-size:22px;font-weight:800;color:var(--neon);margin:0 10px}
+.lote-item-del{width:36px;height:36px;border-radius:50%;background:rgba(251,113,133,.1);border:1px solid rgba(251,113,133,.2);color:var(--rose);font-size:14px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:var(--transition)}
+.lote-item-del:active{background:rgba(251,113,133,.2);transform:scale(.95)}
 
-/* ── TOAST ── */
-#toast-wrap{position:fixed;bottom:calc(80px + var(--sib) + 8px);left:16px;right:16px;z-index:9000;display:flex;flex-direction:column;gap:6px;pointer-events:none}
-.toast{display:flex;align-items:center;gap:10px;padding:12px 16px;border-radius:var(--r-md);font-size:13px;font-weight:600;animation:slideUp .3s ease both;pointer-events:all}
-@keyframes slideUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+/* Toast */
+#toast-wrap{position:fixed;bottom:calc(80px + var(--sib) + 8px);left:16px;right:16px;z-index:9000;display:flex;flex-direction:column;gap:8px;pointer-events:none}
+.toast{display:flex;align-items:center;gap:12px;padding:14px 18px;border-radius:var(--r-md);font-size:13px;font-weight:600;animation:slideUp .3s ease both;pointer-events:all;box-shadow:0 4px 12px rgba(0,0,0,.2)}
+@keyframes slideUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
 .toast.ok{background:rgba(52,211,153,.15);border:1px solid rgba(52,211,153,.3);color:var(--emerald)}
 .toast.err{background:rgba(251,113,133,.15);border:1px solid rgba(251,113,133,.3);color:var(--rose)}
 .toast.wrn{background:rgba(251,191,36,.15);border:1px solid rgba(251,191,36,.3);color:var(--amber)}
 .toast.inf{background:rgba(56,189,248,.15);border:1px solid rgba(56,189,248,.3);color:var(--neon)}
 
-/* ── MODALS ── */
+/* Modals */
 .modal-full{position:fixed;inset:0;z-index:800;background:rgba(0,0,0,.92);display:none;flex-direction:column;align-items:center;justify-content:center;padding:16px}
 .modal-full.open{display:flex}
-.modal-card{width:100%;max-width:380px;background:var(--ink2);border:1px solid var(--wire2);border-radius:var(--r-xl);overflow:hidden}
-.modal-head{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;border-bottom:1px solid var(--wire)}
+.modal-card{width:100%;max-width:400px;background:var(--ink2);border:1px solid var(--wire2);border-radius:var(--r-xl);overflow:hidden}
+.modal-head{display:flex;align-items:center;justify-content:space-between;padding:18px 20px;border-bottom:1px solid var(--wire)}
 .modal-head-title{font-family:var(--f-d);font-size:16px;font-weight:800;letter-spacing:2px;color:var(--tx1)}
-.modal-close{width:30px;height:30px;border-radius:50%;background:var(--ink4);border:none;color:var(--tx3);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center}
-.modal-body{padding:16px 18px}
+.modal-close{width:32px;height:32px;border-radius:50%;background:var(--ink4);border:none;color:var(--tx3);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:var(--transition)}
+.modal-close:active{background:var(--ink5);transform:scale(.95)}
+.modal-body{padding:18px}
 
-/* ── BOTTOM NAV ── */
+/* Bottom Nav */
 .bnav{position:fixed;bottom:0;left:0;right:0;z-index:200;background:rgba(13,18,33,.95);backdrop-filter:blur(16px);border-top:1px solid var(--wire2);padding-bottom:var(--sib);display:flex}
-.bnav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 6px;cursor:pointer;color:var(--tx3);transition:color .2s;border:none;background:none}
-.bnav-btn i{font-size:18px}
+.bnav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:12px 6px;cursor:pointer;color:var(--tx3);transition:var(--transition);border:none;background:none}
+.bnav-btn:active{transform:scale(.96)}
+.bnav-btn i{font-size:20px}
 .bnav-btn span{font-size:9px;letter-spacing:1px;text-transform:uppercase;font-family:var(--f-d);font-weight:700}
 .bnav-btn.active{color:var(--neon)}
 .bnav-btn.active i{filter:drop-shadow(0 0 6px var(--neon))}
 
-/* ── PHOTO MODAL ── */
+/* Photo Modal */
 .photo-video{width:100%;border-radius:var(--r-md);overflow:hidden;background:#000;aspect-ratio:4/3;position:relative}
 .photo-video video{width:100%;height:100%;object-fit:cover}
-.photo-capture-btn{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);width:56px;height:56px;border-radius:50%;background:rgba(255,255,255,.9);border:3px solid #fff;cursor:pointer;display:flex;align-items:center;justify-content:center}
-.photo-capture-btn i{font-size:22px;color:#000}
-.photo-preview{display:none;margin-top:10px}
+.photo-capture-btn{position:absolute;bottom:16px;left:50%;transform:translateX(-50%);width:60px;height:60px;border-radius:50%;background:rgba(255,255,255,.9);border:3px solid #fff;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:var(--transition)}
+.photo-capture-btn:active{transform:translateX(-50%) scale(.95)}
+.photo-capture-btn i{font-size:24px;color:#000}
+.photo-preview{display:none;margin-top:12px}
 .photo-preview img{width:100%;border-radius:var(--r-md);max-height:200px;object-fit:cover}
-.photo-actions{display:flex;gap:8px;margin-top:8px}
-.photo-actions .btn{flex:1;padding:11px;font-size:13px}
+.photo-actions{display:flex;gap:10px;margin-top:10px}
+.photo-actions .btn{flex:1;padding:12px;font-size:13px}
 </style>
 </head>
 <body>
 <div id="app">
 
-<!-- ══ LOGIN ══ -->
+<!-- LOGIN -->
 <div class="scr on" id="s-login">
   <div class="login-mark">
     <div class="mark-hex">
@@ -273,677 +304,334 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
       <label class="fld-lbl">Email</label>
       <div class="fld-row">
         <i class="fas fa-at"></i>
-        <input class="fld-inp" id="lEmail" type="email" placeholder="usuario@empresa.com" autocomplete="email"/>
+        <input class="fld-inp" id="lEmail" type="email" placeholder="usuario@empresa.com" autocomplete="email">
       </div>
     </div>
     <div class="fld">
       <label class="fld-lbl">Contraseña</label>
       <div class="fld-row">
         <i class="fas fa-lock"></i>
-        <input class="fld-inp" id="lPass" type="password" placeholder="••••••••" autocomplete="current-password"/>
+        <input class="fld-inp" id="lPass" type="password" placeholder="••••••••" autocomplete="current-password">
       </div>
     </div>
     <button class="btn btn-neon" onclick="doLogin()" id="btn-login"><i class="fas fa-arrow-right-to-bracket"></i> Ingresar</button>
   </div>
 </div>
 
-<!-- ══ HOME ══ -->
+<!-- HOME -->
 <div class="scr" id="s-home">
-  <!-- TOPBAR -->
   <div class="topbar">
     <div>
       <div style="font-family:var(--f-d);font-size:18px;font-weight:800;letter-spacing:2px">NX <span style="color:var(--neon)">BODEGA</span></div>
       <div style="font-size:11px;color:var(--tx3)" id="home-user">Cargando...</div>
     </div>
-    <div style="display:flex;align-items:center;gap:8px;margin-left:auto">
-      <div id="offline-icon" style="width:32px;height:32px;border-radius:50%;background:var(--ink4);border:1px solid var(--wire2);display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--emerald)"><i class="fas fa-wifi"></i></div>
-      <div onclick="doLogout()" style="width:32px;height:32px;border-radius:50%;background:var(--ink4);border:1px solid var(--wire2);display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--tx3);cursor:pointer"><i class="fas fa-right-from-bracket"></i></div>
+    <div style="display:flex;align-items:center;gap:10px;margin-left:auto">
+      <div id="offline-icon" style="width:34px;height:34px;border-radius:50%;background:var(--ink4);border:1px solid var(--wire2);display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--emerald)"><i class="fas fa-wifi"></i></div>
+      <div onclick="doLogout()" style="width:34px;height:34px;border-radius:50%;background:var(--ink4);border:1px solid var(--wire2);display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--tx3);cursor:pointer;transition:var(--transition)"><i class="fas fa-right-from-bracket"></i></div>
     </div>
   </div>
-
-  <div class="offline-bar" id="offline-bar"><i class="fas fa-wifi-slash"></i><span id="offline-txt">Sin conexion · modo offline activo</span></div>
-
+  <div class="offline-bar" id="offline-bar"><i class="fas fa-wifi-slash"></i><span id="offline-txt">Sin conexión · modo offline activo</span></div>
   <div class="body">
-    <!-- Saludo -->
-    <div style="margin-bottom:14px">
-      <div style="font-family:var(--f-d);font-size:22px;font-weight:700;color:var(--tx1)">Hola, <span id="home-nombre" style="color:var(--neon)">Operador</span></div>
+    <div style="margin-bottom:16px">
+      <div style="font-family:var(--f-d);font-size:24px;font-weight:700;color:var(--tx1)">Hola, <span id="home-nombre" style="color:var(--neon)">Operador</span></div>
       <div style="font-size:12px;color:var(--tx3)" id="home-fecha"></div>
     </div>
-
-    <!-- Stats chips -->
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px">
-      <div style="background:var(--ink3);border:1px solid var(--wire);border-radius:var(--r-md);padding:12px;text-align:center">
-        <div style="font-family:var(--f-d);font-size:24px;font-weight:800;color:var(--neon)" id="st-total">—</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px">
+      <div style="background:var(--ink3);border:1px solid var(--wire);border-radius:var(--r-md);padding:14px;text-align:center">
+        <div style="font-family:var(--f-d);font-size:26px;font-weight:800;color:var(--neon)" id="st-total">—</div>
         <div style="font-size:10px;color:var(--tx3);letter-spacing:1px;text-transform:uppercase">Productos</div>
       </div>
-      <div style="background:var(--ink3);border:1px solid rgba(251,113,133,.25);border-radius:var(--r-md);padding:12px;text-align:center">
-        <div style="font-family:var(--f-d);font-size:24px;font-weight:800;color:var(--rose)" id="st-sin">—</div>
+      <div style="background:var(--ink3);border:1px solid rgba(251,113,133,.25);border-radius:var(--r-md);padding:14px;text-align:center">
+        <div style="font-family:var(--f-d);font-size:26px;font-weight:800;color:var(--rose)" id="st-sin">—</div>
         <div style="font-size:10px;color:var(--tx3);letter-spacing:1px;text-transform:uppercase">Sin Stock</div>
       </div>
-      <div style="background:var(--ink3);border:1px solid rgba(251,191,36,.25);border-radius:var(--r-md);padding:12px;text-align:center">
-        <div style="font-family:var(--f-d);font-size:24px;font-weight:800;color:var(--amber)" id="st-bajo">—</div>
+      <div style="background:var(--ink3);border:1px solid rgba(251,191,36,.25);border-radius:var(--r-md);padding:14px;text-align:center">
+        <div style="font-family:var(--f-d);font-size:26px;font-weight:800;color:var(--amber)" id="st-bajo">—</div>
         <div style="font-size:10px;color:var(--tx3);letter-spacing:1px;text-transform:uppercase">Stock Bajo</div>
       </div>
     </div>
-
-    <!-- Operaciones -->
-    <div style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--tx3);margin-bottom:10px;font-weight:700">Operaciones</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
-      <!-- Ingreso -->
-      <div onclick="goScan('in')" style="background:linear-gradient(135deg,rgba(52,211,153,.12),rgba(52,211,153,.04));border:1px solid rgba(52,211,153,.35);border-radius:var(--r-lg);padding:18px 14px;display:flex;flex-direction:column;align-items:center;gap:10px;cursor:pointer;text-align:center;active:opacity:.8">
-        <div style="width:52px;height:52px;border-radius:14px;background:rgba(52,211,153,.15);display:flex;align-items:center;justify-content:center">
-          <i class="fas fa-arrow-down" style="color:var(--emerald);font-size:22px"></i>
-        </div>
-        <div>
-          <div style="color:var(--emerald);font-family:var(--f-d);font-size:15px;font-weight:800;letter-spacing:1px">INGRESO</div>
-          <div style="color:var(--tx3);font-size:11px;margin-top:3px">Recibir mercaderia</div>
-        </div>
+    <div style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--tx3);margin-bottom:12px;font-weight:700">Operaciones</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+      <div onclick="goScan('in')" style="background:linear-gradient(135deg,rgba(52,211,153,.12),rgba(52,211,153,.04));border:1px solid rgba(52,211,153,.35);border-radius:var(--r-lg);padding:20px 14px;display:flex;flex-direction:column;align-items:center;gap:12px;cursor:pointer;text-align:center;transition:var(--transition)">
+        <div style="width:56px;height:56px;border-radius:14px;background:rgba(52,211,153,.15);display:flex;align-items:center;justify-content:center"><i class="fas fa-arrow-down" style="color:var(--emerald);font-size:24px"></i></div>
+        <div><div style="color:var(--emerald);font-family:var(--f-d);font-size:16px;font-weight:800;letter-spacing:1px">INGRESO</div><div style="color:var(--tx3);font-size:11px;margin-top:4px">Recibir mercadería</div></div>
       </div>
-      <!-- Salida -->
-      <div onclick="goScan('out')" style="background:linear-gradient(135deg,rgba(251,113,133,.12),rgba(251,113,133,.04));border:1px solid rgba(251,113,133,.35);border-radius:var(--r-lg);padding:18px 14px;display:flex;flex-direction:column;align-items:center;gap:10px;cursor:pointer;text-align:center">
-        <div style="width:52px;height:52px;border-radius:14px;background:rgba(251,113,133,.15);display:flex;align-items:center;justify-content:center">
-          <i class="fas fa-arrow-up" style="color:var(--rose);font-size:22px"></i>
-        </div>
-        <div>
-          <div style="color:var(--rose);font-family:var(--f-d);font-size:15px;font-weight:800;letter-spacing:1px">SALIDA</div>
-          <div style="color:var(--tx3);font-size:11px;margin-top:3px">Despachar productos</div>
-        </div>
+      <div onclick="goScan('out')" style="background:linear-gradient(135deg,rgba(251,113,133,.12),rgba(251,113,133,.04));border:1px solid rgba(251,113,133,.35);border-radius:var(--r-lg);padding:20px 14px;display:flex;flex-direction:column;align-items:center;gap:12px;cursor:pointer;text-align:center;transition:var(--transition)">
+        <div style="width:56px;height:56px;border-radius:14px;background:rgba(251,113,133,.15);display:flex;align-items:center;justify-content:center"><i class="fas fa-arrow-up" style="color:var(--rose);font-size:24px"></i></div>
+        <div><div style="color:var(--rose);font-family:var(--f-d);font-size:16px;font-weight:800;letter-spacing:1px">SALIDA</div><div style="color:var(--tx3);font-size:11px;margin-top:4px">Despachar productos</div></div>
       </div>
     </div>
-
-    <!-- Lote -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
-      <div onclick="goLote('in')" style="background:var(--ink3);border:1px solid rgba(52,211,153,.2);border-radius:var(--r-md);padding:12px 10px;display:flex;align-items:center;gap:10px;cursor:pointer">
-        <div style="width:36px;height:36px;border-radius:10px;background:rgba(52,211,153,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0">
-          <i class="fas fa-layer-group" style="color:var(--emerald);font-size:15px"></i>
-        </div>
-        <div>
-          <div style="color:var(--emerald);font-family:var(--f-d);font-size:12px;font-weight:800;letter-spacing:1px">INGRESO</div>
-          <div style="color:var(--tx3);font-size:10px">por lote</div>
-        </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px">
+      <div onclick="goLote('in')" style="background:var(--ink3);border:1px solid rgba(52,211,153,.2);border-radius:var(--r-md);padding:14px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:var(--transition)">
+        <div style="width:40px;height:40px;border-radius:12px;background:rgba(52,211,153,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fas fa-layer-group" style="color:var(--emerald);font-size:16px"></i></div>
+        <div><div style="color:var(--emerald);font-family:var(--f-d);font-size:12px;font-weight:800;letter-spacing:1px">INGRESO POR LOTE</div><div style="color:var(--tx3);font-size:10px">múltiples productos</div></div>
       </div>
-      <div onclick="goLote('out')" style="background:var(--ink3);border:1px solid rgba(251,113,133,.2);border-radius:var(--r-md);padding:12px 10px;display:flex;align-items:center;gap:10px;cursor:pointer">
-        <div style="width:36px;height:36px;border-radius:10px;background:rgba(251,113,133,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0">
-          <i class="fas fa-layer-group" style="color:var(--rose);font-size:15px"></i>
-        </div>
-        <div>
-          <div style="color:var(--rose);font-family:var(--f-d);font-size:12px;font-weight:800;letter-spacing:1px">SALIDA</div>
-          <div style="color:var(--tx3);font-size:10px">por lote</div>
-        </div>
+      <div onclick="goLote('out')" style="background:var(--ink3);border:1px solid rgba(251,113,133,.2);border-radius:var(--r-md);padding:14px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:var(--transition)">
+        <div style="width:40px;height:40px;border-radius:12px;background:rgba(251,113,133,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fas fa-layer-group" style="color:var(--rose);font-size:16px"></i></div>
+        <div><div style="color:var(--rose);font-family:var(--f-d);font-size:12px;font-weight:800;letter-spacing:1px">SALIDA POR LOTE</div><div style="color:var(--tx3);font-size:10px">múltiples productos</div></div>
       </div>
     </div>
-
-    <!-- Bodega RFP -->
-    <div style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--tx3);margin-bottom:10px;font-weight:700">Bodega RFP</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
-      <div onclick="goRFP('retiro')" style="background:linear-gradient(135deg,rgba(251,191,36,.1),rgba(251,191,36,.03));border:1px solid rgba(251,191,36,.3);border-radius:var(--r-md);padding:14px;display:flex;align-items:center;gap:10px;cursor:pointer">
-        <div style="width:40px;height:40px;border-radius:10px;background:rgba(251,191,36,.12);display:flex;align-items:center;justify-content:center;flex-shrink:0">
-          <i class="fas fa-arrow-circle-right" style="color:var(--amber);font-size:18px"></i>
-        </div>
-        <div>
-          <div style="color:var(--amber);font-family:var(--f-d);font-size:12px;font-weight:800;letter-spacing:1px">RETIRO RFP</div>
-          <div style="color:var(--tx3);font-size:10px">registrar prestamo</div>
-        </div>
+    <div style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--tx3);margin-bottom:12px;font-weight:700">Bodega RFP</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px">
+      <div onclick="goRFP('retiro')" style="background:linear-gradient(135deg,rgba(251,191,36,.1),rgba(251,191,36,.03));border:1px solid rgba(251,191,36,.3);border-radius:var(--r-md);padding:16px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:var(--transition)">
+        <div style="width:44px;height:44px;border-radius:12px;background:rgba(251,191,36,.12);display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fas fa-arrow-circle-right" style="color:var(--amber);font-size:20px"></i></div>
+        <div><div style="color:var(--amber);font-family:var(--f-d);font-size:12px;font-weight:800;letter-spacing:1px">RETIRO RFP</div><div style="color:var(--tx3);font-size:10px">registrar préstamo</div></div>
       </div>
-      <div onclick="goRFP('devolucion')" style="background:linear-gradient(135deg,rgba(52,211,153,.1),rgba(52,211,153,.03));border:1px solid rgba(52,211,153,.3);border-radius:var(--r-md);padding:14px;display:flex;align-items:center;gap:10px;cursor:pointer">
-        <div style="width:40px;height:40px;border-radius:10px;background:rgba(52,211,153,.12);display:flex;align-items:center;justify-content:center;flex-shrink:0">
-          <i class="fas fa-undo-alt" style="color:var(--emerald);font-size:18px"></i>
-        </div>
-        <div>
-          <div style="color:var(--emerald);font-family:var(--f-d);font-size:12px;font-weight:800;letter-spacing:1px">DEVOLUCION</div>
-          <div style="color:var(--tx3);font-size:10px">devolver a RFP</div>
-        </div>
+      <div onclick="goRFP('devolucion')" style="background:linear-gradient(135deg,rgba(52,211,153,.1),rgba(52,211,153,.03));border:1px solid rgba(52,211,153,.3);border-radius:var(--r-md);padding:16px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:var(--transition)">
+        <div style="width:44px;height:44px;border-radius:12px;background:rgba(52,211,153,.12);display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fas fa-undo-alt" style="color:var(--emerald);font-size:20px"></i></div>
+        <div><div style="color:var(--emerald);font-family:var(--f-d);font-size:12px;font-weight:800;letter-spacing:1px">DEVOLUCIÓN</div><div style="color:var(--tx3);font-size:10px">devolver a RFP</div></div>
       </div>
     </div>
-
-    <!-- Consultar e Historial -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
-      <div onclick="goQuery()" style="background:var(--ink3);border:1px solid var(--wire);border-radius:var(--r-md);padding:14px;display:flex;align-items:center;gap:10px;cursor:pointer">
-        <div style="width:36px;height:36px;border-radius:10px;background:rgba(56,189,248,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0">
-          <i class="fas fa-magnifying-glass" style="color:var(--neon);font-size:15px"></i>
-        </div>
-        <div>
-          <div style="color:var(--neon);font-family:var(--f-d);font-size:12px;font-weight:800;letter-spacing:1px">CONSULTAR</div>
-          <div style="color:var(--tx3);font-size:10px">buscar producto</div>
-        </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px">
+      <div onclick="goQuery()" style="background:var(--ink3);border:1px solid var(--wire);border-radius:var(--r-md);padding:16px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:var(--transition)">
+        <div style="width:40px;height:40px;border-radius:12px;background:rgba(56,189,248,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fas fa-magnifying-glass" style="color:var(--neon);font-size:16px"></i></div>
+        <div><div style="color:var(--neon);font-family:var(--f-d);font-size:12px;font-weight:800;letter-spacing:1px">CONSULTAR</div><div style="color:var(--tx3);font-size:10px">buscar producto</div></div>
       </div>
-      <div onclick="goHist()" style="background:var(--ink3);border:1px solid var(--wire);border-radius:var(--r-md);padding:14px;display:flex;align-items:center;gap:10px;cursor:pointer">
-        <div style="width:36px;height:36px;border-radius:10px;background:rgba(167,139,250,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0">
-          <i class="fas fa-clock-rotate-left" style="color:var(--violet);font-size:15px"></i>
-        </div>
-        <div>
-          <div style="color:var(--violet);font-family:var(--f-d);font-size:12px;font-weight:800;letter-spacing:1px">HISTORIAL</div>
-          <div style="color:var(--tx3);font-size:10px">mis movimientos</div>
-        </div>
+      <div onclick="goHist()" style="background:var(--ink3);border:1px solid var(--wire);border-radius:var(--r-md);padding:16px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:var(--transition)">
+        <div style="width:40px;height:40px;border-radius:12px;background:rgba(167,139,250,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fas fa-clock-rotate-left" style="color:var(--violet);font-size:16px"></i></div>
+        <div><div style="color:var(--violet);font-family:var(--f-d);font-size:12px;font-weight:800;letter-spacing:1px">HISTORIAL</div><div style="color:var(--tx3);font-size:10px">mis movimientos</div></div>
       </div>
     </div>
-
-    <!-- Cola offline -->
-    <div id="queue-info" style="display:none;background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.2);border-radius:var(--r-md);padding:12px 14px">
+    <div id="queue-info" style="display:none;background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.2);border-radius:var(--r-md);padding:14px 16px;margin-top:8px">
       <div style="color:var(--amber);font-size:12px;font-weight:700"><i class="fas fa-clock"></i> <span id="q-count">0</span> movimiento(s) pendientes de sincronizar</div>
-      <button onclick="syncQ()" style="margin-top:8px;padding:7px 14px;background:rgba(251,191,36,.15);border:1px solid rgba(251,191,36,.3);border-radius:var(--r-sm);color:var(--amber);font-size:12px;cursor:pointer;font-family:var(--f-d);font-weight:700;letter-spacing:1px;width:100%">SINCRONIZAR AHORA</button>
+      <button onclick="syncQ()" style="margin-top:10px;padding:8px 16px;background:rgba(251,191,36,.15);border:1px solid rgba(251,191,36,.3);border-radius:var(--r-sm);color:var(--amber);font-size:12px;cursor:pointer;font-family:var(--f-d);font-weight:700;letter-spacing:1px;width:100%">SINCRONIZAR AHORA</button>
     </div>
   </div>
 </div>
 
-<!-- ══ SCAN ══ -->
+<!-- SCAN -->
 <div class="scr" id="s-scan">
   <div class="topbar">
     <div class="topbar-back" onclick="back()"><i class="fas fa-chevron-left"></i></div>
     <div class="topbar-title" id="scan-title">INGRESO</div>
     <div class="topbar-badge" id="scan-badge">Bodega</div>
   </div>
-
-  <div style="display:flex;align-items:center;padding:8px 16px;gap:8px;flex-shrink:0">
-    <div id="scan-tipo-pill" style="flex:1;padding:8px 12px;border-radius:var(--r-sm);font-family:var(--f-d);font-size:13px;font-weight:700;letter-spacing:1px;text-align:center">INGRESO</div>
-    <div class="mode-tabs" style="flex:1">
-      <div class="mode-tab on" id="tab-cam" onclick="setMode('cam')"><i class="fas fa-camera"></i> Camara</div>
-      <div class="mode-tab" id="tab-man" onclick="setMode('man')"><i class="fas fa-keyboard"></i> Manual</div>
-    </div>
+  <div style="display:flex;align-items:center;padding:10px 16px;gap:10px;flex-shrink:0">
+    <div id="scan-tipo-pill" style="flex:1;padding:10px 14px;border-radius:var(--r-sm);font-family:var(--f-d);font-size:13px;font-weight:700;letter-spacing:1px;text-align:center">INGRESO</div>
+    <div class="mode-tabs" style="flex:1"><div class="mode-tab on" id="tab-cam" onclick="setMode('cam')"><i class="fas fa-camera"></i> Cámara</div><div class="mode-tab" id="tab-man" onclick="setMode('man')"><i class="fas fa-keyboard"></i> Manual</div></div>
   </div>
-  <div class="man-row" id="man-row">
-    <div class="man-inp-wrap" style="position:relative">
-      <input class="man-inp" id="man-inp" type="text" placeholder="Código del producto..." oninput="searchLive(this.value)" onkeydown="if(event.key==='Enter')searchManual()"/>
-      <button class="man-inp-btn" onclick="searchManual()"><i class="fas fa-arrow-right"></i></button>
-      <div class="scan-sugg" id="scan-sugg"></div>
-    </div>
-  </div>
+  <div class="man-row" id="man-row"><div class="man-inp-wrap" style="position:relative"><input class="man-inp" id="man-inp" type="text" placeholder="Código del producto..." oninput="searchLive(this.value)" onkeydown="if(event.key==='Enter')searchManual()"><button class="man-inp-btn" onclick="searchManual()"><i class="fas fa-arrow-right"></i></button><div class="scan-sugg" id="scan-sugg"></div></div></div>
   <div style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:16px">
-    <div class="qr-box" id="scan-box">
-      <div class="scan-ov"><div class="sc tl"></div><div class="sc tr"></div><div class="sc bl"></div><div class="sc br"></div><div class="sc-line"></div></div>
-      <div id="qr-reader" style="width:100%"></div>
-    </div>
-    <div style="text-align:center;font-size:12px;color:var(--tx3);padding:6px 16px 10px;letter-spacing:.5px" id="scan-sub">Escanea o ingresa el código</div>
-    <div class="p-card" id="p-card">
-      <div class="p-card-top">
-        <div class="p-icon in" id="p-icon"><i class="fas fa-arrow-down"></i></div>
-        <div class="p-info">
-          <div class="p-name" id="p-name">—</div>
-          <div class="p-code" id="p-code">—</div>
-        </div>
-        <div id="p-badge" class="badge b-ok">OK</div>
-      </div>
-      <div class="p-stats">
-        <div class="p-sb ok" id="p-sb">
-          <div class="p-sb-lbl">Stock Actual</div>
-          <div class="p-sb-val" id="p-stk">—</div>
-        </div>
-        <div class="p-sb" style="background:var(--ink4)">
-          <div class="p-sb-lbl">Mínimo</div>
-          <div class="p-sb-val" style="color:var(--tx2)" id="p-min">—</div>
-        </div>
-      </div>
-    </div>
-    <div class="qty-card" id="qty-card">
-      <div class="qty-label" id="qty-label">Cantidad a Ingresar</div>
-      <div class="qty-row">
-        <button class="qty-btn" onclick="dQ(-1)"><i class="fas fa-minus"></i></button>
-        <input class="qty-inp" id="qty-val" type="number" value="1" min="0.01" step="0.01"/>
-        <button class="qty-btn" onclick="dQ(1)"><i class="fas fa-plus"></i></button>
-      </div>
-      <div class="qty-resp">
-        <i class="fas fa-user" style="color:var(--tx3);font-size:13px"></i>
-        <input class="qty-resp-inp" id="resp-inp" type="text" placeholder="Responsable (obligatorio)"/>
-      </div>
-      <textarea class="qty-obs" id="obs-inp" rows="2" placeholder="Observaciones (opcional)..."></textarea>
-      <button class="foto-btn" id="btn-foto-resp" onclick="tomarFotoRespaldo()"><i class="fas fa-camera"></i> Adjuntar foto de respaldo</button>
-    </div>
+    <div class="qr-box" id="scan-box"><div class="scan-ov"><div class="sc tl"></div><div class="sc tr"></div><div class="sc bl"></div><div class="sc br"></div><div class="sc-line"></div></div><div id="qr-reader" style="width:100%"></div></div>
+    <div style="text-align:center;font-size:12px;color:var(--tx3);padding:8px 16px 12px;letter-spacing:.5px" id="scan-sub">Escanea o ingresa el código</div>
+    <div class="p-card" id="p-card"><div class="p-card-top"><div class="p-icon in" id="p-icon"><i class="fas fa-arrow-down"></i></div><div class="p-info"><div class="p-name" id="p-name">—</div><div class="p-code" id="p-code">—</div></div><div id="p-badge" class="badge b-ok">OK</div></div><div class="p-stats"><div class="p-sb ok" id="p-sb"><div class="p-sb-lbl">Stock Actual</div><div class="p-sb-val" id="p-stk">—</div></div><div class="p-sb" style="background:var(--ink4)"><div class="p-sb-lbl">Mínimo</div><div class="p-sb-val" style="color:var(--tx2)" id="p-min">—</div></div></div></div>
+    <div class="qty-card" id="qty-card"><div class="qty-label" id="qty-label">Cantidad a Ingresar</div><div class="qty-row"><button class="qty-btn" onclick="dQ(-1)"><i class="fas fa-minus"></i></button><input class="qty-inp" id="qty-val" type="number" value="1" min="0.01" step="0.01"><button class="qty-btn" onclick="dQ(1)"><i class="fas fa-plus"></i></button></div><div class="qty-resp"><i class="fas fa-user" style="color:var(--tx3);font-size:13px"></i><input class="qty-resp-inp" id="resp-inp" type="text" placeholder="Responsable (obligatorio)"></div><textarea class="qty-obs" id="obs-inp" rows="2" placeholder="Observaciones (opcional)..."></textarea><button class="foto-btn" id="btn-foto-resp" onclick="tomarFotoRespaldo()"><i class="fas fa-camera"></i> Adjuntar foto de respaldo</button></div>
     <button class="btn-scan-otro" id="btn-scan-otro" onclick="resetScan()"><i class="fas fa-barcode"></i> Escanear otro producto</button>
-    <div class="scan-bar" id="scan-bar">
-      <button class="btn btn-ghost" onclick="resetScan()"><i class="fas fa-xmark"></i> Cancelar</button>
-      <button class="btn btn-green" id="confirm-btn" onclick="askConfirm()"><i class="fas fa-check"></i> Confirmar</button>
-    </div>
+    <div class="scan-bar" id="scan-bar"><button class="btn btn-ghost" onclick="resetScan()"><i class="fas fa-xmark"></i> Cancelar</button><button class="btn btn-green" id="confirm-btn" onclick="askConfirm()"><i class="fas fa-check"></i> Confirmar</button></div>
   </div>
 </div>
 
-<!-- ══ CONSULTA ══ -->
+<!-- QUERY -->
 <div class="scr" id="s-query">
-  <div class="topbar">
-    <div class="topbar-back" onclick="back()"><i class="fas fa-chevron-left"></i></div>
-    <div class="topbar-title">CONSULTAR</div>
-  </div>
-  <div class="body">
-    <div class="q-inp-wrap">
-      <i class="fas fa-magnifying-glass q-inp-icon"></i>
-      <input class="q-inp" id="q-inp" type="text" placeholder="Nombre o código..." oninput="qSearch()"/>
-      <button class="q-clear" onclick="document.getElementById('q-inp').value='';document.getElementById('q-results').innerHTML='';document.getElementById('q-detail').classList.add('hidden')"><i class="fas fa-xmark"></i></button>
-    </div>
-    <div class="q-detail hidden" id="q-detail">
-      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px">
-        <div>
-          <div class="qd-name" id="qd-name">—</div>
-          <div class="qd-code" id="qd-code">—</div>
-        </div>
-        <div id="qd-badge" class="badge b-ok">OK</div>
-      </div>
-      <div class="qd-stats">
-        <div class="qd-stat"><div class="qd-stat-lbl">Stock</div><div class="qd-stat-val" id="qd-stk" style="color:var(--neon)">—</div></div>
-        <div class="qd-stat"><div class="qd-stat-lbl">Mínimo</div><div class="qd-stat-val" id="qd-min" style="color:var(--tx2)">—</div></div>
-        <div class="qd-stat"><div class="qd-stat-lbl">Unidad</div><div class="qd-stat-val" id="qd-unit" style="color:var(--violet);font-size:14px">—</div></div>
-      </div>
-      <div class="qd-btns">
-        <button class="btn btn-green" style="font-size:13px;padding:10px" onclick="goFromQuery('in')"><i class="fas fa-arrow-down"></i> Ingreso</button>
-        <button class="btn btn-rose" style="font-size:13px;padding:10px" onclick="goFromQuery('out')"><i class="fas fa-arrow-up"></i> Salida</button>
-      </div>
-    </div>
-    <div id="q-results"></div>
-  </div>
+  <div class="topbar"><div class="topbar-back" onclick="back()"><i class="fas fa-chevron-left"></i></div><div class="topbar-title">CONSULTAR</div></div>
+  <div class="body"><div class="q-inp-wrap"><i class="fas fa-magnifying-glass q-inp-icon"></i><input class="q-inp" id="q-inp" type="text" placeholder="Nombre o código..." oninput="debounceQSearch()"><button class="q-clear" onclick="clearQuery()"><i class="fas fa-xmark"></i></button></div><div class="q-detail hidden" id="q-detail"><div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px"><div><div class="qd-name" id="qd-name">—</div><div class="qd-code" id="qd-code">—</div></div><div id="qd-badge" class="badge b-ok">OK</div></div><div class="qd-stats"><div class="qd-stat"><div class="qd-stat-lbl">Stock</div><div class="qd-stat-val" id="qd-stk" style="color:var(--neon)">—</div></div><div class="qd-stat"><div class="qd-stat-lbl">Mínimo</div><div class="qd-stat-val" id="qd-min" style="color:var(--tx2)">—</div></div><div class="qd-stat"><div class="qd-stat-lbl">Unidad</div><div class="qd-stat-val" id="qd-unit" style="color:var(--violet);font-size:14px">—</div></div></div><div class="qd-btns"><button class="btn btn-green" style="font-size:13px;padding:11px" onclick="goFromQuery('in')"><i class="fas fa-arrow-down"></i> Ingreso</button><button class="btn btn-rose" style="font-size:13px;padding:11px" onclick="goFromQuery('out')"><i class="fas fa-arrow-up"></i> Salida</button></div></div><div id="q-results"></div></div>
 </div>
 
-<!-- ══ HISTORIAL ══ -->
+<!-- HISTORIAL -->
 <div class="scr" id="s-hist">
-  <div class="topbar">
-    <div class="topbar-back" onclick="back()"><i class="fas fa-chevron-left"></i></div>
-    <div class="topbar-title">HISTORIAL</div>
-  </div>
-  <div class="body">
-    <div id="hist-list"><div class="loading"><div class="spin"></div>Cargando...</div></div>
-  </div>
+  <div class="topbar"><div class="topbar-back" onclick="back()"><i class="fas fa-chevron-left"></i></div><div class="topbar-title">HISTORIAL</div></div>
+  <div class="body"><div id="hist-list"><div class="loading"><div class="spin"></div>Cargando...</div></div></div>
 </div>
 
-<!-- ══ RFP ══ -->
+<!-- RFP -->
 <div class="scr" id="s-rfp">
-  <div class="topbar">
-    <div class="topbar-back" onclick="back()"><i class="fas fa-chevron-left"></i></div>
-    <div class="topbar-title" id="rfp-title">RFP</div>
-  </div>
+  <div class="topbar"><div class="topbar-back" onclick="back()"><i class="fas fa-chevron-left"></i></div><div class="topbar-title" id="rfp-title">RFP</div></div>
   <div class="body">
-    <!-- Retiro -->
-    <div id="rfp-retiro">
-      <div class="rfp-form">
-        <div class="rfp-form-title"><i class="fas fa-hand-holding-box" style="color:var(--amber)"></i> Datos del Retiro</div>
-        <div class="form-fld">
-          <label class="form-lbl">Código RFP</label>
-          <div style="position:relative">
-            <input class="form-inp" id="rfp-codigo" type="text" placeholder="RFP-001" style="padding-right:44px;text-transform:uppercase"/>
-            <button onclick="rfpScanQR()" style="position:absolute;right:6px;top:50%;transform:translateY(-50%);width:32px;height:32px;background:var(--ink4);border:1px solid var(--wire2);border-radius:var(--r-sm);color:var(--neon);font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center"><i class="fas fa-qrcode"></i></button>
-          </div>
-        </div>
-        <div class="form-fld">
-          <label class="form-lbl">Producto</label>
-          <input class="form-inp" id="rfp-producto" type="text" placeholder="Nombre del producto"/>
-        </div>
-        <div class="form-row">
-          <div class="form-fld"><label class="form-lbl">Cantidad</label><input class="form-inp" id="rfp-cantidad" type="number" placeholder="0" min="0.01" step="0.01"/></div>
-          <div class="form-fld"><label class="form-lbl">Unidad</label><input class="form-inp" id="rfp-unidad" type="text" placeholder="unid"/></div>
-        </div>
-        <div class="form-fld"><label class="form-lbl">Autorizado Por</label><input class="form-inp" id="rfp-autoriza" type="text" placeholder="Nombre del autorizante"/></div>
-        <div class="form-fld"><label class="form-lbl">Responsable Retiro</label><input class="form-inp" id="rfp-resp" type="text" placeholder="Quien retira"/></div>
-        <div class="form-fld"><label class="form-lbl">Observaciones</label><input class="form-inp" id="rfp-obs" type="text" placeholder="Opcional..."/></div>
-        <button onclick="rfpTomarFoto()" class="foto-btn" id="btn-rfp-foto" style="display:flex;width:100%;margin-bottom:0"><i class="fas fa-camera"></i> Fotografía del retiro</button>
-      </div>
-      <button class="btn btn-amber" id="rfp-guardar-btn" onclick="rfpGuardar('retiro')"><i class="fas fa-floppy-disk"></i> Registrar Retiro</button>
-    </div>
-    <!-- Devolución -->
-    <div id="rfp-devolucion" style="display:none">
-      <div class="rfp-form">
-        <div class="rfp-form-title"><i class="fas fa-rotate-left" style="color:var(--emerald)"></i> Devolución de Préstamo</div>
-        <div class="form-fld">
-          <label class="form-lbl">Seleccionar Préstamo Pendiente</label>
-          <div class="rfp-pend-list" id="rfp-pend-list"><div class="loading"><div class="spin"></div>Cargando...</div></div>
-        </div>
-        <div class="rfp-info" id="rfp-info-dev"></div>
-        <div class="form-fld" id="rfp-dev-flds" style="display:none">
-          <label class="form-lbl">Cantidad a Devolver</label>
-          <input class="form-inp" id="rfp-cant-dev" type="number" placeholder="0" min="0.01" step="0.01"/>
-        </div>
-      </div>
-      <button class="btn btn-green" id="rfp-dev-btn" onclick="rfpGuardar('devolucion')"><i class="fas fa-check"></i> Confirmar Devolución</button>
-    </div>
+    <div id="rfp-retiro"><div class="rfp-form"><div class="rfp-form-title"><i class="fas fa-hand-holding-box" style="color:var(--amber)"></i> Datos del Retiro</div><div class="form-fld"><label class="form-lbl">Código RFP</label><div style="position:relative"><input class="form-inp" id="rfp-codigo" type="text" placeholder="RFP-001" style="padding-right:48px;text-transform:uppercase"><button onclick="rfpScanQR()" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);width:36px;height:36px;background:var(--ink4);border:1px solid var(--wire2);border-radius:var(--r-sm);color:var(--neon);font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center"><i class="fas fa-qrcode"></i></button></div></div><div class="form-fld"><label class="form-lbl">Producto</label><input class="form-inp" id="rfp-producto" type="text" placeholder="Nombre del producto"></div><div class="form-row"><div class="form-fld"><label class="form-lbl">Cantidad</label><input class="form-inp" id="rfp-cantidad" type="number" placeholder="0" min="0.01" step="0.01"></div><div class="form-fld"><label class="form-lbl">Unidad</label><input class="form-inp" id="rfp-unidad" type="text" placeholder="unid"></div></div><div class="form-fld"><label class="form-lbl">Autorizado Por</label><input class="form-inp" id="rfp-autoriza" type="text" placeholder="Nombre del autorizante"></div><div class="form-fld"><label class="form-lbl">Responsable Retiro</label><input class="form-inp" id="rfp-resp" type="text" placeholder="Quien retira"></div><div class="form-fld"><label class="form-lbl">Observaciones</label><input class="form-inp" id="rfp-obs" type="text" placeholder="Opcional..."></div><button onclick="rfpTomarFoto()" class="foto-btn" id="btn-rfp-foto" style="display:flex;width:100%;margin-bottom:0"><i class="fas fa-camera"></i> Fotografía del retiro</button></div><button class="btn btn-amber" id="rfp-guardar-btn" onclick="rfpGuardar('retiro')"><i class="fas fa-floppy-disk"></i> Registrar Retiro</button></div>
+    <div id="rfp-devolucion" style="display:none"><div class="rfp-form"><div class="rfp-form-title"><i class="fas fa-rotate-left" style="color:var(--emerald)"></i> Devolución de Préstamo</div><div class="form-fld"><label class="form-lbl">Seleccionar Préstamo Pendiente</label><div class="rfp-pend-list" id="rfp-pend-list"><div class="loading"><div class="spin"></div>Cargando...</div></div></div><div class="rfp-info" id="rfp-info-dev"></div><div class="form-fld" id="rfp-dev-flds" style="display:none"><label class="form-lbl">Cantidad a Devolver</label><input class="form-inp" id="rfp-cant-dev" type="number" placeholder="0" min="0.01" step="0.01"></div></div><button class="btn btn-green" id="rfp-dev-btn" onclick="rfpGuardar('devolucion')"><i class="fas fa-check"></i> Confirmar Devolución</button></div>
   </div>
 </div>
 
-<!-- ══ LOTE ══ -->
+<!-- LOTE -->
 <div class="scr" id="s-lote">
-  <div class="topbar">
-    <div class="topbar-back" onclick="back()"><i class="fas fa-chevron-left"></i></div>
-    <div class="topbar-title">LOTE</div>
-    <div class="topbar-badge" id="lote-count-badge">0 items</div>
-  </div>
-  <div class="body">
-    <div style="display:flex;gap:8px;margin-bottom:14px">
-      <input class="man-inp" id="lote-search" type="text" placeholder="Buscar producto..." oninput="loteSearchLive(this.value)" style="flex:1;padding:12px 14px"/>
-      <button onclick="loteScanQR()" style="width:44px;height:44px;border-radius:var(--r-sm);background:var(--ink4);border:1px solid var(--wire2);color:var(--neon);font-size:16px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center"><i class="fas fa-qrcode"></i></button>
-    </div>
-    <div class="scan-sugg" id="lote-sugg" style="position:static;display:none;margin-bottom:12px;border-radius:var(--r-md)"></div>
-    <div class="section-lbl">Items en el lote</div>
-    <div id="lote-list"><div class="empty"><i class="fas fa-layer-group"></i><p>Agrega productos escaneando o buscando</p></div></div>
-    <div id="lote-actions" style="display:none;margin-top:12px">
-      <div class="form-fld"><label class="form-lbl">Responsable</label><input class="form-inp" id="lote-resp" type="text" placeholder="Nombre del responsable"/></div>
-      <div style="display:flex;gap:8px;margin-top:8px">
-        <button class="btn btn-green" style="flex:1" onclick="loteConfirmar('INGRESO')"><i class="fas fa-arrow-down"></i> Ingresar Todo</button>
-        <button class="btn btn-rose" style="flex:1" onclick="loteConfirmar('SALIDA')"><i class="fas fa-arrow-up"></i> Salida Todo</button>
-      </div>
-    </div>
-  </div>
+  <div class="topbar"><div class="topbar-back" onclick="back()"><i class="fas fa-chevron-left"></i></div><div class="topbar-title">LOTE</div><div class="topbar-badge" id="lote-count-badge">0 items</div></div>
+  <div class="body"><div style="display:flex;gap:10px;margin-bottom:16px"><input class="man-inp" id="lote-search" type="text" placeholder="Buscar producto..." oninput="debounceLoteSearch(this.value)" style="flex:1;padding:14px 16px"><button onclick="loteScanQR()" style="width:48px;height:48px;border-radius:var(--r-sm);background:var(--ink4);border:1px solid var(--wire2);color:var(--neon);font-size:16px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:var(--transition)"><i class="fas fa-qrcode"></i></button></div><div class="scan-sugg" id="lote-sugg" style="position:static;display:none;margin-bottom:14px;border-radius:var(--r-md)"></div><div class="section-lbl">Items en el lote</div><div id="lote-list"><div class="empty"><i class="fas fa-layer-group"></i><p>Agrega productos escaneando o buscando</p></div></div><div id="lote-actions" style="display:none;margin-top:16px"><div class="form-fld"><label class="form-lbl">Responsable</label><input class="form-inp" id="lote-resp" type="text" placeholder="Nombre del responsable"></div><div style="display:flex;gap:12px;margin-top:12px"><button class="btn btn-green" style="flex:1" onclick="loteConfirmar('INGRESO')"><i class="fas fa-arrow-down"></i> Ingresar Todo</button><button class="btn btn-rose" style="flex:1" onclick="loteConfirmar('SALIDA')"><i class="fas fa-arrow-up"></i> Salida Todo</button></div></div></div>
 </div>
 
-<!-- ══ SHEET CONFIRM ══ -->
-<div class="sheet-bg" id="sheet-bg">
-  <div class="sheet">
-    <div class="sheet-handle"></div>
-    <div class="sheet-title" id="sh-title">Confirmar</div>
-    <div class="sheet-body" id="sh-body"></div>
-    <div class="sheet-btns">
-      <button class="btn btn-ghost" style="flex:1" onclick="closeSheet()"><i class="fas fa-xmark"></i> Cancelar</button>
-      <button class="btn btn-green" style="flex:1" id="sh-ok-btn" onclick="execMov()"><i class="fas fa-check"></i> Confirmar</button>
-    </div>
-  </div>
-</div>
+<!-- CONFIRM SHEET -->
+<div class="sheet-bg" id="sheet-bg"><div class="sheet"><div class="sheet-handle"></div><div class="sheet-title" id="sh-title">Confirmar</div><div class="sheet-body" id="sh-body"></div><div class="sheet-btns"><button class="btn btn-ghost" style="flex:1" onclick="closeSheet()"><i class="fas fa-xmark"></i> Cancelar</button><button class="btn btn-green" style="flex:1" id="sh-ok-btn" onclick="execMov()"><i class="fas fa-check"></i> Confirmar</button></div></div></div>
 
-<!-- ══ SHEET FIRMA ══ -->
-<div class="sheet-bg" id="firma-sheet-bg">
-  <div class="sheet" style="max-height:95vh;overflow-y:auto">
-    <div class="sheet-handle"></div>
-    <div class="sheet-title"><i class="fas fa-signature" style="color:var(--neon);margin-right:8px"></i>Firma de Retiro</div>
-    <div style="padding:0 16px 4px;font-size:12px;color:var(--tx3);background:rgba(0,229,255,.06);border-radius:var(--r-md);margin:0 4px 14px;padding:10px 14px" id="movil-firma-info"></div>
+<!-- FIRMA SHEET -->
+<div class="sheet-bg" id="firma-sheet-bg"><div class="sheet" style="max-height:95vh;overflow-y:auto"><div class="sheet-handle"></div><div class="sheet-title"><i class="fas fa-signature" style="color:var(--neon);margin-right:8px"></i>Firma de Retiro</div><div style="padding:0 16px 6px;font-size:12px;color:var(--tx3);background:rgba(0,229,255,.06);border-radius:var(--r-md);margin:0 4px 16px;padding:12px 16px" id="movil-firma-info"></div><div style="padding:0 4px"><div style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--tx3);margin-bottom:12px;display:flex;align-items:center;gap:10px"><span style="width:20px;height:20px;border-radius:50%;background:var(--neon);color:#000;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center">1</span>Datos de quien retira</div><input class="form-ctrl" id="movil-firma-nombre" type="text" placeholder="Nombre completo *" autocomplete="name" style="font-size:16px;margin-bottom:12px;width:100%;padding:14px;background:var(--ink3);border:1px solid var(--wire);border-radius:var(--r-md);color:var(--tx1);outline:none"><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px"><input class="form-ctrl" id="movil-firma-rut" type="text" placeholder="RUT" style="font-size:16px;padding:14px;background:var(--ink3);border:1px solid var(--wire);border-radius:var(--r-md);color:var(--tx1);outline:none"><input class="form-ctrl" id="movil-firma-tel" type="tel" placeholder="Teléfono" autocomplete="tel" style="font-size:16px;padding:14px;background:var(--ink3);border:1px solid var(--wire);border-radius:var(--r-md);color:var(--tx1);outline:none"></div><input class="form-ctrl" id="movil-firma-cargo" type="text" placeholder="Cargo / Empresa" style="font-size:16px;margin-bottom:16px;width:100%;padding:14px;background:var(--ink3);border:1px solid var(--wire);border-radius:var(--r-md);color:var(--tx1);outline:none"><div style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--tx3);margin-bottom:12px;display:flex;align-items:center;gap:10px"><span style="width:20px;height:20px;border-radius:50%;background:var(--neon);color:#000;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center">2</span>Firma con el dedo</div><div style="position:relative;border:2px dashed var(--neon);border-radius:var(--r-md);overflow:hidden;background:#fff;margin-bottom:10px" id="movil-firma-wrap"><canvas id="movil-firma-canvas" style="display:block;width:100%;touch-action:none;-webkit-user-select:none;cursor:crosshair"></canvas><div id="movil-firma-ph" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;opacity:.3"><i class="fas fa-signature" style="font-size:32px;color:#888;margin-bottom:8px"></i><div style="font-size:12px;color:#888">Firma aquí con el dedo</div></div></div><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div style="font-size:11px;color:var(--tx3)">Dibuja tu firma en el área de arriba</div><button onclick="movilLimpiarFirma()" style="background:var(--ink3);border:1px solid var(--wire);color:var(--tx2);padding:8px 14px;border-radius:var(--r-md);font-size:12px;cursor:pointer;transition:var(--transition)"><i class="fas fa-eraser"></i> Limpiar</button></div><label style="display:flex;align-items:center;gap:12px;cursor:pointer;background:var(--ink3);padding:14px;border-radius:var(--r-md);border:1px solid var(--wire);margin-bottom:18px"><input type="checkbox" id="movil-firma-omitir" style="width:20px;height:20px"><div><div style="font-size:13px;color:var(--tx2);font-weight:500">Sin firma disponible</div><div style="font-size:11px;color:var(--tx3)">Continuar sin firma</div></div></label></div><div class="sheet-btns" style="padding:0 4px 4px"><button class="btn btn-ghost" style="flex:1" onclick="movilCerrarFirma()"><i class="fas fa-xmark"></i> Cancelar</button><button class="btn btn-rose" style="flex:2;font-size:15px;padding:15px" onclick="movilConfirmarFirma()"><i class="fas fa-check-circle"></i> Confirmar Retiro</button></div></div></div>
 
-    <!-- Datos -->
-    <div style="padding:0 4px">
-      <div style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--tx3);margin-bottom:10px;display:flex;align-items:center;gap:8px"><span style="width:18px;height:18px;border-radius:50%;background:var(--neon);color:#000;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center">1</span>Datos de quien retira</div>
-      <input class="form-ctrl" id="movil-firma-nombre" type="text" placeholder="Nombre completo *" autocomplete="name" style="font-size:16px;margin-bottom:10px;width:100%;padding:12px;background:var(--ink3);border:1px solid var(--wire);border-radius:var(--r-md);color:var(--tx1);outline:none"/>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
-        <input class="form-ctrl" id="movil-firma-rut" type="text" placeholder="RUT" style="font-size:16px;padding:12px;background:var(--ink3);border:1px solid var(--wire);border-radius:var(--r-md);color:var(--tx1);outline:none"/>
-        <input class="form-ctrl" id="movil-firma-tel" type="tel" placeholder="Telefono" autocomplete="tel" style="font-size:16px;padding:12px;background:var(--ink3);border:1px solid var(--wire);border-radius:var(--r-md);color:var(--tx1);outline:none"/>
-      </div>
-      <input class="form-ctrl" id="movil-firma-cargo" type="text" placeholder="Cargo / Empresa" style="font-size:16px;margin-bottom:14px;width:100%;padding:12px;background:var(--ink3);border:1px solid var(--wire);border-radius:var(--r-md);color:var(--tx1);outline:none"/>
+<!-- QR MODAL -->
+<div class="modal-full" id="modal-qr"><div class="modal-card"><div class="modal-head"><div class="modal-head-title"><i class="fas fa-qrcode" style="color:var(--neon);margin-right:8px"></i><span id="qr-title">Escanear QR</span></div><button class="modal-close" onclick="closeModalQR()"><i class="fas fa-xmark"></i></button></div><div class="modal-body"><div id="qr-reader-modal" style="width:100%;border-radius:var(--r-md);overflow:hidden;background:#000"></div><p style="color:var(--tx3);font-size:12px;text-align:center;margin-top:12px">Apunta la cámara al código QR o de barras</p></div></div></div>
 
-      <!-- Canvas firma -->
-      <div style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--tx3);margin-bottom:10px;display:flex;align-items:center;gap:8px"><span style="width:18px;height:18px;border-radius:50%;background:var(--neon);color:#000;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center">2</span>Firma con el dedo</div>
-      <div style="position:relative;border:2px dashed var(--neon);border-radius:var(--r-md);overflow:hidden;background:#fff;margin-bottom:8px" id="movil-firma-wrap">
-        <canvas id="movil-firma-canvas" style="display:block;width:100%;touch-action:none;-webkit-user-select:none;cursor:crosshair"></canvas>
-        <div id="movil-firma-ph" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;opacity:.3">
-          <i class="fas fa-signature" style="font-size:28px;color:#888;margin-bottom:6px"></i>
-          <div style="font-size:12px;color:#888">Firma aqui con el dedo</div>
-        </div>
-      </div>
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
-        <div style="font-size:11px;color:var(--tx3)">Dibuja tu firma en el area de arriba</div>
-        <button onclick="movilLimpiarFirma()" style="background:var(--ink3);border:1px solid var(--wire);color:var(--tx2);padding:6px 12px;border-radius:var(--r-md);font-size:12px;cursor:pointer"><i class="fas fa-eraser"></i> Limpiar</button>
-      </div>
-
-      <!-- Omitir -->
-      <label style="display:flex;align-items:center;gap:12px;cursor:pointer;background:var(--ink3);padding:12px;border-radius:var(--r-md);border:1px solid var(--wire);margin-bottom:16px">
-        <input type="checkbox" id="movil-firma-omitir" style="width:20px;height:20px"/>
-        <div>
-          <div style="font-size:13px;color:var(--tx2);font-weight:500">Sin firma disponible</div>
-          <div style="font-size:11px;color:var(--tx3)">Continuar sin firma</div>
-        </div>
-      </label>
-    </div>
-
-    <div class="sheet-btns" style="padding:0 4px 4px">
-      <button class="btn btn-ghost" style="flex:1" onclick="movilCerrarFirma()"><i class="fas fa-xmark"></i> Cancelar</button>
-      <button class="btn btn-rose" style="flex:2;font-size:15px;padding:14px" onclick="movilConfirmarFirma()">
-        <i class="fas fa-check-circle"></i> Confirmar Retiro
-      </button>
-    </div>
-  </div>
-</div>
-
-<!-- ══ MODAL QR ══ -->
-<div class="modal-full" id="modal-qr">
-  <div class="modal-card">
-    <div class="modal-head">
-      <div class="modal-head-title"><i class="fas fa-qrcode" style="color:var(--neon);margin-right:8px"></i><span id="qr-title">Escanear QR</span></div>
-      <button class="modal-close" onclick="closeModalQR()"><i class="fas fa-xmark"></i></button>
-    </div>
-    <div class="modal-body">
-      <div id="qr-reader-modal" style="width:100%;border-radius:var(--r-md);overflow:hidden;background:#000"></div>
-      <p style="color:var(--tx3);font-size:12px;text-align:center;margin-top:10px">Apunta la cámara al código QR o de barras</p>
-    </div>
-  </div>
-</div>
-
-<!-- ══ MODAL FOTO ══ -->
-<div class="modal-full" id="modal-foto">
-  <div class="modal-card">
-    <div class="modal-head">
-      <div class="modal-head-title"><i class="fas fa-camera" style="color:var(--amber);margin-right:8px"></i><span id="foto-title">Tomar Foto</span></div>
-      <button class="modal-close" onclick="closeModalFoto()"><i class="fas fa-xmark"></i></button>
-    </div>
-    <div class="modal-body">
-      <div class="photo-video">
-        <video id="foto-video" autoplay playsinline muted></video>
-        <canvas id="foto-canvas" style="display:none"></canvas>
-        <button class="photo-capture-btn" onclick="capturarFoto()"><i class="fas fa-camera"></i></button>
-      </div>
-      <div class="photo-preview" id="foto-preview">
-        <img id="foto-preview-img"/>
-        <div class="photo-actions">
-          <button class="btn btn-ghost" onclick="retomarFoto()"><i class="fas fa-redo"></i> Retomar</button>
-          <button class="btn btn-green" onclick="usarFoto()"><i class="fas fa-check"></i> Usar foto</button>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ══ PWA MODAL ══ -->
-<div id="pwa-modal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.75);align-items:flex-end;justify-content:center">
-  <div style="background:linear-gradient(135deg,var(--ink2),var(--ink3));border:1px solid var(--wire2);border-radius:var(--r-xl) var(--r-xl) 0 0;padding:24px 20px calc(24px + var(--sib));width:100%">
-    <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
-      <div style="font-size:32px">📲</div>
-      <div><div style="font-weight:800;font-size:16px;color:var(--tx1)">Instalar NEXUS BODEGA</div><div style="color:var(--tx3);font-size:12px;margin-top:2px">Acceso rápido desde tu pantalla de inicio</div></div>
-      <button onclick="document.getElementById('pwa-modal').style.display='none'" style="margin-left:auto;background:none;border:none;color:var(--tx3);font-size:22px;cursor:pointer">×</button>
-    </div>
-    <div id="pwa-ios" style="display:none;background:var(--ink4);border-radius:var(--r-md);padding:14px;margin-bottom:14px;font-size:13px;color:var(--tx1);line-height:1.8"><strong style="color:var(--neon)">iOS Safari:</strong><br>1. Toca <strong>Compartir ⬆</strong><br>2. Selecciona <strong>"En pantalla de inicio"</strong><br>3. Toca <strong>"Añadir"</strong></div>
-    <div id="pwa-android" style="display:none;background:var(--ink4);border-radius:var(--r-md);padding:14px;margin-bottom:14px;font-size:13px;color:var(--tx1);line-height:1.8"><strong style="color:var(--neon)">Android Chrome:</strong><br>1. Toca el menú <strong>⋮</strong><br>2. Selecciona <strong>"Añadir a pantalla de inicio"</strong></div>
-    <button onclick="document.getElementById('pwa-modal').style.display='none'" style="width:100%;background:var(--neon);color:#000;border:none;border-radius:var(--r-md);padding:14px;font-weight:800;font-size:14px;cursor:pointer">Entendido ✓</button>
-  </div>
-</div>
+<!-- FOTO MODAL -->
+<div class="modal-full" id="modal-foto"><div class="modal-card"><div class="modal-head"><div class="modal-head-title"><i class="fas fa-camera" style="color:var(--amber);margin-right:8px"></i><span id="foto-title">Tomar Foto</span></div><button class="modal-close" onclick="closeModalFoto()"><i class="fas fa-xmark"></i></button></div><div class="modal-body"><div class="photo-video"><video id="foto-video" autoplay playsinline muted></video><canvas id="foto-canvas" style="display:none"></canvas><button class="photo-capture-btn" onclick="capturarFoto()"><i class="fas fa-camera"></i></button></div><div class="photo-preview" id="foto-preview"><img id="foto-preview-img"><div class="photo-actions"><button class="btn btn-ghost" onclick="retomarFoto()"><i class="fas fa-redo"></i> Retomar</button><button class="btn btn-green" onclick="usarFoto()"><i class="fas fa-check"></i> Usar foto</button></div></div></div></div></div>
 
 <div id="toast-wrap"></div>
-</div><!-- end #app -->
+</div>
 
 <script>
+// ============================================
+// NEXUS BODEGA - Mobile v3.0 Optimizado
+// ============================================
+
 const API = 'https://nexus-prime-backend.onrender.com';
 
-// ── STATE ──────────────────────────────────────────
-var S = {
-  token: null, user: null,
-  prod: null, tipo: 'in', mode: 'cam',
+let S = {
+  token: null, user: null, prod: null, tipo: 'in', mode: 'cam',
   scanner: null, qrScanner: null, fotoStream: null,
   _fotoRespaldo: null, _rfpFoto: null, _fotoCallback: null,
   _qProd: null, _rfpPrestamo: null,
-  queue: [], syncing: false,
-  navStack: []
+  queue: [], syncing: false, navStack: [],
+  debounceTimers: {}
 };
 
-// ── INIT ───────────────────────────────────────────
-document.addEventListener('DOMContentLoaded', function() {
-  document.getElementById('lPass').addEventListener('keydown', function(e){ if(e.key==='Enter') doLogin(); });
+function debounce(fn, delay, key) {
+  if (S.debounceTimers[key]) clearTimeout(S.debounceTimers[key]);
+  S.debounceTimers[key] = setTimeout(fn, delay);
+}
+
+function toast(msg, type, dur) {
+  type = type || 'inf'; dur = dur || 3000;
+  const el = document.createElement('div');
+  el.className = `toast ${type}`;
+  const icons = { ok: 'fa-check-circle', err: 'fa-circle-xmark', wrn: 'fa-triangle-exclamation', inf: 'fa-circle-info' };
+  el.innerHTML = `<i class="fas ${icons[type] || icons.inf}"></i> ${msg}`;
+  document.getElementById('toast-wrap').appendChild(el);
+  setTimeout(() => { el.style.opacity = '0'; el.style.transform = 'translateY(8px)'; el.style.transition = 'all .3s'; setTimeout(() => el.remove(), 300); }, dur);
+}
+
+async function apiFetch(path, opts) {
+  opts = opts || {};
+  const res = await fetch(API + path, {
+    ...opts,
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${S.token}`, ...(opts.headers || {}) }
+  });
+  if (res.status === 401) { doLogout(); throw new Error('Sesión expirada'); }
+  return res.json();
+}
+
+// AUTH
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('lPass')?.addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
   try {
-    var saved = JSON.parse(localStorage.getItem('nxb') || 'null');
+    const saved = JSON.parse(localStorage.getItem('nxb') || 'null');
     if (saved && saved.token && saved.user) {
       S.token = saved.token; S.user = saved.user;
-      loadQueue(); go('s-home'); initHome(); if(!AL_M.active) initAutoLogoutMovil(); initAutoLogoutMovil();
+      loadQueue(); go('s-home'); initHome(); initAutoLogoutMovil();
       return;
     }
   } catch(e) {}
   loadQueue();
-
-  // PWA manifest
-  var m = {name:'NEXUS BODEGA',short_name:'NX Bodega',display:'standalone',background_color:'#080c18',theme_color:'#38bdf8',start_url:window.location.href,icons:[{src:'https://img.icons8.com/fluency/96/warehouse.png',sizes:'96x96',type:'image/png'}]};
-  var blob = new Blob([JSON.stringify(m)],{type:'application/json'});
-  var link = document.createElement('link'); link.rel='manifest'; link.href=URL.createObjectURL(blob);
-  document.head.appendChild(link);
-
-  // Show install hint after 3s
-  setTimeout(function(){
-    if (!window.matchMedia('(display-mode: standalone)').matches) {
-      var ios = /iphone|ipad|ipod/i.test(navigator.userAgent);
-      var android = /android/i.test(navigator.userAgent);
-      if (ios || android) {
-        document.getElementById('pwa-ios').style.display = ios ? 'block' : 'none';
-        document.getElementById('pwa-android').style.display = android ? 'block' : 'none';
-        document.getElementById('pwa-modal').style.display = 'flex';
-      }
-    }
-  }, 4000);
 });
 
-window.addEventListener('online',  function(){ updOffline(); syncQ(); toast('Conexión restaurada','ok'); });
-window.addEventListener('offline', function(){ updOffline(); toast('Sin conexión · modo offline','wrn'); });
-
-// ── NAVIGATION ─────────────────────────────────────
-function go(id) {
-  var cur = document.querySelector('.scr.on');
-  var nxt = document.getElementById(id);
-  if (!nxt || cur === nxt) return;
-  if (cur) { cur.classList.add('out'); setTimeout(function(){ cur.classList.remove('on','out'); }, 220); }
-  nxt.classList.add('on');
-  S.cur = id;
-}
-
-function back() {
-  stopScan();
-  var prev = S.navStack.pop() || 's-home';
-  go(prev);
-}
-
-function push(id) { S.navStack.push(S.cur || 's-home'); go(id); }
-
-function setNav(id) {
-  document.querySelectorAll('.bnav-btn').forEach(function(b){ b.classList.remove('active'); });
-  var el = document.getElementById(id); if(el) el.classList.add('active');
-}
-
-// ── AUTH ───────────────────────────────────────────
 async function doLogin() {
-  var email = document.getElementById('lEmail').value.trim();
-  var pass  = document.getElementById('lPass').value;
-  var btn   = document.getElementById('btn-login');
-  var errEl = document.getElementById('login-err');
-  if (!email || !pass) { errEl.textContent='Ingresa email y contrasena'; errEl.style.display='block'; return; }
+  const email = document.getElementById('lEmail').value.trim();
+  const pass = document.getElementById('lPass').value;
+  const errEl = document.getElementById('login-err');
+  const btn = document.getElementById('btn-login');
+  if (!email || !pass) { errEl.textContent = 'Ingresa email y contraseña'; errEl.style.display = 'block'; return; }
   btn.disabled = true;
   btn.innerHTML = '<span style="display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .8s linear infinite;vertical-align:middle;margin-right:8px"></span>Accediendo...';
-  errEl.style.display='none';
+  errEl.style.display = 'none';
   try {
-    var res = await fetch(API+'/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password:pass})});
-    var text = await res.text();
-    var data;
-    try { data = JSON.parse(text); } catch(e) {
-      btn.innerHTML = '<span style="display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .8s linear infinite;vertical-align:middle;margin-right:8px"></span>Iniciando servidor...';
-      await new Promise(function(r){ setTimeout(r,8000); });
-      var res2 = await fetch(API+'/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password:pass})});
-      data = await res2.json();
-    }
+    const res = await fetch(API + '/api/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password: pass })
+    });
+    const data = await res.json();
     if (data.status === 'success') {
       btn.innerHTML = '<i class="fas fa-check"></i> Bienvenido';
       S.token = data.data.token; S.user = data.data.usuario;
-      localStorage.setItem('nxb', JSON.stringify({token:S.token, user:S.user}));
-      setTimeout(function(){ go('s-home'); initHome(); if(!AL_M.active) initAutoLogoutMovil(); }, 400);
+      localStorage.setItem('nxb', JSON.stringify({ token: S.token, user: S.user }));
+      setTimeout(() => { go('s-home'); initHome(); initAutoLogoutMovil(); }, 400);
     } else {
-      errEl.textContent = data.message || 'Credenciales incorrectas'; errEl.style.display='block';
+      errEl.textContent = data.message || 'Credenciales incorrectas';
+      errEl.style.display = 'block';
       btn.disabled = false;
       btn.innerHTML = '<i class="fas fa-arrow-right-to-bracket"></i> Ingresar';
     }
   } catch(e) {
-    errEl.textContent='Sin conexion. Intenta de nuevo.'; errEl.style.display='block';
+    errEl.textContent = 'Sin conexión. Intenta de nuevo.';
+    errEl.style.display = 'block';
     btn.disabled = false;
     btn.innerHTML = '<i class="fas fa-arrow-right-to-bracket"></i> Ingresar';
   }
 }
 
 function doLogout() {
-  stopScan();
-  if (S.token) apiFetch('/api/logout',{method:'POST'}).catch(function(){});
-  S.token=null; S.user=null;
+  if (S.scanner) S.scanner.stop().catch(() => {});
+  if (S.token) apiFetch('/api/logout', { method: 'POST' }).catch(() => {});
+  S.token = null; S.user = null;
   localStorage.removeItem('nxb');
   go('s-login');
 }
 
-// ── API ────────────────────────────────────────────
-async function apiFetch(path, opts) {
-  opts = opts || {};
-  var res = await fetch(API+path, Object.assign({}, opts, {
-    headers: Object.assign({'Content-Type':'application/json','Authorization':'Bearer '+S.token}, opts.headers||{})
-  }));
-  if (res.status === 401) { doLogout(); throw new Error('Sesión expirada'); }
-  return res.json();
-}
-
-// ── HOME ───────────────────────────────────────────
 function initHome() {
-  // Set greeting
-  var now = new Date();
-  var dias = ['Domingo','Lunes','Martes','Miercoles','Jueves','Viernes','Sabado'];
-  var meses = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
-  var fechaEl = document.getElementById('home-fecha');
-  if (fechaEl) fechaEl.textContent = dias[now.getDay()] + ', ' + now.getDate() + ' de ' + meses[now.getMonth()] + ' de ' + now.getFullYear();
-  var nombreEl = document.getElementById('home-nombre');
-  if (nombreEl && S.user) nombreEl.textContent = (S.user.nombre||S.user.email||'Operador').split(' ')[0];
-  var userEl = document.getElementById('home-user');
-  if (userEl && S.user) userEl.textContent = S.user.nombre||S.user.email||'';
-  // old initHome continues:
-  _oldInitHome();
-}
-function _oldInitHome() {
-  document.getElementById('home-user').textContent = (S.user && (S.user.nombre||S.user.email)) || '—';
+  const now = new Date();
+  const dias = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+  const meses = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+  const fechaEl = document.getElementById('home-fecha');
+  if (fechaEl) fechaEl.textContent = `${dias[now.getDay()]}, ${now.getDate()} de ${meses[now.getMonth()]} de ${now.getFullYear()}`;
+  const nombreEl = document.getElementById('home-nombre');
+  if (nombreEl && S.user) nombreEl.textContent = (S.user.nombre || S.user.email || 'Operador').split(' ')[0];
+  const userEl = document.getElementById('home-user');
+  if (userEl && S.user) userEl.textContent = S.user.nombre || S.user.email || '';
   updOffline(); updQueueBadge();
   loadStats();
 }
 
 async function loadStats() {
   try {
-    var res = await apiFetch('/api/productos');
-    var data = res.data || [];
+    const res = await apiFetch('/api/productos');
+    const data = res.data || [];
     document.getElementById('st-total').textContent = data.length;
-    document.getElementById('st-sin').textContent   = data.filter(function(p){ return p.estado_stock==='SIN_STOCK'; }).length;
-    document.getElementById('st-bajo').textContent  = data.filter(function(p){ return p.estado_stock==='STOCK_BAJO'; }).length;
+    document.getElementById('st-sin').textContent = data.filter(p => p.estado_stock === 'SIN_STOCK').length;
+    document.getElementById('st-bajo').textContent = data.filter(p => p.estado_stock === 'STOCK_BAJO').length;
   } catch(e) {}
 }
 
 function updOffline() {
-  var online = navigator.onLine;
-  var bar  = document.getElementById('offline-bar');
-  var icon = document.getElementById('offline-icon');
+  const online = navigator.onLine;
+  const bar = document.getElementById('offline-bar');
+  const icon = document.getElementById('offline-icon');
   if (!online) {
-    bar.classList.add('show');
-    if (icon) { icon.style.color='var(--rose)'; icon.innerHTML='<i class="fas fa-wifi-slash"></i>'; }
+    bar?.classList.add('show');
+    if (icon) { icon.style.color = 'var(--rose)'; icon.innerHTML = '<i class="fas fa-wifi-slash"></i>'; }
   } else {
-    bar.classList.remove('show');
-    if (icon) { icon.style.color='var(--tx3)'; icon.innerHTML='<i class="fas fa-wifi"></i>'; }
+    bar?.classList.remove('show');
+    if (icon) { icon.style.color = 'var(--tx3)'; icon.innerHTML = '<i class="fas fa-wifi"></i>'; }
   }
 }
 
-function updQueueBadge() {
-  var n = S.queue.length;
-  var el = document.getElementById('queue-info');
-  if (el) { el.style.display = n > 0 ? 'block' : 'none'; }
-  var cnt = document.getElementById('q-count');
-  if (cnt) cnt.textContent = n;
+// Navigation
+function go(id) {
+  const cur = document.querySelector('.scr.on');
+  const nxt = document.getElementById(id);
+  if (!nxt || cur === nxt) return;
+  if (cur) { cur.classList.add('out'); setTimeout(() => { cur.classList.remove('on', 'out'); }, 220); }
+  nxt.classList.add('on');
+  S.cur = id;
 }
 
-// ── SCAN ───────────────────────────────────────────
+function back() {
+  stopScan();
+  const prev = S.navStack.pop() || 's-home';
+  go(prev);
+}
+
+function push(id) { S.navStack.push(S.cur || 's-home'); go(id); }
+
+// SCAN
 function goScan(tipo) {
   S.tipo = tipo; S.prod = null; S._fotoRespaldo = null;
-  document.getElementById('scan-title').textContent = tipo==='in' ? 'INGRESO' : tipo==='out' ? 'SALIDA' : 'AJUSTE';
+  document.getElementById('scan-title').textContent = tipo === 'in' ? 'INGRESO' : 'SALIDA';
   updateScanBanner();
   resetScanUI();
   S.navStack = ['s-home'];
   go('s-scan');
-  setTimeout(function(){ setMode('cam'); }, 200);
+  setTimeout(() => setMode('cam'), 200);
 }
-
-function setScanTipo(t) {
-  S.tipo = t;
-  document.getElementById('scan-title').textContent = t==='in' ? 'INGRESO' : t==='out' ? 'SALIDA' : 'AJUSTE';
-  updateScanBanner();
-  resetScanUI();
-  if (S.prod) renderProd(S.prod, t);
-}
-
-function updateScanTypeUI() { updateScanBanner(); }
 
 function updateScanBanner() {
-  var isIn = S.tipo==='in';
-  // Update topbar title
-  var title = document.getElementById('scan-title');
+  const isIn = S.tipo === 'in';
+  const title = document.getElementById('scan-title');
   if (title) title.textContent = isIn ? 'INGRESO' : 'SALIDA';
-  // Update pill
-  var pill = document.getElementById('scan-tipo-pill');
+  const pill = document.getElementById('scan-tipo-pill');
   if (pill) {
     if (isIn) {
       pill.style.background = 'rgba(52,211,153,.12)';
@@ -957,46 +645,40 @@ function updateScanBanner() {
       pill.innerHTML = '<i class="fas fa-arrow-up" style="margin-right:6px"></i>SALIDA';
     }
   }
-  // Update confirm button
-  var confirmBtn = document.getElementById('confirm-btn');
+  const confirmBtn = document.getElementById('confirm-btn');
   if (confirmBtn) {
-    confirmBtn.className = 'btn ' + (isIn ? 'btn-green' : 'btn-rose');
-    confirmBtn.innerHTML = isIn
-      ? '<i class="fas fa-check"></i> Confirmar Ingreso'
-      : '<i class="fas fa-check"></i> Confirmar Salida';
+    confirmBtn.className = `btn ${isIn ? 'btn-green' : 'btn-rose'}`;
+    confirmBtn.innerHTML = isIn ? '<i class="fas fa-check"></i> Confirmar Ingreso' : '<i class="fas fa-check"></i> Confirmar Salida';
   }
-  // Update qty label
-  var qtyLbl = document.getElementById('qty-label');
+  const qtyLbl = document.getElementById('qty-label');
   if (qtyLbl) qtyLbl.textContent = isIn ? 'Cantidad a Ingresar' : 'Cantidad a Retirar';
-  // Update p-card color
-  var pCard = document.getElementById('p-card');
-  if (pCard && S.prod) renderProd(S.prod, S.tipo);
+  if (S.prod) renderProd(S.prod, S.tipo);
 }
 
 function setMode(m) {
   S.mode = m;
-  document.getElementById('tab-cam').classList.toggle('on', m==='cam');
-  document.getElementById('tab-man').classList.toggle('on', m==='man');
-  document.getElementById('man-row').style.display = m==='man' ? 'block' : 'none';
-  if (m==='cam') startScan(); else { stopScan(); setTimeout(function(){ document.getElementById('man-inp').focus(); }, 80); }
+  document.getElementById('tab-cam').classList.toggle('on', m === 'cam');
+  document.getElementById('tab-man').classList.toggle('on', m === 'man');
+  document.getElementById('man-row').style.display = m === 'man' ? 'block' : 'none';
+  if (m === 'cam') startScan(); else { stopScan(); setTimeout(() => document.getElementById('man-inp').focus(), 100); }
 }
 
 function startScan() {
   if (S.scanner) return;
-  var el = document.getElementById('qr-reader');
+  const el = document.getElementById('qr-reader');
   el.innerHTML = '';
   try {
-    S.scanner = new Html5Qrcode('qr-reader', {verbose:false});
-    var qrW = Math.min(200, window.innerWidth - 48);
-    S.scanner.start({facingMode:'environment'},{fps:10,qrbox:{width:qrW,height:Math.round(qrW*.65)},aspectRatio:1.5},
-      function(code){ stopScan(); toast('Código: '+code,'inf',1200); fetchProd(code); },
-      function(){}
-    ).catch(function(){ setMode('man'); toast('No se pudo acceder a la cámara','wrn'); });
-  } catch(e){ setMode('man'); }
+    S.scanner = new Html5Qrcode('qr-reader', { verbose: false });
+    const qrW = Math.min(240, window.innerWidth - 48);
+    S.scanner.start({ facingMode: 'environment' }, { fps: 10, qrbox: { width: qrW, height: Math.round(qrW * .65) }, aspectRatio: 1.5 },
+      (code) => { stopScan(); toast('Código: ' + code, 'inf', 1200); fetchProd(code); },
+      () => {}
+    ).catch(() => { setMode('man'); toast('No se pudo acceder a la cámara', 'wrn'); });
+  } catch(e) { setMode('man'); }
 }
 
 function stopScan() {
-  if (S.scanner) { S.scanner.stop().catch(function(){}); S.scanner = null; }
+  if (S.scanner) { S.scanner.stop().catch(() => {}); S.scanner = null; }
 }
 
 function resetScanUI() {
@@ -1013,180 +695,160 @@ function resetScanUI() {
   document.getElementById('resp-inp').value = '';
   document.getElementById('btn-foto-resp').style.display = 'none';
   S._fotoRespaldo = null;
-  var sugg = document.getElementById('scan-sugg'); if(sugg) sugg.style.display='none';
+  const sugg = document.getElementById('scan-sugg'); if (sugg) sugg.style.display = 'none';
 }
 
-function resetScan() { resetScanUI(); if(S.mode==='cam') setTimeout(startScan, 200); }
+function resetScan() { resetScanUI(); if (S.mode === 'cam') setTimeout(startScan, 200); }
 
 function searchManual() {
-  var v = document.getElementById('man-inp').value.trim();
-  if (!v) { toast('Ingresa un código','wrn'); return; }
+  const v = document.getElementById('man-inp').value.trim();
+  if (!v) { toast('Ingresa un código', 'wrn'); return; }
   document.getElementById('scan-sugg').style.display = 'none';
   fetchProd(v);
 }
 
-var _liveTimer = null;
 function searchLive(val) {
-  clearTimeout(_liveTimer);
-  var sugg = document.getElementById('scan-sugg');
-  if (!val || val.length < 2) { sugg.style.display='none'; return; }
-  _liveTimer = setTimeout(async function() {
+  debounce(async () => {
+    const sugg = document.getElementById('scan-sugg');
+    if (!val || val.length < 2) { sugg.style.display = 'none'; return; }
     try {
-      var res = await apiFetch('/api/productos/buscar?q='+encodeURIComponent(val)+'&limit=10');
-      var data = res.data || [];
-      if (!data.length) { sugg.style.display='none'; return; }
-      sugg.innerHTML = data.map(function(p){
-        var col = p.stock_actual<=0 ? 'var(--rose)' : (p.stock_minimo>0&&p.stock_actual<=p.stock_minimo ? 'var(--amber)' : 'var(--emerald)');
-        var pj = JSON.stringify(p).replace(/"/g,'&quot;');
-        return '<div onclick="selScanProd('+pj+')" style="padding:10px 14px;border-bottom:1px solid var(--wire);cursor:pointer;display:flex;align-items:center;gap:10px">'+
-          '<div style="width:8px;height:8px;border-radius:50%;background:'+col+';flex-shrink:0"></div>'+
-          '<div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:700;color:var(--tx1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+p.nombre+'</div>'+
-          '<div style="font-size:11px;color:var(--tx3)">'+p.codigo+' · <span style="color:'+col+'">'+p.stock_actual+' '+p.unidad+'</span></div></div></div>';
+      const res = await apiFetch(`/api/productos/buscar?q=${encodeURIComponent(val)}&limit=10`);
+      const data = res.data || [];
+      if (!data.length) { sugg.style.display = 'none'; return; }
+      sugg.innerHTML = data.map(p => {
+        const col = p.stock_actual <= 0 ? 'var(--rose)' : (p.stock_minimo > 0 && p.stock_actual <= p.stock_minimo ? 'var(--amber)' : 'var(--emerald)');
+        const pj = JSON.stringify(p).replace(/"/g, '&quot;');
+        return `<div onclick="selScanProd(${pj})" style="padding:12px 16px;border-bottom:1px solid var(--wire);cursor:pointer;display:flex;align-items:center;gap:12px">
+          <div style="width:10px;height:10px;border-radius:50%;background:${col};flex-shrink:0"></div>
+          <div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:700;color:var(--tx1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.nombre}</div>
+          <div style="font-size:11px;color:var(--tx3)">${p.codigo} · <span style="color:${col}">${p.stock_actual} ${p.unidad}</span></div></div></div>`;
       }).join('');
       sugg.style.display = 'block';
-    } catch(e){}
-  }, 280);
+    } catch(e) {}
+  }, 300, 'searchLive');
 }
 
 function selScanProd(p) {
   document.getElementById('man-inp').value = p.codigo;
   document.getElementById('scan-sugg').style.display = 'none';
-  S.prod = {codigo:p.codigo,nombre:p.nombre,grupo:p.grupo,unidad:p.unidad,cantidad:p.stock_actual,stockMin:p.stock_minimo};
+  S.prod = { codigo: p.codigo, nombre: p.nombre, grupo: p.grupo, unidad: p.unidad, cantidad: p.stock_actual, stockMin: p.stock_minimo };
   renderProd(S.prod, S.tipo);
 }
 
 async function fetchProd(code) {
-  document.getElementById('p-card').style.display='none';
-  document.getElementById('qty-card').style.display='none';
+  document.getElementById('p-card').style.display = 'none';
+  document.getElementById('qty-card').style.display = 'none';
   document.getElementById('scan-sub').textContent = 'Buscando...';
   try {
-    var res = await apiFetch('/api/productos/'+encodeURIComponent(code.toUpperCase()));
-    var p = res.data;
+    const res = await apiFetch(`/api/productos/${encodeURIComponent(code.toUpperCase())}`);
+    const p = res.data;
     if (!p) throw new Error('Producto no encontrado');
-    S.prod = {codigo:p.codigo,nombre:p.nombre,grupo:p.grupo,unidad:p.unidad,cantidad:p.stock_actual,stockMin:p.stock_minimo};
+    S.prod = { codigo: p.codigo, nombre: p.nombre, grupo: p.grupo, unidad: p.unidad, cantidad: p.stock_actual, stockMin: p.stock_minimo };
     renderProd(S.prod, S.tipo);
     document.getElementById('scan-sub').textContent = 'Producto encontrado';
     document.getElementById('qty-val').focus();
   } catch(e) {
-    toast(e.message || 'Producto no encontrado','err');
+    toast(e.message || 'Producto no encontrado', 'err');
     document.getElementById('scan-sub').textContent = 'Escanea o ingresa el código';
-    if (S.mode==='cam') setTimeout(startScan, 1600);
+    if (S.mode === 'cam') setTimeout(startScan, 1600);
   }
 }
 
 function renderProd(p, tipo) {
-  var isIn = tipo==='in', isAdj = tipo==='adj';
-  var card = document.getElementById('p-card');
-  card.className = 'p-card ' + (isIn?'t-in':isAdj?'t-adj':'t-out');
-  var icon = document.getElementById('p-icon');
-  icon.className = 'p-icon ' + (isIn?'in':isAdj?'adj':'out');
-  icon.innerHTML = '<i class="fas fa-arrow-'+(isIn?'down':isAdj?'right-left':'up')+'"></i>';
+  const isIn = tipo === 'in';
+  const card = document.getElementById('p-card');
+  card.className = `p-card ${isIn ? 't-in' : 't-out'}`;
+  const icon = document.getElementById('p-icon');
+  icon.className = `p-icon ${isIn ? 'in' : 'out'}`;
+  icon.innerHTML = `<i class="fas fa-arrow-${isIn ? 'down' : 'up'}"></i>`;
   document.getElementById('p-name').textContent = p.nombre;
-  document.getElementById('p-code').textContent = p.codigo + ' · ' + (p.grupo||'') + ' · ' + (p.unidad||'');
+  document.getElementById('p-code').textContent = `${p.codigo} · ${p.grupo || ''} · ${p.unidad || ''}`;
   document.getElementById('p-stk').textContent = p.cantidad;
   document.getElementById('p-min').textContent = p.stockMin || '—';
-  var sb = document.getElementById('p-sb');
-  sb.className = 'p-sb ' + (p.cantidad<=0?'crit':p.stockMin>0&&p.cantidad<=p.stockMin?'warn':'ok');
-  var bdg = document.getElementById('p-badge');
-  if (!p.stockMin||p.stockMin<=0) { bdg.className='badge b-nmin'; bdg.innerHTML='<i class="fas fa-question-circle"></i> SIN MÍN'; }
-  else if (p.cantidad<=0)         { bdg.className='badge b-crit'; bdg.innerHTML='<i class="fas fa-circle-xmark"></i> SIN STOCK'; }
-  else if (p.cantidad<=p.stockMin){ bdg.className='badge b-warn'; bdg.innerHTML='<i class="fas fa-triangle-exclamation"></i> CRÍTICO'; }
-  else                            { bdg.className='badge b-ok';   bdg.innerHTML='<i class="fas fa-circle-check"></i> OK'; }
-  card.style.display='block';
-  document.getElementById('qty-card').style.display='block';
-  document.getElementById('scan-bar').style.display='flex';
-  document.getElementById('scan-box').style.display='none';
-  document.getElementById('btn-scan-otro').style.display='block';
-  document.getElementById('btn-foto-resp').style.display='flex';
+  const sb = document.getElementById('p-sb');
+  sb.className = `p-sb ${p.cantidad <= 0 ? 'crit' : (p.stockMin > 0 && p.cantidad <= p.stockMin ? 'warn' : 'ok')}`;
+  const bdg = document.getElementById('p-badge');
+  if (!p.stockMin || p.stockMin <= 0) { bdg.className = 'badge b-nmin'; bdg.innerHTML = '<i class="fas fa-question-circle"></i> SIN MÍN'; }
+  else if (p.cantidad <= 0) { bdg.className = 'badge b-crit'; bdg.innerHTML = '<i class="fas fa-circle-xmark"></i> SIN STOCK'; }
+  else if (p.cantidad <= p.stockMin) { bdg.className = 'badge b-warn'; bdg.innerHTML = '<i class="fas fa-triangle-exclamation"></i> CRÍTICO'; }
+  else { bdg.className = 'badge b-ok'; bdg.innerHTML = '<i class="fas fa-circle-check"></i> OK'; }
+  card.style.display = 'block';
+  document.getElementById('qty-card').style.display = 'block';
+  document.getElementById('scan-bar').style.display = 'flex';
+  document.getElementById('scan-box').style.display = 'none';
+  document.getElementById('btn-scan-otro').style.display = 'block';
+  document.getElementById('btn-foto-resp').style.display = 'flex';
   stopScan();
 }
 
 function dQ(delta) {
-  var inp = document.getElementById('qty-val');
-  inp.value = Math.max(0.01, (parseFloat(inp.value)||1) + delta);
+  const inp = document.getElementById('qty-val');
+  inp.value = Math.max(0.01, (parseFloat(inp.value) || 1) + delta);
 }
 
 function askConfirm() {
-  var p = S.prod; if (!p) return;
-  var qty  = parseFloat(document.getElementById('qty-val').value) || 1;
-  var resp = document.getElementById('resp-inp').value.trim();
-  if (!resp) { document.getElementById('resp-inp').style.borderColor='var(--rose)'; document.getElementById('resp-inp').focus(); toast('El campo responsable es obligatorio','err'); return; }
-  document.getElementById('resp-inp').style.borderColor='';
-  var isIn = S.tipo==='in', isAdj = S.tipo==='adj';
-  if (!isIn && !isAdj && p.cantidad < qty) { toast('Stock insuficiente · disponible: '+p.cantidad+' '+p.unidad,'err'); return; }
-  var newStk = isIn ? p.cantidad+qty : isAdj ? qty : p.cantidad-qty;
-  var col = isIn ? 'var(--emerald)' : isAdj ? 'var(--amber)' : 'var(--rose)';
-  var sign = isIn ? '+' : isAdj ? '=' : '-';
-  document.getElementById('sh-title').textContent = isIn ? '✅ Confirmar Ingreso' : isAdj ? '🔧 Confirmar Ajuste' : '⚠️ Confirmar Salida';
-  document.getElementById('sh-body').innerHTML =
-    '<strong style="font-size:15px;color:var(--tx1)">'+p.nombre+'</strong><br>'+
-    '<span style="color:var(--tx3);font-size:12px">'+p.codigo+' · '+p.unidad+'</span><br><br>'+
-    '<span style="font-family:var(--f-d);font-size:40px;font-weight:800;color:'+col+'">'+sign+qty+' <small style="font-size:16px">'+p.unidad+'</small></span><br>'+
-    '<span style="font-size:12px;color:var(--tx3)">Stock resultante: '+newStk+' '+p.unidad+'</span>';
-  var okBtn = document.getElementById('sh-ok-btn');
-  okBtn.className = 'btn flex-1 ' + (isIn?'btn-green':isAdj?'btn-amber':'btn-rose');
+  const p = S.prod; if (!p) return;
+  const qty = parseFloat(document.getElementById('qty-val').value) || 1;
+  const resp = document.getElementById('resp-inp').value.trim();
+  if (!resp) { document.getElementById('resp-inp').style.borderColor = 'var(--rose)'; document.getElementById('resp-inp').focus(); toast('El campo responsable es obligatorio', 'err'); return; }
+  document.getElementById('resp-inp').style.borderColor = '';
+  const isIn = S.tipo === 'in';
+  if (!isIn && p.cantidad < qty) { toast(`Stock insuficiente · disponible: ${p.cantidad} ${p.unidad}`, 'err'); return; }
+  const newStk = isIn ? p.cantidad + qty : p.cantidad - qty;
+  const col = isIn ? 'var(--emerald)' : 'var(--rose)';
+  const sign = isIn ? '+' : '-';
+  document.getElementById('sh-title').textContent = isIn ? '✅ Confirmar Ingreso' : '⚠️ Confirmar Salida';
+  document.getElementById('sh-body').innerHTML = `<strong style="font-size:15px;color:var(--tx1)">${p.nombre}</strong><br><span style="color:var(--tx3);font-size:12px">${p.codigo} · ${p.unidad}</span><br><br><span style="font-family:var(--f-d);font-size:44px;font-weight:800;color:${col}">${sign}${qty} <small style="font-size:16px">${p.unidad}</small></span><br><span style="font-size:12px;color:var(--tx3)">Stock resultante: ${newStk} ${p.unidad}</span>`;
+  const okBtn = document.getElementById('sh-ok-btn');
+  okBtn.className = `btn flex-1 ${isIn ? 'btn-green' : 'btn-rose'}`;
   document.getElementById('sheet-bg').classList.add('on');
 }
 
 function closeSheet() { document.getElementById('sheet-bg').classList.remove('on'); }
 
 async function execMov() {
-  var p = S.prod; if(!p) return;
-  var qty  = parseFloat(document.getElementById('qty-val').value) || 1;
-  var resp = document.getElementById('resp-inp').value.trim();
-  var obs  = document.getElementById('obs-inp').value.trim();
+  const p = S.prod; if (!p) return;
+  const qty = parseFloat(document.getElementById('qty-val').value) || 1;
+  const resp = document.getElementById('resp-inp').value.trim();
+  const obs = document.getElementById('obs-inp').value.trim();
   closeSheet();
-
-  // Si es SALIDA, pedir firma primero
   if (S.tipo === 'out') {
-    S._pendingPayload = {
-      codigo: p.codigo, tipo: 'SALIDA', cantidad: qty,
-      responsable: resp, observaciones: obs || 'SALIDA via app bodega'
-    };
+    S._pendingPayload = { codigo: p.codigo, tipo: 'SALIDA', cantidad: qty, responsable: resp, observaciones: obs || 'SALIDA via app bodega' };
     if (S._fotoRespaldo) S._pendingPayload.fotoBase64 = S._fotoRespaldo;
-    // Small delay to let confirm sheet close first
-    setTimeout(function(){
-      movilAbrirFirma(p.nombre + ' — Cantidad: ' + qty + ' ' + p.unidad);
-    }, 300);
+    setTimeout(() => movilAbrirFirma(`${p.nombre} — Cantidad: ${qty} ${p.unidad}`), 300);
     return;
   }
-
-  var tipoMap = {in:'INGRESO',out:'SALIDA',adj:'AJUSTE'};
-  var payload = {codigo:p.codigo, tipo:tipoMap[S.tipo], cantidad:qty, responsable:resp, observaciones:obs || (tipoMap[S.tipo]+' via app bodega')};
+  const payload = { codigo: p.codigo, tipo: S.tipo === 'in' ? 'INGRESO' : 'SALIDA', cantidad: qty, responsable: resp, observaciones: obs || `${S.tipo === 'in' ? 'INGRESO' : 'SALIDA'} via app bodega` };
   if (S._fotoRespaldo) payload.fotoBase64 = S._fotoRespaldo;
   await ejecutarPayload(payload);
 }
 
 async function ejecutarPayload(payload, firmaData) {
-  var btn = document.getElementById('confirm-btn'); btn.classList.add('btn-off');
+  const btn = document.getElementById('confirm-btn'); btn.classList.add('off');
   if (!navigator.onLine) {
-    S.queue.push(Object.assign({},payload,{_ts:Date.now()})); saveQueue();
-    toast('Guardado sin conexion · se sincronizara','wrn'); btn.classList.remove('btn-off'); resetScan(); return;
+    S.queue.push(Object.assign({}, payload, { _ts: Date.now() })); saveQueue();
+    toast('Guardado sin conexión · se sincronizará', 'wrn'); btn.classList.remove('off'); resetScan(); return;
   }
   try {
-    var res = await apiFetch('/api/movimientos',{method:'POST',body:JSON.stringify(payload)});
-    if (res.status==='success') {
-      // Guardar firma si existe
+    const res = await apiFetch('/api/movimientos', { method: 'POST', body: JSON.stringify(payload) });
+    if (res.status === 'success') {
       if (firmaData && firmaData.nombre) {
-        var movId = res.data?.movimiento_id || res.data?.id;
+        const movId = res.data?.movimiento_id || res.data?.id;
         movilGuardarFirma(firmaData, movId);
         movilGenerarComprobante(firmaData, payload);
       }
-      toast((payload.tipo==='INGRESO'?'Ingreso':payload.tipo==='SALIDA'?'Salida':'Ajuste')+' registrado · Stock: '+(res.data?.stock_resultante??'?'),'ok');
+      toast(`${payload.tipo === 'INGRESO' ? 'Ingreso' : 'Salida'} registrado · Stock: ${res.data?.stock_resultante ?? '?'}`, 'ok');
       loadStats();
-    } else toast(res.message||'Error al registrar','err');
+    } else toast(res.message || 'Error al registrar', 'err');
   } catch(e) {
-    S.queue.push(Object.assign({},payload,{_ts:Date.now()})); saveQueue();
-    toast('Error de red · guardado en cola','wrn');
+    S.queue.push(Object.assign({}, payload, { _ts: Date.now() })); saveQueue();
+    toast('Error de red · guardado en cola', 'wrn');
   }
-  btn.classList.remove('btn-off'); resetScan();
+  btn.classList.remove('off'); resetScan();
 }
 
-// ── FIRMA MOVIL ──────────────────────────────────────
-var movilFirmaCanvas = null;
-var movilFirmaCtx = null;
-var movilFirmaDrawing = false;
-var movilFirmaHasFirma = false;
+// FIRMA
+let movilFirmaCanvas = null, movilFirmaCtx = null, movilFirmaDrawing = false, movilFirmaHasFirma = false;
 
 function movilAbrirFirma(info) {
   document.getElementById('movil-firma-info').textContent = info;
@@ -1199,17 +861,14 @@ function movilAbrirFirma(info) {
   setTimeout(movilInitCanvas, 150);
 }
 
-function movilCerrarFirma() {
-  document.getElementById('firma-sheet-bg').classList.remove('on');
-  S._pendingPayload = null;
-}
+function movilCerrarFirma() { document.getElementById('firma-sheet-bg').classList.remove('on'); S._pendingPayload = null; }
 
 function movilInitCanvas() {
-  var wrap = document.getElementById('movil-firma-wrap');
-  var canvas = document.getElementById('movil-firma-canvas');
+  const wrap = document.getElementById('movil-firma-wrap');
+  let canvas = document.getElementById('movil-firma-canvas');
   if (!canvas || !wrap) return;
-  var w = wrap.clientWidth;
-  var dpr = window.devicePixelRatio || 1;
+  const w = wrap.clientWidth;
+  const dpr = window.devicePixelRatio || 1;
   canvas.width = w * dpr;
   canvas.height = 180 * dpr;
   canvas.style.height = '180px';
@@ -1221,8 +880,7 @@ function movilInitCanvas() {
   movilFirmaCtx.lineCap = 'round';
   movilFirmaCtx.lineJoin = 'round';
   movilFirmaHasFirma = false;
-
-  var newCanvas = canvas.cloneNode(false);
+  const newCanvas = canvas.cloneNode(false);
   wrap.replaceChild(newCanvas, canvas);
   movilFirmaCanvas = newCanvas;
   movilFirmaCtx = newCanvas.getContext('2d');
@@ -1231,37 +889,35 @@ function movilInitCanvas() {
   movilFirmaCtx.lineWidth = 3;
   movilFirmaCtx.lineCap = 'round';
   movilFirmaCtx.lineJoin = 'round';
-
   function getPos(e) {
-    var rect = newCanvas.getBoundingClientRect();
-    var src = e.touches ? e.touches[0] : e;
+    const rect = newCanvas.getBoundingClientRect();
+    const src = e.touches ? e.touches[0] : e;
     return { x: src.clientX - rect.left, y: src.clientY - rect.top };
   }
-  function start(e) { e.preventDefault(); movilFirmaDrawing=true; var p=getPos(e); movilFirmaCtx.beginPath(); movilFirmaCtx.moveTo(p.x,p.y); document.getElementById('movil-firma-ph').style.display='none'; movilFirmaHasFirma=true; }
-  function move(e)  { e.preventDefault(); if(!movilFirmaDrawing) return; var p=getPos(e); movilFirmaCtx.lineTo(p.x,p.y); movilFirmaCtx.stroke(); }
-  function end(e)   { e.preventDefault(); movilFirmaDrawing=false; }
+  function start(e) { e.preventDefault(); movilFirmaDrawing = true; const p = getPos(e); movilFirmaCtx.beginPath(); movilFirmaCtx.moveTo(p.x, p.y); document.getElementById('movil-firma-ph').style.display = 'none'; movilFirmaHasFirma = true; }
+  function move(e) { e.preventDefault(); if (!movilFirmaDrawing) return; const p = getPos(e); movilFirmaCtx.lineTo(p.x, p.y); movilFirmaCtx.stroke(); }
+  function end(e) { e.preventDefault(); movilFirmaDrawing = false; }
   newCanvas.addEventListener('mousedown', start);
   newCanvas.addEventListener('mousemove', move);
   newCanvas.addEventListener('mouseup', end);
-  newCanvas.addEventListener('touchstart', start, {passive:false});
-  newCanvas.addEventListener('touchmove', move, {passive:false});
-  newCanvas.addEventListener('touchend', end, {passive:false});
+  newCanvas.addEventListener('touchstart', start, { passive: false });
+  newCanvas.addEventListener('touchmove', move, { passive: false });
+  newCanvas.addEventListener('touchend', end, { passive: false });
 }
 
 function movilLimpiarFirma() {
   if (movilFirmaCtx && movilFirmaCanvas) {
-    movilFirmaCtx.clearRect(0,0,movilFirmaCanvas.width,movilFirmaCanvas.height);
+    movilFirmaCtx.clearRect(0, 0, movilFirmaCanvas.width, movilFirmaCanvas.height);
     movilFirmaHasFirma = false;
     document.getElementById('movil-firma-ph').style.display = 'flex';
   }
 }
 
 async function movilConfirmarFirma() {
-  var omitir = document.getElementById('movil-firma-omitir').checked;
-  var nombre = document.getElementById('movil-firma-nombre').value.trim();
-  if (!nombre && !omitir) { toast('El nombre es obligatorio','err'); document.getElementById('movil-firma-nombre').focus(); return; }
-  
-  var firmaData = null;
+  const omitir = document.getElementById('movil-firma-omitir').checked;
+  const nombre = document.getElementById('movil-firma-nombre').value.trim();
+  if (!nombre && !omitir) { toast('El nombre es obligatorio', 'err'); document.getElementById('movil-firma-nombre').focus(); return; }
+  let firmaData = null;
   if (!omitir && nombre) {
     firmaData = {
       nombre: nombre,
@@ -1272,495 +928,379 @@ async function movilConfirmarFirma() {
     };
   }
   document.getElementById('firma-sheet-bg').classList.remove('on');
-  var payload = S._pendingPayload;
+  const payload = S._pendingPayload;
   S._pendingPayload = null;
   if (payload) await ejecutarPayload(payload, firmaData);
 }
 
 async function movilGuardarFirma(firmaData, movId) {
+  if (!firmaData) return;
   try {
-    var fd = new FormData();
-    fd.append('nombre', firmaData.nombre||'');
-    fd.append('rut', firmaData.rut||'');
-    fd.append('cargo', firmaData.cargo||'');
-    fd.append('telefono', firmaData.telefono||'');
+    const fd = new FormData();
+    fd.append('nombre', firmaData.nombre || '');
+    fd.append('rut', firmaData.rut || '');
+    fd.append('cargo', firmaData.cargo || '');
+    fd.append('telefono', firmaData.telefono || '');
     fd.append('tipo', 'SALIDA');
     if (movId) fd.append('movimiento_id', movId);
     if (firmaData.firmaImg) {
-      var arr = firmaData.firmaImg.split(',');
-      var bstr = atob(arr[1]);
-      var u8 = new Uint8Array(bstr.length);
-      for (var i=0; i<bstr.length; i++) u8[i] = bstr.charCodeAt(i);
-      fd.append('firma', new Blob([u8],{type:'image/png'}), 'firma.png');
+      const arr = firmaData.firmaImg.split(',');
+      const bstr = atob(arr[1]);
+      const u8 = new Uint8Array(bstr.length);
+      for (let i = 0; i < bstr.length; i++) u8[i] = bstr.charCodeAt(i);
+      fd.append('firma', new Blob([u8], { type: 'image/png' }), 'firma.png');
     }
-    await fetch(API+'/api/firmas',{method:'POST',headers:{'Authorization':'Bearer '+S.token},body:fd});
+    await fetch(API + '/api/firmas', { method: 'POST', headers: { 'Authorization': `Bearer ${S.token}` }, body: fd });
   } catch(e) { console.error('Error firma:', e); }
 }
 
 function movilGenerarComprobante(firmaData, payload) {
-  var html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Comprobante Retiro</title><style>body{font-family:Arial,sans-serif;padding:24px;max-width:480px;margin:0 auto;font-size:14px}.logo{font-size:22px;font-weight:700;letter-spacing:2px;color:#1e3c72}.sub{font-size:10px;letter-spacing:3px;color:#888;margin-bottom:20px}h2{color:#1e3c72;border-bottom:2px solid #1e3c72;padding-bottom:6px;font-size:16px}.field{background:#f8f9fa;padding:10px;border-radius:6px;margin-bottom:8px}.lbl{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:#888}.val{font-weight:600;color:#1e3c72;font-size:15px}.firma-box{border:1px solid #ddd;border-radius:8px;padding:12px;text-align:center;margin:16px 0}.footer{font-size:10px;color:#aaa;text-align:center;border-top:1px solid #eee;padding-top:12px;margin-top:16px}@media print{body{padding:10px}button{display:none}}</style></head><body>';
-  html += '<div class="logo">NEXUS<span style="color:#00bcd4">PRIME</span></div><div class="sub">COMPROBANTE DE RETIRO DE BODEGA</div>';
-  html += '<h2>Retiro de Material</h2>';
-  html += '<div class="field"><div class="lbl">Fecha</div><div class="val">'+new Date().toLocaleString('es-CL')+'</div></div>';
-  html += '<div class="field"><div class="lbl">Producto</div><div class="val">'+payload.codigo+'</div></div>';
-  html += '<div class="field"><div class="lbl">Cantidad</div><div class="val">'+payload.cantidad+'</div></div>';
-  if (firmaData.nombre) {
-    html += '<h2 style="margin-top:16px">Datos del Retirante</h2>';
-    html += '<div class="field"><div class="lbl">Nombre</div><div class="val">'+firmaData.nombre+'</div></div>';
-    if (firmaData.rut) html += '<div class="field"><div class="lbl">RUT</div><div class="val">'+firmaData.rut+'</div></div>';
-    if (firmaData.cargo) html += '<div class="field"><div class="lbl">Cargo / Empresa</div><div class="val">'+firmaData.cargo+'</div></div>';
-    if (firmaData.telefono) html += '<div class="field"><div class="lbl">Telefono</div><div class="val">'+firmaData.telefono+'</div></div>';
-    if (firmaData.firmaImg) {
-      html += '<div class="firma-box"><div style="font-size:10px;color:#888;margin-bottom:8px;letter-spacing:1px">FIRMA DEL RETIRANTE</div>';
-      html += '<img src="'+firmaData.firmaImg+'" style="max-width:240px;max-height:90px;border-bottom:1px solid #333;padding-bottom:4px"/></div>';
-    }
-  }
-  html += '<div class="footer">Generado por NEXUS PRIME &mdash; '+new Date().toLocaleString('es-CL')+'</div>';
-  html += '<br><button onclick="window.print()" style="width:100%;padding:12px;background:#1e3c72;color:#fff;border:none;border-radius:8px;font-size:14px;cursor:pointer">Imprimir / Guardar PDF</button>';
-  html += '</body></html>';
-  var blob = new Blob([html],{type:'text/html'});
-  var url = URL.createObjectURL(blob);
+  const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Comprobante Retiro</title><style>body{font-family:Arial,sans-serif;padding:24px;max-width:480px;margin:0 auto;font-size:14px}.logo{font-size:22px;font-weight:700;letter-spacing:2px;color:#1e3c72}.sub{font-size:10px;letter-spacing:3px;color:#888;margin-bottom:20px}h2{color:#1e3c72;border-bottom:2px solid #1e3c72;padding-bottom:6px;font-size:16px}.field{background:#f8f9fa;padding:10px;border-radius:6px;margin-bottom:8px}.lbl{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:#888}.val{font-weight:600;color:#1e3c72;font-size:15px}.firma-box{border:1px solid #ddd;border-radius:8px;padding:12px;text-align:center;margin:16px 0}.footer{font-size:10px;color:#aaa;text-align:center;border-top:1px solid #eee;padding-top:12px;margin-top:16px}@media print{body{padding:10px}button{display:none}}</style></head><body><div class="logo">NEXUS<span style="color:#00bcd4">PRIME</span></div><div class="sub">COMPROBANTE DE RETIRO DE BODEGA</div><h2>Retiro de Material</h2><div class="field"><div class="lbl">Fecha</div><div class="val">${new Date().toLocaleString('es-CL')}</div></div><div class="field"><div class="lbl">Producto</div><div class="val">${payload.codigo}</div></div><div class="field"><div class="lbl">Cantidad</div><div class="val">${payload.cantidad}</div></div>${firmaData.nombre ? `<h2 style="margin-top:16px">Datos del Retirante</h2><div class="field"><div class="lbl">Nombre</div><div class="val">${firmaData.nombre}</div></div>${firmaData.rut ? `<div class="field"><div class="lbl">RUT</div><div class="val">${firmaData.rut}</div></div>` : ''}${firmaData.cargo ? `<div class="field"><div class="lbl">Cargo / Empresa</div><div class="val">${firmaData.cargo}</div></div>` : ''}${firmaData.telefono ? `<div class="field"><div class="lbl">Teléfono</div><div class="val">${firmaData.telefono}</div></div>` : ''}${firmaData.firmaImg ? `<div class="firma-box"><div style="font-size:10px;color:#888;margin-bottom:8px;letter-spacing:1px">FIRMA DEL RETIRANTE</div><img src="${firmaData.firmaImg}" style="max-width:240px;max-height:90px;border-bottom:1px solid #333;padding-bottom:4px"/></div>` : ''}` : ''}<div class="footer">Generado por NEXUS PRIME &mdash; ${new Date().toLocaleString('es-CL')}</div><br><button onclick="window.print()" style="width:100%;padding:12px;background:#1e3c72;color:#fff;border:none;border-radius:8px;font-size:14px;cursor:pointer">Imprimir / Guardar PDF</button></body></html>`;
+  const blob = new Blob([html], { type: 'text/html' });
+  const url = URL.createObjectURL(blob);
   window.open(url, '_blank');
-  setTimeout(function(){ URL.revokeObjectURL(url); }, 3000);
+  setTimeout(() => URL.revokeObjectURL(url), 3000);
 }
 
-// ── OFFLINE QUEUE ──────────────────────────────────
-function saveQueue()  { localStorage.setItem('nxb_q', JSON.stringify(S.queue)); updQueueBadge(); }
-function loadQueue()  { try{ S.queue = JSON.parse(localStorage.getItem('nxb_q')||'[]'); }catch(e){ S.queue=[]; } updQueueBadge(); }
+// OFFLINE QUEUE
+function saveQueue() { localStorage.setItem('nxb_q', JSON.stringify(S.queue)); updQueueBadge(); }
+function loadQueue() { try { S.queue = JSON.parse(localStorage.getItem('nxb_q') || '[]'); } catch(e) { S.queue = []; } updQueueBadge(); }
+function updQueueBadge() { const n = S.queue.length; const el = document.getElementById('queue-info'); if (el) el.style.display = n > 0 ? 'block' : 'none'; const cnt = document.getElementById('q-count'); if (cnt) cnt.textContent = n; }
 
 async function syncQ() {
   if (!navigator.onLine || S.syncing || !S.queue.length) return;
   S.syncing = true;
-  var total = S.queue.length;
-  var item  = S.queue[0];
+  const total = S.queue.length;
+  const item = S.queue[0];
   try {
-    await apiFetch('/api/movimientos',{method:'POST',body:JSON.stringify(item)});
+    await apiFetch('/api/movimientos', { method: 'POST', body: JSON.stringify(item) });
     S.queue.shift(); saveQueue(); S.syncing = false;
     if (S.queue.length) setTimeout(syncQ, 500);
-    else { toast('✅ '+total+' movimiento(s) sincronizado(s)','ok'); loadStats(); }
-  } catch(e) {
-    S.syncing = false;
-    setTimeout(function(){ if(navigator.onLine) syncQ(); }, 30000);
-  }
+    else { toast(`✅ ${total} movimiento(s) sincronizado(s)`, 'ok'); loadStats(); }
+  } catch(e) { S.syncing = false; setTimeout(() => { if (navigator.onLine) syncQ(); }, 30000); }
 }
 
-// ── QUERY ─────────────────────────────────────────
-function goQuery() {
-  S.navStack.push(S.cur||'s-home'); go('s-query');
-  setTimeout(function(){ document.getElementById('q-inp').focus(); }, 300);
-}
+// QUERY
+function goQuery() { S.navStack.push(S.cur || 's-home'); go('s-query'); setTimeout(() => document.getElementById('q-inp').focus(), 300); }
+function clearQuery() { document.getElementById('q-inp').value = ''; document.getElementById('q-results').innerHTML = ''; document.getElementById('q-detail').classList.add('hidden'); }
+function debounceQSearch() { debounce(() => qSearch(), 300, 'qSearch'); }
 
-var _qTimer = null;
-function qSearch() {
-  var q = document.getElementById('q-inp').value.trim();
+async function qSearch() {
+  const q = document.getElementById('q-inp').value.trim();
   document.getElementById('q-detail').classList.add('hidden');
   document.getElementById('q-results').innerHTML = '';
   if (!q) return;
-  clearTimeout(_qTimer);
-  _qTimer = setTimeout(async function() {
-    try {
-      var res = await apiFetch('/api/productos/buscar?q='+encodeURIComponent(q)+'&limit=30');
-      renderQList(res.data || []);
-    } catch(e){}
-  }, 300);
+  try {
+    const res = await apiFetch(`/api/productos/buscar?q=${encodeURIComponent(q)}&limit=30`);
+    renderQList(res.data || []);
+  } catch(e) {}
 }
 
 function renderQList(data) {
-  var c = document.getElementById('q-results');
-  if (!data.length) { c.innerHTML='<div class="empty"><i class="fas fa-magnifying-glass"></i><p>Sin resultados</p></div>'; return; }
-  c.innerHTML = data.map(function(p){
-    var col = p.stock_actual<=0 ? 'var(--rose)' : (p.stock_minimo>0&&p.stock_actual<=p.stock_minimo ? 'var(--amber)' : 'var(--emerald)');
-    var pj = JSON.stringify({codigo:p.codigo,nombre:p.nombre,grupo:p.grupo,unidad:p.unidad,cantidad:p.stock_actual,stockMin:p.stock_minimo}).replace(/"/g,'&quot;');
-    return '<div onclick="showQDetail('+pj+')" style="background:var(--ink3);border:1px solid var(--wire);border-radius:var(--r-md);padding:12px 14px;margin-bottom:8px;cursor:pointer;display:flex;align-items:center;gap:12px">'+
-      '<div style="width:10px;height:10px;border-radius:50%;flex-shrink:0;background:'+col+'"></div>'+
-      '<div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:700;color:var(--tx1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+p.nombre+'</div>'+
-      '<div style="font-size:11px;color:var(--tx3);margin-top:2px">'+p.codigo+' · '+p.grupo+'</div></div>'+
-      '<div style="text-align:right"><div style="font-size:18px;font-weight:800;color:'+col+'">'+p.stock_actual+'</div><div style="font-size:10px;color:var(--tx3)">'+p.unidad+'</div></div></div>';
+  const c = document.getElementById('q-results');
+  if (!data.length) { c.innerHTML = '<div class="empty"><i class="fas fa-magnifying-glass"></i><p>Sin resultados</p></div>'; return; }
+  c.innerHTML = data.map(p => {
+    const col = p.stock_actual <= 0 ? 'var(--rose)' : (p.stock_minimo > 0 && p.stock_actual <= p.stock_minimo ? 'var(--amber)' : 'var(--emerald)');
+    const pj = JSON.stringify({ codigo: p.codigo, nombre: p.nombre, grupo: p.grupo, unidad: p.unidad, cantidad: p.stock_actual, stockMin: p.stock_minimo }).replace(/"/g, '&quot;');
+    return `<div onclick="showQDetail(${pj})" style="background:var(--ink3);border:1px solid var(--wire);border-radius:var(--r-md);padding:14px 16px;margin-bottom:10px;cursor:pointer;display:flex;align-items:center;gap:14px">
+      <div style="width:12px;height:12px;border-radius:50%;flex-shrink:0;background:${col}"></div>
+      <div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:700;color:var(--tx1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.nombre}</div>
+      <div style="font-size:11px;color:var(--tx3);margin-top:2px">${p.codigo} · ${p.grupo}</div></div>
+      <div style="text-align:right"><div style="font-size:20px;font-weight:800;color:${col}">${p.stock_actual}</div><div style="font-size:10px;color:var(--tx3)">${p.unidad}</div></div></div>`;
   }).join('');
 }
 
 function showQDetail(p) {
   document.getElementById('q-results').innerHTML = '';
   document.getElementById('qd-name').textContent = p.nombre;
-  document.getElementById('qd-code').textContent = p.codigo + ' · ' + p.grupo;
-  document.getElementById('qd-stk').textContent  = p.cantidad;
-  document.getElementById('qd-stk').style.color  = p.cantidad<=0 ? 'var(--rose)' : p.stockMin>0&&p.cantidad<=p.stockMin ? 'var(--amber)' : 'var(--emerald)';
-  document.getElementById('qd-min').textContent  = p.stockMin || '—';
+  document.getElementById('qd-code').textContent = `${p.codigo} · ${p.grupo}`;
+  document.getElementById('qd-stk').textContent = p.cantidad;
+  document.getElementById('qd-stk').style.color = p.cantidad <= 0 ? 'var(--rose)' : (p.stockMin > 0 && p.cantidad <= p.stockMin ? 'var(--amber)' : 'var(--emerald)');
+  document.getElementById('qd-min').textContent = p.stockMin || '—';
   document.getElementById('qd-unit').textContent = p.unidad;
-  var bdg = document.getElementById('qd-badge');
-  if (!p.stockMin||p.stockMin<=0) { bdg.className='badge b-nmin'; bdg.textContent='SIN MÍN'; }
-  else if (p.cantidad<=0)         { bdg.className='badge b-crit'; bdg.textContent='SIN STOCK'; }
-  else if (p.cantidad<=p.stockMin){ bdg.className='badge b-warn'; bdg.textContent='CRÍTICO'; }
-  else                            { bdg.className='badge b-ok';   bdg.textContent='OK'; }
+  const bdg = document.getElementById('qd-badge');
+  if (!p.stockMin || p.stockMin <= 0) { bdg.className = 'badge b-nmin'; bdg.textContent = 'SIN MÍN'; }
+  else if (p.cantidad <= 0) { bdg.className = 'badge b-crit'; bdg.textContent = 'SIN STOCK'; }
+  else if (p.cantidad <= p.stockMin) { bdg.className = 'badge b-warn'; bdg.textContent = 'CRÍTICO'; }
+  else { bdg.className = 'badge b-ok'; bdg.textContent = 'OK'; }
   S._qProd = p;
   document.getElementById('q-detail').classList.remove('hidden');
 }
 
 function goFromQuery(tipo) {
-  var p = S._qProd; if(!p) return;
+  const p = S._qProd; if (!p) return;
   S.tipo = tipo; S.prod = p; S._fotoRespaldo = null;
-  document.getElementById('scan-title').textContent = tipo==='in' ? 'INGRESO' : 'SALIDA';
-  updateScanTypeUI(); resetScanUI();
+  document.getElementById('scan-title').textContent = tipo === 'in' ? 'INGRESO' : 'SALIDA';
+  updateScanBanner(); resetScanUI();
   S.navStack = ['s-home'];
   go('s-scan'); stopScan(); setMode('man');
   document.getElementById('man-inp').value = p.codigo;
   renderProd(p, tipo);
 }
 
-// ── HISTORIAL ──────────────────────────────────────
+// HISTORIAL
 async function goHist() {
-  S.navStack.push(S.cur||'s-home'); go('s-hist');
+  S.navStack.push(S.cur || 's-home'); go('s-hist');
   document.getElementById('hist-list').innerHTML = '<div class="loading"><div class="spin"></div>Cargando...</div>';
   try {
-    var res = await apiFetch('/api/auditoria?limit=40');
+    const res = await apiFetch('/api/auditoria?limit=40');
     renderHist(res.data || []);
   } catch(e) { document.getElementById('hist-list').innerHTML = '<div class="empty"><i class="fas fa-circle-exclamation"></i><p>No se pudo cargar</p></div>'; }
 }
 
 function renderHist(movs) {
-  var c = document.getElementById('hist-list');
-  if (!movs.length) { c.innerHTML='<div class="empty"><i class="fas fa-clock-rotate-left"></i><p>Sin movimientos</p></div>'; return; }
-  c.innerHTML = movs.map(function(m,i){
-    var isIn=m.tipo==='INGRESO', isAdj=m.tipo==='AJUSTE';
-    var col = isIn?'var(--emerald)':isAdj?'var(--neon)':'var(--rose)';
-    var sign = isIn||isAdj?'+':'-';
-    return '<div style="background:var(--ink3);border:1px solid var(--wire);border-radius:var(--r-md);padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:12px;animation:fadeUp .3s '+(i*.04)+'s both">'+
-      '<div style="width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;flex-shrink:0">'+
-        '<i class="fas fa-arrow-'+(isIn?'down':isAdj?'right-left':'up')+'" style="color:'+col+';font-size:14px"></i>'+
-      '</div>'+
-      '<div style="flex:1;min-width:0">'+
-        '<div style="font-size:13px;font-weight:700;color:var(--tx1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+(m.producto||m.codigo)+'</div>'+
-        '<div style="font-size:11px;color:var(--tx3);margin-top:2px">'+(m.fecha||'')+(m.responsable?' · <span style="color:var(--neon)">'+m.responsable+'</span>':'')+'</div>'+
-        (m.observaciones?'<div style="font-size:10px;color:var(--tx3);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+m.observaciones+'</div>':'')+
-      '</div>'+
-      '<div style="text-align:right;flex-shrink:0"><div style="font-size:18px;font-weight:800;color:'+col+'">'+sign+m.cantidad+'</div>'+
-        '<div style="font-size:10px;color:var(--tx3)">'+(m.stock_resultante!=null?'→ '+m.stock_resultante:'')+'</div></div></div>';
+  const c = document.getElementById('hist-list');
+  if (!movs.length) { c.innerHTML = '<div class="empty"><i class="fas fa-clock-rotate-left"></i><p>Sin movimientos</p></div>'; return; }
+  c.innerHTML = movs.map((m, i) => {
+    const isIn = m.tipo === 'INGRESO';
+    const col = isIn ? 'var(--emerald)' : 'var(--rose)';
+    const sign = isIn ? '+' : '-';
+    return `<div style="background:var(--ink3);border:1px solid var(--wire);border-radius:var(--r-md);padding:14px 16px;margin-bottom:10px;display:flex;align-items:center;gap:14px;animation:fadeUp .3s ${i * 0.04}s both">
+      <div style="width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fas fa-arrow-${isIn ? 'down' : 'up'}" style="color:${col};font-size:14px"></i></div>
+      <div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:700;color:var(--tx1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${m.producto || m.codigo}</div>
+      <div style="font-size:11px;color:var(--tx3);margin-top:2px">${m.fecha || ''}${m.responsable ? ` · <span style="color:var(--neon)">${m.responsable}</span>` : ''}</div>
+      ${m.observaciones ? `<div style="font-size:10px;color:var(--tx3);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${m.observaciones}</div>` : ''}</div>
+      <div style="text-align:right;flex-shrink:0"><div style="font-size:20px;font-weight:800;color:${col}">${sign}${m.cantidad}</div>
+      <div style="font-size:10px;color:var(--tx3)">${m.stock_resultante != null ? `→ ${m.stock_resultante}` : ''}</div></div></div>`;
   }).join('');
 }
 
-// ── RFP ───────────────────────────────────────────
+// RFP
 function goRFP(modo) {
-  S.navStack.push(S.cur||'s-home');
-  document.getElementById('rfp-retiro').style.display    = modo==='retiro' ? '' : 'none';
-  document.getElementById('rfp-devolucion').style.display = modo==='devolucion' ? '' : 'none';
-  document.getElementById('rfp-title').textContent = modo==='retiro' ? 'RETIRO RFP' : 'DEVOLUCIÓN';
+  S.navStack.push(S.cur || 's-home');
+  document.getElementById('rfp-retiro').style.display = modo === 'retiro' ? '' : 'none';
+  document.getElementById('rfp-devolucion').style.display = modo === 'devolucion' ? '' : 'none';
+  document.getElementById('rfp-title').textContent = modo === 'retiro' ? 'RETIRO RFP' : 'DEVOLUCIÓN';
   S._rfpFoto = null;
-  if (modo==='devolucion') rfpCargarPendientes();
-  if (S.user) {
-    var r = document.getElementById('rfp-resp');
-    if (r) r.value = S.user.nombre || '';
-  }
+  if (modo === 'devolucion') rfpCargarPendientes();
+  if (S.user) { const r = document.getElementById('rfp-resp'); if (r) r.value = S.user.nombre || ''; }
   go('s-rfp');
 }
 
 async function rfpCargarPendientes() {
-  var list = document.getElementById('rfp-pend-list');
+  const list = document.getElementById('rfp-pend-list');
   list.innerHTML = '<div class="loading"><div class="spin"></div>Cargando...</div>';
   try {
-    var res = await apiFetch('/api/rfp/historial?limit=100');
-    var data = (res.data||[]).filter(function(r){ return r.estado==='PENDIENTE'||r.estado==='DEVUELTO_PARCIAL'; });
-    if (!data.length) { list.innerHTML='<div class="empty"><i class="fas fa-check"></i><p>Sin préstamos pendientes</p></div>'; return; }
-    list.innerHTML = data.map(function(r){
-      var pend = r.cantidad - (r.cantidad_devuelta||0);
-      return '<div class="rfp-pend-item" onclick="rfpSelPrestamo(this,\''+r.id+'\','+pend+',\''+r.unidad+'\')">'+
-        '<div style="font-weight:700;color:var(--tx1);font-size:13px">'+r.producto+'</div>'+
-        '<div style="font-size:11px;color:var(--tx3);margin-top:3px">'+r.fecha_retiro+' · Pendiente: <span style="color:var(--amber)">'+pend+' '+r.unidad+'</span> · Auth: '+r.autorizado_por+'</div></div>';
+    const res = await apiFetch('/api/rfp/historial?limit=100');
+    const data = (res.data || []).filter(r => r.estado === 'PENDIENTE' || r.estado === 'DEVUELTO_PARCIAL');
+    if (!data.length) { list.innerHTML = '<div class="empty"><i class="fas fa-check"></i><p>Sin préstamos pendientes</p></div>'; return; }
+    list.innerHTML = data.map(r => {
+      const pend = r.cantidad - (r.cantidad_devuelta || 0);
+      return `<div class="rfp-pend-item" onclick="rfpSelPrestamo(this,'${r.id}',${pend},'${r.unidad}')">
+        <div style="font-weight:700;color:var(--tx1);font-size:13px">${r.producto}</div>
+        <div style="font-size:11px;color:var(--tx3);margin-top:4px">${r.fecha_retiro} · Pendiente: <span style="color:var(--amber)">${pend} ${r.unidad}</span> · Auth: ${r.autorizado_por}</div></div>`;
     }).join('');
-  } catch(e) { list.innerHTML='<div class="empty"><i class="fas fa-circle-exclamation"></i><p>Error cargando</p></div>'; }
+  } catch(e) { list.innerHTML = '<div class="empty"><i class="fas fa-circle-exclamation"></i><p>Error cargando</p></div>'; }
 }
 
 function rfpSelPrestamo(el, id, pend, unidad) {
-  document.querySelectorAll('.rfp-pend-item').forEach(function(i){ i.classList.remove('selected'); });
+  document.querySelectorAll('.rfp-pend-item').forEach(i => i.classList.remove('selected'));
   el.classList.add('selected');
-  S._rfpPrestamo = {id, pend, unidad};
-  var info = document.getElementById('rfp-info-dev');
-  info.style.display='block';
-  info.innerHTML='<div style="color:var(--amber);font-size:12px;font-weight:700">Máximo a devolver: <span style="font-size:18px">'+pend+'</span> '+unidad+'</div>';
-  var flds = document.getElementById('rfp-dev-flds');
-  flds.style.display='block';
-  var inp = document.getElementById('rfp-cant-dev');
-  inp.max=pend; inp.value=pend; inp.placeholder='máx '+pend;
+  S._rfpPrestamo = { id, pend, unidad };
+  const info = document.getElementById('rfp-info-dev');
+  info.style.display = 'block';
+  info.innerHTML = `<div style="color:var(--amber);font-size:12px;font-weight:700">Máximo a devolver: <span style="font-size:18px">${pend}</span> ${unidad}</div>`;
+  const flds = document.getElementById('rfp-dev-flds');
+  flds.style.display = 'block';
+  const inp = document.getElementById('rfp-cant-dev');
+  inp.max = pend; inp.value = pend; inp.placeholder = `máx ${pend}`;
 }
 
 async function rfpGuardar(modo) {
-  if (modo==='retiro') {
-    var codigo = (document.getElementById('rfp-codigo').value||'').trim().toUpperCase();
-    var nombre = (document.getElementById('rfp-producto').value||'').trim();
-    var cant   = parseFloat(document.getElementById('rfp-cantidad').value||0);
-    var unidad = (document.getElementById('rfp-unidad').value||'unid').trim();
-    var autor  = (document.getElementById('rfp-autoriza').value||'').trim();
-    var resp   = (document.getElementById('rfp-resp').value||'').trim();
-    var obs    = (document.getElementById('rfp-obs').value||'').trim();
-    if (!codigo){ toast('Ingresa el código RFP','err'); return; }
-    if (!nombre){ toast('Ingresa el nombre del producto','err'); return; }
-    if (!cant)  { toast('Cantidad inválida','err'); return; }
-    if (!autor) { toast('Registra quién autoriza','err'); return; }
-    var today = new Date(); var fecha = today.getFullYear()+'-'+String(today.getMonth()+1).padStart(2,'0')+'-'+String(today.getDate()).padStart(2,'0');
-    var id = 'RFP-'+fecha.replace(/-/g,'')+'-'+String(Date.now()).slice(-3);
-    var body = {id,fecha_retiro:fecha,codigo_rfp:codigo,producto:nombre,cantidad:cant,unidad,autorizado_por:autor,responsable_retiro:resp,observaciones:obs};
+  if (modo === 'retiro') {
+    const codigo = (document.getElementById('rfp-codigo').value || '').trim().toUpperCase();
+    const nombre = (document.getElementById('rfp-producto').value || '').trim();
+    const cant = parseFloat(document.getElementById('rfp-cantidad').value || 0);
+    const unidad = (document.getElementById('rfp-unidad').value || 'unid').trim();
+    const autor = (document.getElementById('rfp-autoriza').value || '').trim();
+    const resp = (document.getElementById('rfp-resp').value || '').trim();
+    const obs = (document.getElementById('rfp-obs').value || '').trim();
+    if (!codigo) { toast('Ingresa el código RFP', 'err'); return; }
+    if (!nombre) { toast('Ingresa el nombre del producto', 'err'); return; }
+    if (!cant) { toast('Cantidad inválida', 'err'); return; }
+    if (!autor) { toast('Registra quién autoriza', 'err'); return; }
+    const today = new Date(); const fecha = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
+    const id = 'RFP-' + fecha.replace(/-/g, '') + '-' + String(Date.now()).slice(-3);
+    const body = { id, fecha_retiro: fecha, codigo_rfp: codigo, producto: nombre, cantidad: cant, unidad, autorizado_por: autor, responsable_retiro: resp, observaciones: obs };
     if (S._rfpFoto) body.fotoBase64 = S._rfpFoto;
-    var btn = document.getElementById('rfp-guardar-btn'); btn.classList.add('btn-off');
+    const btn = document.getElementById('rfp-guardar-btn'); btn.classList.add('off');
     try {
-      var res = await apiFetch('/api/rfp',{method:'POST',body:JSON.stringify(body)});
-      if (res.status==='success'){ toast('✅ Retiro RFP registrado · ID: '+id,'ok'); ['rfp-codigo','rfp-producto','rfp-cantidad','rfp-autoriza','rfp-obs'].forEach(function(x){ document.getElementById(x).value=''; }); S._rfpFoto=null; back(); }
-      else toast(res.message||'Error registrando','err');
-    } catch(e){ toast('Error de conexión','err'); }
-    btn.classList.remove('btn-off');
+      const res = await apiFetch('/api/rfp', { method: 'POST', body: JSON.stringify(body) });
+      if (res.status === 'success') { toast(`✅ Retiro RFP registrado · ID: ${id}`, 'ok'); ['rfp-codigo', 'rfp-producto', 'rfp-cantidad', 'rfp-autoriza', 'rfp-obs'].forEach(x => document.getElementById(x).value = ''); S._rfpFoto = null; back(); }
+      else toast(res.message || 'Error registrando', 'err');
+    } catch(e) { toast('Error de conexión', 'err'); }
+    btn.classList.remove('off');
   } else {
-    if (!S._rfpPrestamo){ toast('Selecciona un préstamo','err'); return; }
-    var cantDev = parseFloat(document.getElementById('rfp-cant-dev').value||0);
-    if (!cantDev){ toast('Ingresa la cantidad a devolver','err'); return; }
-    var btn = document.getElementById('rfp-dev-btn'); btn.classList.add('btn-off');
+    if (!S._rfpPrestamo) { toast('Selecciona un préstamo', 'err'); return; }
+    const cantDev = parseFloat(document.getElementById('rfp-cant-dev').value || 0);
+    if (!cantDev) { toast('Ingresa la cantidad a devolver', 'err'); return; }
+    const btn = document.getElementById('rfp-dev-btn'); btn.classList.add('off');
     try {
-      var res = await apiFetch('/api/rfp/'+S._rfpPrestamo.id+'/devolucion',{method:'POST',body:JSON.stringify({cantidad_devuelta:cantDev,responsable:S.user?S.user.nombre:''})});
-      if (res.status==='success'){ toast(res.data?.message||'✅ Devolución registrada','ok'); back(); }
-      else toast(res.message||'Error','err');
-    } catch(e){ toast('Error de conexión','err'); }
-    btn.classList.remove('btn-off');
+      const res = await apiFetch(`/api/rfp/${S._rfpPrestamo.id}/devolucion`, { method: 'POST', body: JSON.stringify({ cantidad_devuelta: cantDev, responsable: S.user ? S.user.nombre : '' }) });
+      if (res.status === 'success') { toast(res.data?.message || '✅ Devolución registrada', 'ok'); back(); }
+      else toast(res.message || 'Error', 'err');
+    } catch(e) { toast('Error de conexión', 'err'); }
+    btn.classList.remove('off');
   }
 }
 
-function rfpScanQR() {
-  openModalQR('Código RFP', function(code){ document.getElementById('rfp-codigo').value=code.toUpperCase(); toast('Código: '+code,'ok'); });
+function rfpScanQR() { openModalQR('Código RFP', code => { document.getElementById('rfp-codigo').value = code.toUpperCase(); toast('Código: ' + code, 'ok'); }); }
+function rfpTomarFoto() { openModalFoto('Foto de Retiro RFP', dataUrl => { S._rfpFoto = dataUrl; const btn = document.getElementById('btn-rfp-foto'); btn.style.background = 'rgba(52,211,153,.15)'; btn.style.color = 'var(--emerald)'; btn.innerHTML = '<i class="fas fa-check-circle"></i> Foto lista · toca para cambiar'; }); }
+function tomarFotoRespaldo() { openModalFoto('Foto de Respaldo', dataUrl => { S._fotoRespaldo = dataUrl; const btn = document.getElementById('btn-foto-resp'); btn.style.background = 'rgba(52,211,153,.15)'; btn.style.color = 'var(--emerald)'; btn.innerHTML = '<i class="fas fa-check-circle"></i> Foto lista · toca para cambiar'; }); }
+
+// LOTE
+let _loteItems = [];
+
+function goLote() { _loteItems = []; renderLote(); S.navStack.push(S.cur || 's-home'); go('s-lote'); }
+function debounceLoteSearch(val) { debounce(() => loteSearchLive(val), 300, 'loteSearch'); }
+
+async function loteSearchLive(val) {
+  const sugg = document.getElementById('lote-sugg');
+  if (!val || val.length < 2) { sugg.style.display = 'none'; return; }
+  try {
+    const res = await apiFetch(`/api/productos/buscar?q=${encodeURIComponent(val)}&limit=10`);
+    const data = res.data || [];
+    if (!data.length) { sugg.style.display = 'none'; return; }
+    sugg.innerHTML = data.map(p => {
+      const pj = JSON.stringify({ codigo: p.codigo, nombre: p.nombre, grupo: p.grupo, unidad: p.unidad, cantidad: p.stock_actual, stockMin: p.stock_minimo }).replace(/"/g, '&quot;');
+      return `<div onclick="loteAdd(${pj})" style="padding:12px 16px;border-bottom:1px solid var(--wire);cursor:pointer">
+        <div style="font-size:13px;font-weight:700;color:var(--tx1)">${p.nombre}</div>
+        <div style="font-size:11px;color:var(--tx3)">${p.codigo} · ${p.stock_actual} ${p.unidad}</div></div>`;
+    }).join('');
+    sugg.style.display = 'block';
+  } catch(e) {}
 }
 
-function rfpTomarFoto() {
-  openModalFoto('Foto de Retiro RFP', function(dataUrl){
-    S._rfpFoto = dataUrl;
-    var btn = document.getElementById('btn-rfp-foto');
-    btn.style.background='rgba(52,211,153,.15)'; btn.style.color='var(--emerald)';
-    btn.innerHTML='<i class="fas fa-check-circle"></i> Foto lista · toca para cambiar';
-  });
-}
-
-function tomarFotoRespaldo() {
-  openModalFoto('Foto de Respaldo', function(dataUrl){
-    S._fotoRespaldo = dataUrl;
-    var btn = document.getElementById('btn-foto-resp');
-    btn.style.background='rgba(52,211,153,.15)'; btn.style.color='var(--emerald)';
-    btn.innerHTML='<i class="fas fa-check-circle"></i> Foto lista · toca para cambiar';
-  });
-}
-
-// ── LOTE ──────────────────────────────────────────
-var _loteItems = [];
-var _loteSuggTimer = null;
-
-function goLote() {
-  _loteItems = []; renderLote();
-  S.navStack.push(S.cur||'s-home');
-  go('s-lote');
-}
-
-function loteSearchLive(val) {
-  clearTimeout(_loteSuggTimer);
-  var sugg = document.getElementById('lote-sugg');
-  if (!val||val.length<2){ sugg.style.display='none'; return; }
-  _loteSuggTimer = setTimeout(async function(){
-    try {
-      var res = await apiFetch('/api/productos/buscar?q='+encodeURIComponent(val)+'&limit=10');
-      var data = res.data||[];
-      if (!data.length){ sugg.style.display='none'; return; }
-      sugg.innerHTML = data.map(function(p){
-        var pj = JSON.stringify({codigo:p.codigo,nombre:p.nombre,grupo:p.grupo,unidad:p.unidad,cantidad:p.stock_actual,stockMin:p.stock_minimo}).replace(/"/g,'&quot;');
-        return '<div onclick="loteAdd('+pj+')" style="padding:10px 14px;border-bottom:1px solid var(--wire);cursor:pointer">'+
-          '<div style="font-size:13px;font-weight:700;color:var(--tx1)">'+p.nombre+'</div>'+
-          '<div style="font-size:11px;color:var(--tx3)">'+p.codigo+' · '+p.stock_actual+' '+p.unidad+'</div></div>';
-      }).join('');
-      sugg.style.display='block';
-    } catch(e){}
-  }, 280);
-}
-
-function loteScanQR() {
-  openModalQR('Escanear Producto', async function(code){
-    try {
-      var res = await apiFetch('/api/productos/'+encodeURIComponent(code.toUpperCase()));
-      var p = res.data; if(!p) throw new Error('No encontrado');
-      loteAdd({codigo:p.codigo,nombre:p.nombre,grupo:p.grupo,unidad:p.unidad,cantidad:p.stock_actual,stockMin:p.stock_minimo});
-    } catch(e){ toast('Producto no encontrado','err'); }
-  });
-}
+function loteScanQR() { openModalQR('Escanear Producto', async code => { try { const res = await apiFetch(`/api/productos/${encodeURIComponent(code.toUpperCase())}`); const p = res.data; if (!p) throw new Error('No encontrado'); loteAdd({ codigo: p.codigo, nombre: p.nombre, grupo: p.grupo, unidad: p.unidad, cantidad: p.stock_actual, stockMin: p.stock_minimo }); } catch(e) { toast('Producto no encontrado', 'err'); } }); }
 
 function loteAdd(p) {
-  document.getElementById('lote-sugg').style.display='none';
-  document.getElementById('lote-search').value='';
-  var existing = _loteItems.find(function(i){ return i.prod.codigo===p.codigo; });
-  if (existing) { existing.qty++; } else { _loteItems.push({prod:p,qty:1}); }
-  renderLote(); toast(p.nombre+' agregado','ok',1500);
+  document.getElementById('lote-sugg').style.display = 'none';
+  document.getElementById('lote-search').value = '';
+  const existing = _loteItems.find(i => i.prod.codigo === p.codigo);
+  if (existing) { existing.qty++; } else { _loteItems.push({ prod: p, qty: 1 }); }
+  renderLote(); toast(p.nombre + ' agregado', 'ok', 1500);
 }
 
-function loteRemove(idx) { _loteItems.splice(idx,1); renderLote(); }
+function loteRemove(idx) { _loteItems.splice(idx, 1); renderLote(); }
+function loteQty(idx, delta) { _loteItems[idx].qty = Math.max(1, _loteItems[idx].qty + delta); renderLote(); }
 
 function renderLote() {
-  var list = document.getElementById('lote-list');
-  var badge = document.getElementById('lote-count-badge');
-  var actions = document.getElementById('lote-actions');
+  const list = document.getElementById('lote-list');
+  const badge = document.getElementById('lote-count-badge');
+  const actions = document.getElementById('lote-actions');
   badge.textContent = _loteItems.length + ' items';
-  actions.style.display = _loteItems.length>0 ? 'block' : 'none';
-  if (!_loteItems.length){ list.innerHTML='<div class="empty"><i class="fas fa-layer-group"></i><p>Agrega productos escaneando o buscando</p></div>'; return; }
-  list.innerHTML = _loteItems.map(function(item,i){
-    return '<div class="lote-item">'+
-      '<div class="lote-item-info"><div class="lote-item-name">'+item.prod.nombre+'</div><div class="lote-item-code">'+item.prod.codigo+' · '+item.prod.unidad+'</div></div>'+
-      '<button onclick="loteQty('+i+',-1)" style="width:28px;height:28px;border-radius:var(--r-sm);background:var(--ink4);border:1px solid var(--wire2);color:var(--tx1);font-size:14px;cursor:pointer">-</button>'+
-      '<div class="lote-item-qty">'+item.qty+'</div>'+
-      '<button onclick="loteQty('+i+',1)" style="width:28px;height:28px;border-radius:var(--r-sm);background:var(--ink4);border:1px solid var(--wire2);color:var(--tx1);font-size:14px;cursor:pointer">+</button>'+
-      '<div class="lote-item-del" onclick="loteRemove('+i+')"><i class="fas fa-xmark"></i></div></div>';
-  }).join('');
+  actions.style.display = _loteItems.length > 0 ? 'block' : 'none';
+  if (!_loteItems.length) { list.innerHTML = '<div class="empty"><i class="fas fa-layer-group"></i><p>Agrega productos escaneando o buscando</p></div>'; return; }
+  list.innerHTML = _loteItems.map((item, i) => `<div class="lote-item"><div class="lote-item-info"><div class="lote-item-name">${item.prod.nombre}</div><div class="lote-item-code">${item.prod.codigo} · ${item.prod.unidad}</div></div><button onclick="loteQty(${i},-1)" style="width:32px;height:32px;border-radius:var(--r-sm);background:var(--ink4);border:1px solid var(--wire2);color:var(--tx1);font-size:16px;cursor:pointer">-</button><div class="lote-item-qty">${item.qty}</div><button onclick="loteQty(${i},1)" style="width:32px;height:32px;border-radius:var(--r-sm);background:var(--ink4);border:1px solid var(--wire2);color:var(--tx1);font-size:16px;cursor:pointer">+</button><div class="lote-item-del" onclick="loteRemove(${i})"><i class="fas fa-xmark"></i></div></div>`).join('');
 }
-
-function loteQty(idx, delta) { _loteItems[idx].qty = Math.max(1, _loteItems[idx].qty+delta); renderLote(); }
 
 async function loteConfirmar(tipo) {
-  var resp = document.getElementById('lote-resp').value.trim();
-  if (!resp){ toast('Responsable obligatorio','err'); return; }
-  var errors=0, success=0;
-  for (var i=0; i<_loteItems.length; i++) {
-    var item = _loteItems[i];
+  const resp = document.getElementById('lote-resp').value.trim();
+  if (!resp) { toast('Responsable obligatorio', 'err'); return; }
+  let errors = 0, success = 0;
+  for (const item of _loteItems) {
     try {
-      var res = await apiFetch('/api/movimientos',{method:'POST',body:JSON.stringify({codigo:item.prod.codigo,tipo,cantidad:item.qty,responsable:resp,observaciones:tipo+' en lote vía app'})});
-      if (res.status==='success') success++; else errors++;
-    } catch(e){ errors++; }
+      const res = await apiFetch('/api/movimientos', { method: 'POST', body: JSON.stringify({ codigo: item.prod.codigo, tipo, cantidad: item.qty, responsable: resp, observaciones: `${tipo} en lote vía app` }) });
+      if (res.status === 'success') success++; else errors++;
+    } catch(e) { errors++; }
   }
-  toast((errors?'⚠️ '+errors+' errores · ':'')+'✅ '+success+' movimientos registrados',errors?'wrn':'ok');
-  _loteItems=[]; renderLote(); loadStats(); back();
+  toast((errors ? `⚠️ ${errors} errores · ` : '') + `✅ ${success} movimientos registrados`, errors ? 'wrn' : 'ok');
+  _loteItems = []; renderLote(); loadStats(); back();
 }
 
-// ── QR MODAL ──────────────────────────────────────
-var _qrCallback = null;
+// QR MODAL
+let _qrCallback = null;
 
 function openModalQR(title, cb) {
   _qrCallback = cb;
   document.getElementById('qr-title').textContent = title;
   document.getElementById('modal-qr').classList.add('open');
-  setTimeout(function(){
+  setTimeout(() => {
     try {
-      S.qrScanner = new Html5Qrcode('qr-reader-modal',{verbose:false});
-      var w = Math.min(200, window.innerWidth-80);
-      S.qrScanner.start({facingMode:'environment'},{fps:10,qrbox:{width:w,height:Math.round(w*.65)}},
-        function(code){ closeModalQR(); if(_qrCallback) _qrCallback(code); },
-        function(){}
-      ).catch(function(){ toast('No se pudo acceder a cámara','wrn'); });
-    } catch(e){}
+      S.qrScanner = new Html5Qrcode('qr-reader-modal', { verbose: false });
+      const w = Math.min(240, window.innerWidth - 80);
+      S.qrScanner.start({ facingMode: 'environment' }, { fps: 10, qrbox: { width: w, height: Math.round(w * .65) } },
+        code => { closeModalQR(); if (_qrCallback) _qrCallback(code); },
+        () => {}
+      ).catch(() => toast('No se pudo acceder a cámara', 'wrn'));
+    } catch(e) {}
   }, 200);
 }
 
 function closeModalQR() {
-  if (S.qrScanner) { S.qrScanner.stop().catch(function(){}); S.qrScanner=null; }
+  if (S.qrScanner) { S.qrScanner.stop().catch(() => {}); S.qrScanner = null; }
   document.getElementById('modal-qr').classList.remove('open');
 }
 
-// ── FOTO MODAL ────────────────────────────────────
-var _fotoCallback = null;
+// FOTO MODAL
+let _fotoCallback = null;
 
 function openModalFoto(title, cb) {
   _fotoCallback = cb;
   document.getElementById('foto-title').textContent = title;
-  document.getElementById('foto-preview').style.display='none';
-  document.getElementById('foto-video').style.display='block';
-  document.querySelector('.photo-capture-btn').style.display='flex';
+  document.getElementById('foto-preview').style.display = 'none';
+  document.getElementById('foto-video').style.display = 'block';
+  document.querySelector('.photo-capture-btn').style.display = 'flex';
   document.getElementById('modal-foto').classList.add('open');
-  navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'},audio:false})
-    .then(function(stream){ S.fotoStream=stream; document.getElementById('foto-video').srcObject=stream; })
-    .catch(function(){ toast('No se pudo acceder a la cámara','wrn'); closeModalFoto(); });
+  navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio: false })
+    .then(stream => { S.fotoStream = stream; document.getElementById('foto-video').srcObject = stream; })
+    .catch(() => { toast('No se pudo acceder a la cámara', 'wrn'); closeModalFoto(); });
 }
 
 function closeModalFoto() {
-  if (S.fotoStream) { S.fotoStream.getTracks().forEach(function(t){ t.stop(); }); S.fotoStream=null; }
+  if (S.fotoStream) { S.fotoStream.getTracks().forEach(t => t.stop()); S.fotoStream = null; }
   document.getElementById('modal-foto').classList.remove('open');
 }
 
 function capturarFoto() {
-  var video  = document.getElementById('foto-video');
-  var canvas = document.getElementById('foto-canvas');
-  canvas.width=video.videoWidth; canvas.height=video.videoHeight;
-  canvas.getContext('2d').drawImage(video,0,0);
-  var dataUrl = canvas.toDataURL('image/jpeg',0.8);
+  const video = document.getElementById('foto-video');
+  const canvas = document.getElementById('foto-canvas');
+  canvas.width = video.videoWidth; canvas.height = video.videoHeight;
+  canvas.getContext('2d').drawImage(video, 0, 0);
+  const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
   canvas._lastCapture = dataUrl;
   document.getElementById('foto-preview-img').src = dataUrl;
-  document.getElementById('foto-preview').style.display='block';
-  document.getElementById('foto-video').style.display='none';
-  document.querySelector('.photo-capture-btn').style.display='none';
+  document.getElementById('foto-preview').style.display = 'block';
+  document.getElementById('foto-video').style.display = 'none';
+  document.querySelector('.photo-capture-btn').style.display = 'none';
 }
 
 function retomarFoto() {
-  document.getElementById('foto-preview').style.display='none';
-  document.getElementById('foto-video').style.display='block';
-  document.querySelector('.photo-capture-btn').style.display='flex';
+  document.getElementById('foto-preview').style.display = 'none';
+  document.getElementById('foto-video').style.display = 'block';
+  document.querySelector('.photo-capture-btn').style.display = 'flex';
 }
 
 function usarFoto() {
-  var dataUrl = document.getElementById('foto-canvas')._lastCapture;
+  const dataUrl = document.getElementById('foto-canvas')._lastCapture;
   if (!dataUrl) return;
   closeModalFoto();
   if (_fotoCallback) _fotoCallback(dataUrl);
 }
 
-// ── TOAST ─────────────────────────────────────────
-function toast(msg, type, dur) {
-  type = type||'inf'; dur = dur||3000;
-  var el = document.createElement('div');
-  el.className = 'toast '+type;
-  var icons={ok:'fa-check-circle',err:'fa-circle-xmark',wrn:'fa-triangle-exclamation',inf:'fa-circle-info'};
-  el.innerHTML='<i class="fas '+(icons[type]||icons.inf)+'"></i> '+msg;
-  document.getElementById('toast-wrap').appendChild(el);
-  setTimeout(function(){ el.style.opacity='0'; el.style.transform='translateY(8px)'; el.style.transition='all .3s'; setTimeout(function(){ el.remove(); },300); }, dur);
-}
-
-// Auto-logout 5 min
-var _idleTimer=null;
-function resetIdle(){ clearTimeout(_idleTimer); if(!S.token) return; _idleTimer=setTimeout(function(){ doLogout(); toast('Sesión cerrada por inactividad','wrn',4000); },5*60*1000); }
-['touchstart','touchend','click','keydown'].forEach(function(e){ document.addEventListener(e,resetIdle,{passive:true}); });
-
-// ── AUTO LOGOUT MOVIL (5 min) ────────────────────────
-var AL_M = { timer: null, warnTimer: null, countdown: null, active: false };
-var AL_TIMEOUT = 5 * 60 * 1000; // 5 minutos
-var AL_WARNING = 30;             // 30 segundos de aviso
+// AUTO LOGOUT
+let _idleTimer = null;
+function resetIdle() { clearTimeout(_idleTimer); if (!S.token) return; _idleTimer = setTimeout(() => { doLogout(); toast('Sesión cerrada por inactividad', 'wrn', 4000); }, 5 * 60 * 1000); }
+['touchstart', 'touchend', 'click', 'keydown'].forEach(e => document.addEventListener(e, resetIdle, { passive: true }));
 
 function initAutoLogoutMovil() {
-  AL_M.active = true;
-  var events = ['touchstart','touchmove','mousedown','keydown','scroll','click'];
-  events.forEach(function(e){ document.addEventListener(e, resetALMovil, {passive:true}); });
-  resetALMovil();
+  const events = ['touchstart', 'touchmove', 'mousedown', 'keydown', 'scroll', 'click'];
+  events.forEach(e => document.addEventListener(e, resetIdleMovil, { passive: true }));
+  resetIdleMovil();
 }
 
-function resetALMovil() {
-  if (!AL_M.active) return;
-  clearTimeout(AL_M.timer);
-  clearInterval(AL_M.countdown);
-  // Remove warning banner if showing
-  var banner = document.getElementById('al-banner');
+let alTimer = null, alCountdown = null;
+function resetIdleMovil() {
+  clearTimeout(alTimer);
+  clearInterval(alCountdown);
+  const banner = document.getElementById('al-banner');
   if (banner) banner.style.display = 'none';
-  AL_M.timer = setTimeout(showALWarningMovil, AL_TIMEOUT - AL_WARNING * 1000);
+  alTimer = setTimeout(showALWarningMovil, 5 * 60 * 1000 - 30 * 1000);
 }
 
 function showALWarningMovil() {
-  // Show countdown banner
-  var banner = document.getElementById('al-banner');
+  let banner = document.getElementById('al-banner');
   if (!banner) {
     banner = document.createElement('div');
     banner.id = 'al-banner';
-    banner.style.cssText = 'position:fixed;bottom:80px;left:16px;right:16px;z-index:9999;background:rgba(251,113,133,.15);border:1px solid rgba(251,113,133,.4);border-radius:12px;padding:12px 16px;display:flex;align-items:center;gap:12px;backdrop-filter:blur(8px)';
-    banner.innerHTML = '<i class="fas fa-clock" style="color:var(--rose);font-size:18px;flex-shrink:0"></i>' +
-      '<div style="flex:1"><div style="color:var(--rose);font-family:var(--f-d);font-size:13px;font-weight:700">Sesion por vencer</div>' +
-      '<div style="color:var(--tx2);font-size:11px">Cerrando en <span id="al-secs">30</span>s</div></div>' +
-      '<button onclick="resetALMovil()" style="background:var(--neon);color:#000;border:none;border-radius:8px;padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--f-d)">SEGUIR</button>';
-    document.body.appendChild(banner);
-  }
-  banner.style.display = 'flex';
-  var secs = AL_WARNING;
-  var secsEl = document.getElementById('al-secs');
-  if (secsEl) secsEl.textContent = secs;
-  AL_M.countdown = setInterval(function() {
-    secs--;
-    if (secsEl) secsEl.textContent = secs;
-    if (secs <= 0) {
-      clearInterval(AL_M.countdown);
-      banner.style.display = 'none';
-      doLogout();
-    }
-  }, 1000);
-}
-</script>
-</body>
-</html>
+    banner.style.cssText = 'position:fixed;bottom:80px;left:16px;right:16px
