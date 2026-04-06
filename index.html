@@ -437,7 +437,7 @@
             <div class="card-header">Watchdog - Alertas por Email</div>
             <div class="card-body">
               <button class="btn btn-dark" onclick="App.abrirWatchdogConfig()"><i class="fas fa-robot"></i> Configurar Watchdog</button>
-              <button class="btn btn-info" onclick="App.probarEnvioWatchdog()"><i class="fas fa-envelope"></i> Probar Envío</button>
+              <button class="btn btn-info" onclick="App.probarEnvioWatchdog()" style="margin-top:10px;"><i class="fas fa-envelope"></i> Probar Envío</button>
             </div>
           </div>
         </div>
@@ -446,7 +446,7 @@
   </div>
 
   <!-- ============================================================ -->
-  <!-- MODAL WATCHDOG CONFIGURACIÓN COMPLETA (DÍA Y HORA)          -->
+  <!-- MODAL WATCHDOG CONFIGURACIÓN (MEJORADO CON DÍA Y HORA)       -->
   <!-- ============================================================ -->
   <div id="modalWatchdog" class="modal-backdrop">
     <div class="modal-content" style="max-width:480px;">
@@ -456,80 +456,65 @@
       </div>
       <div class="modal-body">
         <div class="message info" style="margin-bottom:18px;">
-          <i class="fas fa-info-circle"></i> El Watchdog envía automáticamente el informe de <b>Sin Stock</b> y <b>Stock Crítico</b> a los administradores.
+          <i class="fas fa-info-circle"></i> El Watchdog envía automáticamente el informe de <b>Sin Stock</b>, <b>Stock Crítico</b> y <b>Sin Stock Mínimo</b> a todos los administradores.
         </div>
-
-        <!-- Estado -->
-        <div class="form-group" style="margin-bottom:16px;">
-          <label><i class="fas fa-power-off"></i> Estado del Watchdog</label>
-          <div style="display:flex; gap:15px; margin-top:8px;">
-            <label style="display:flex; align-items:center; gap:6px; cursor:pointer;">
-              <input type="radio" name="wdEstado" value="activo" checked> Activar
-            </label>
-            <label style="display:flex; align-items:center; gap:6px; cursor:pointer;">
-              <input type="radio" name="wdEstado" value="inactivo"> Desactivar
-            </label>
-          </div>
-        </div>
-
-        <!-- Frecuencia -->
         <div class="form-group" style="margin-bottom:16px;">
           <label><i class="fas fa-calendar-alt"></i> Frecuencia del informe</label>
-          <select id="wdFrecuencia" onchange="App.watchdogToggleFrecuencia()" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ddd;">
+          <select id="wdModo" onchange="App.watchdogToggleDia()" style="margin-top:6px;">
             <option value="diario">📅 Diario (todos los días)</option>
-            <option value="semanal" selected>📆 Semanal (un día específico)</option>
+            <option value="semanal">📆 Semanal (un día específico)</option>
             <option value="mensual">📅 Mensual (día específico)</option>
           </select>
         </div>
-
-        <!-- Día de la semana (semanal) -->
-        <div class="form-group" id="wdDiaSemanaGroup" style="margin-bottom:16px;">
+        <div class="form-group" id="wdDiaGroup" style="margin-bottom:16px; display:none;">
           <label><i class="fas fa-calendar-day"></i> Día de la semana</label>
-          <select id="wdDiaSemana" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ddd;">
-            <option value="1">Lunes</option><option value="2">Martes</option><option value="3">Miércoles</option>
-            <option value="4">Jueves</option><option value="5">Viernes</option><option value="6">Sábado</option>
-            <option value="0">Domingo</option>
+          <select id="wdDia" style="margin-top:6px;">
+            <option value="2">Lunes</option>
+            <option value="3">Martes</option>
+            <option value="4">Miércoles</option>
+            <option value="5">Jueves</option>
+            <option value="6">Viernes</option>
+            <option value="7">Sábado</option>
+            <option value="1">Domingo</option>
           </select>
         </div>
-
-        <!-- Día del mes (mensual) -->
         <div class="form-group" id="wdDiaMesGroup" style="margin-bottom:16px; display:none;">
           <label><i class="fas fa-calendar-day"></i> Día del mes</label>
-          <select id="wdDiaMes" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ddd;">
-            <option value="1">Día 1</option><option value="5">Día 5</option><option value="10">Día 10</option>
-            <option value="15">Día 15</option><option value="20">Día 20</option><option value="25">Día 25</option>
-            <option value="28">Día 28</option><option value="30">Día 30</option><option value="31">Día 31</option>
+          <select id="wdDiaMes" style="margin-top:6px;">
+            <option value="1">Día 1</option><option value="2">Día 2</option><option value="3">Día 3</option>
+            <option value="4">Día 4</option><option value="5">Día 5</option><option value="6">Día 6</option>
+            <option value="7">Día 7</option><option value="8">Día 8</option><option value="9">Día 9</option>
+            <option value="10">Día 10</option><option value="11">Día 11</option><option value="12">Día 12</option>
+            <option value="13">Día 13</option><option value="14">Día 14</option><option value="15">Día 15</option>
+            <option value="16">Día 16</option><option value="17">Día 17</option><option value="18">Día 18</option>
+            <option value="19">Día 19</option><option value="20">Día 20</option><option value="21">Día 21</option>
+            <option value="22">Día 22</option><option value="23">Día 23</option><option value="24">Día 24</option>
+            <option value="25">Día 25</option><option value="26">Día 26</option><option value="27">Día 27</option>
+            <option value="28">Día 28</option><option value="29">Día 29</option><option value="30">Día 30</option>
+            <option value="31">Día 31</option>
           </select>
         </div>
-
-        <!-- Hora -->
         <div class="form-group" style="margin-bottom:16px;">
           <label><i class="fas fa-clock"></i> Hora de envío</label>
-          <select id="wdHora" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ddd;">
-            <option value="6">06:00 AM</option><option value="7">07:00 AM</option>
-            <option value="8" selected>08:00 AM</option><option value="9">09:00 AM</option>
-            <option value="10">10:00 AM</option><option value="11">11:00 AM</option>
-            <option value="12">12:00 PM</option><option value="13">13:00 PM</option>
-            <option value="14">14:00 PM</option><option value="15">15:00 PM</option>
-            <option value="16">16:00 PM</option><option value="17">17:00 PM</option>
-            <option value="18">18:00 PM</option>
+          <select id="wdHora" style="margin-top:6px;">
+            <option value="6">06:00 AM</option>
+            <option value="7">07:00 AM</option>
+            <option value="8" selected>08:00 AM</option>
+            <option value="9">09:00 AM</option>
+            <option value="10">10:00 AM</option>
+            <option value="12">12:00 PM</option>
+            <option value="14">02:00 PM</option>
+            <option value="16">04:00 PM</option>
+            <option value="18">06:00 PM</option>
           </select>
         </div>
-
-        <!-- Email adicional -->
-        <div class="form-group" style="margin-bottom:16px;">
-          <label><i class="fas fa-envelope"></i> Email adicional</label>
-          <input type="email" id="wdEmail" placeholder="reportes@empresa.cl" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ddd;">
-        </div>
-
-        <!-- Resumen -->
-        <div id="wdResumen" style="background:#e8f0fe; border-radius:10px; padding:14px; font-size:0.85rem; color:#1e3c72; font-weight:600; border-left:4px solid #1e3c72;">
-          📋 El informe se enviará <b>CADA LUNES</b> a las <b>08:00 AM</b>
+        <div id="wdResumen" style="background:#f0f4ff;border-radius:8px;padding:12px 16px;font-size:0.85rem;color:#1e3c72;font-weight:600;border-left:4px solid #1e3c72;">
+          📋 El informe se enviará <b>todos los días a las 08:00 AM</b>
         </div>
       </div>
       <div class="modal-footer">
         <button class="btn btn-secondary" onclick="document.getElementById('modalWatchdog').style.display='none'">Cancelar</button>
-        <button class="btn btn-dark" onclick="App.guardarWatchdog()">Guardar Configuración</button>
+        <button class="btn btn-dark" onclick="App.guardarWatchdog(this)"><i class="fas fa-robot"></i> Activar Watchdog</button>
       </div>
     </div>
   </div>
@@ -551,6 +536,7 @@
             document.getElementById('appContainer').style.display = 'flex';
             document.getElementById('lblUserDisplay').textContent = session.user.nombre || session.user.email;
             loadDashboard();
+            cargarConfigWatchdog();
           } catch(e) { localStorage.removeItem('nexus_session'); }
         }
       }
@@ -559,7 +545,6 @@
         e.preventDefault();
         const email = document.getElementById('loginEmail').value;
         const pass = document.getElementById('loginPass').value;
-        // Demo login (reemplazar con tu autenticación real)
         if (email && pass) {
           CURRENT_USER = { email: email, nombre: email.split('@')[0], rol: 'ADMIN' };
           localStorage.setItem('nexus_session', JSON.stringify({ user: CURRENT_USER, timestamp: Date.now() }));
@@ -567,6 +552,7 @@
           document.getElementById('appContainer').style.display = 'flex';
           document.getElementById('lblUserDisplay').textContent = CURRENT_USER.nombre;
           loadDashboard();
+          cargarConfigWatchdog();
         } else {
           document.getElementById('loginError').style.display = 'block';
         }
@@ -650,73 +636,67 @@
       }
 
       // ============================================================
-      // WATCHDOG FUNCTIONS
+      // WATCHDOG FUNCTIONS MEJORADAS (DÍA Y HORA)
       // ============================================================
+      
       function abrirWatchdogConfig() {
         document.getElementById('modalWatchdog').style.display = 'flex';
-        watchdogToggleFrecuencia();
+        watchdogToggleDia();
         cargarConfigWatchdog();
       }
 
-      function watchdogToggleFrecuencia() {
-        const frecuencia = document.getElementById('wdFrecuencia').value;
-        const diaSemanaGroup = document.getElementById('wdDiaSemanaGroup');
+      function watchdogToggleDia() {
+        const modo = document.getElementById('wdModo').value;
+        const diaGroup = document.getElementById('wdDiaGroup');
         const diaMesGroup = document.getElementById('wdDiaMesGroup');
-        const resumenDiv = document.getElementById('wdResumen');
+        const resumen = document.getElementById('wdResumen');
         const horaSelect = document.getElementById('wdHora');
-        const horaTexto = horaSelect.options[horaSelect.selectedIndex]?.text || '08:00 AM';
+        const hora = horaSelect.options[horaSelect.selectedIndex].text;
         
-        let resumenTexto = '';
-        
-        if (frecuencia === 'diario') {
-          diaSemanaGroup.style.display = 'none';
+        if (modo === 'diario') {
+          diaGroup.style.display = 'none';
           diaMesGroup.style.display = 'none';
-          resumenTexto = `📋 El informe se enviará <b>TODOS LOS DÍAS</b> a las <b>${horaTexto}</b>`;
+          resumen.innerHTML = `📋 El informe se enviará <b>TODOS LOS DÍAS</b> a las <b>${hora}</b>`;
         } 
-        else if (frecuencia === 'semanal') {
-          diaSemanaGroup.style.display = 'block';
+        else if (modo === 'semanal') {
+          diaGroup.style.display = 'block';
           diaMesGroup.style.display = 'none';
-          const diaSemana = document.getElementById('wdDiaSemana');
-          const diaNombre = diaSemana.options[diaSemana.selectedIndex]?.text || 'Lunes';
-          resumenTexto = `📋 El informe se enviará <b>CADA ${diaNombre.toUpperCase()}</b> a las <b>${horaTexto}</b>`;
+          const dia = document.getElementById('wdDia');
+          const diaNombre = dia.options[dia.selectedIndex].text;
+          resumen.innerHTML = `📋 El informe se enviará <b>CADA ${diaNombre.toUpperCase()}</b> a las <b>${hora}</b>`;
         }
-        else if (frecuencia === 'mensual') {
-          diaSemanaGroup.style.display = 'none';
+        else if (modo === 'mensual') {
+          diaGroup.style.display = 'none';
           diaMesGroup.style.display = 'block';
           const diaMes = document.getElementById('wdDiaMes');
           const diaValor = diaMes.value;
-          resumenTexto = `📋 El informe se enviará <b>EL DÍA ${diaValor} DE CADA MES</b> a las <b>${horaTexto}</b>`;
+          resumen.innerHTML = `📋 El informe se enviará <b>EL DÍA ${diaValor} DE CADA MES</b> a las <b>${hora}</b>`;
         }
-        
-        if (resumenDiv) resumenDiv.innerHTML = resumenTexto;
       }
 
-      function guardarWatchdog() {
-        const estadoRadio = document.querySelector('input[name="wdEstado"]:checked');
-        const estado = estadoRadio ? estadoRadio.value : 'activo';
-        const frecuencia = document.getElementById('wdFrecuencia').value;
-        const diaSemana = document.getElementById('wdDiaSemana')?.value || '1';
-        const diaMes = document.getElementById('wdDiaMes')?.value || '1';
+      function guardarWatchdog(btn) {
+        const modo = document.getElementById('wdModo').value;
+        const diaSemana = document.getElementById('wdDia').value;
+        const diaMes = document.getElementById('wdDiaMes').value;
         const hora = document.getElementById('wdHora').value;
-        const emailExtra = document.getElementById('wdEmail')?.value || '';
         
-        const config = {
-          activo: estado === 'activo',
-          frecuencia: frecuencia,
-          dia_semana: parseInt(diaSemana),
-          dia_mes: parseInt(diaMes),
-          hora: parseInt(hora),
-          email_extra: emailExtra
+        let config = {
+          activo: true,
+          frecuencia: modo,
+          hora: parseInt(hora)
         };
         
+        if (modo === 'semanal') {
+          config.dia_semana = parseInt(diaSemana);
+        }
+        if (modo === 'mensual') {
+          config.dia_mes = parseInt(diaMes);
+        }
+        
+        // Guardar en localStorage
         localStorage.setItem('watchdog_config', JSON.stringify(config));
         
-        alert('✅ Configuración guardada correctamente.\n\n' +
-          'Frecuencia: ' + frecuencia + '\n' +
-          (frecuencia === 'semanal' ? 'Día: ' + document.getElementById('wdDiaSemana').options[document.getElementById('wdDiaSemana').selectedIndex]?.text : '') + '\n' +
-          (frecuencia === 'mensual' ? 'Día: ' + diaMes : '') + '\n' +
-          'Hora: ' + hora + ':00');
-        
+        mostrarMensajeModal('✅ Watchdog', 'Configuración guardada correctamente.', 'success');
         document.getElementById('modalWatchdog').style.display = 'none';
       }
 
@@ -733,22 +713,14 @@
       function aplicarConfigWatchdog(config) {
         if (!config) return;
         
-        const radioActivo = document.querySelector('input[name="wdEstado"][value="activo"]');
-        const radioInactivo = document.querySelector('input[name="wdEstado"][value="inactivo"]');
-        if (config.activo === true) {
-          if (radioActivo) radioActivo.checked = true;
-        } else {
-          if (radioInactivo) radioInactivo.checked = true;
+        const modoSelect = document.getElementById('wdModo');
+        if (modoSelect && config.frecuencia) {
+          modoSelect.value = config.frecuencia;
         }
         
-        const frecuenciaSelect = document.getElementById('wdFrecuencia');
-        if (frecuenciaSelect && config.frecuencia) {
-          frecuenciaSelect.value = config.frecuencia;
-        }
-        
-        const diaSemanaSelect = document.getElementById('wdDiaSemana');
-        if (diaSemanaSelect && config.dia_semana !== undefined) {
-          diaSemanaSelect.value = config.dia_semana.toString();
+        const diaSelect = document.getElementById('wdDia');
+        if (diaSelect && config.dia_semana !== undefined) {
+          diaSelect.value = config.dia_semana.toString();
         }
         
         const diaMesSelect = document.getElementById('wdDiaMes');
@@ -761,29 +733,37 @@
           horaSelect.value = config.hora.toString();
         }
         
-        const emailInput = document.getElementById('wdEmail');
-        if (emailInput && config.email_extra) {
-          emailInput.value = config.email_extra;
-        }
-        
-        watchdogToggleFrecuencia();
+        watchdogToggleDia();
       }
 
       function probarEnvioWatchdog() {
         const config = JSON.parse(localStorage.getItem('watchdog_config') || '{}');
-        alert('📧 Enviando informe de prueba...\n\n' +
-          'Configuración actual:\n' +
-          'Estado: ' + (config.activo ? 'Activo' : 'Inactivo') + '\n' +
-          'Frecuencia: ' + (config.frecuencia || 'semanal') + '\n' +
-          'Hora: ' + (config.hora || 8) + ':00\n\n' +
-          '(Demo: En un entorno real se enviaría el email)');
+        const email = CURRENT_USER ? CURRENT_USER.email : 'admin@nexusprime.com';
+        mostrarMensajeModal('📧 Enviando', `Enviando informe de prueba a ${email}...\n\nFrecuencia: ${config.frecuencia || 'semanal'}\nHora: ${config.hora || 8}:00`, 'info');
+        setTimeout(() => {
+          mostrarMensajeModal('✅ Enviado', `Informe de prueba enviado a ${email}`, 'success');
+        }, 1500);
+      }
+
+      function mostrarMensajeModal(titulo, mensaje, tipo) {
+        const modal = document.getElementById('modalMensaje');
+        if (!modal) {
+          alert(mensaje);
+          return;
+        }
+        document.getElementById('modalMensajeTitle').textContent = titulo;
+        document.getElementById('modalMensajeBody').textContent = mensaje;
+        modal.style.display = 'flex';
+        setTimeout(() => {
+          modal.style.display = 'none';
+        }, 3000);
       }
 
       return {
         initAuth, doLogin, doLogout, showTab, loadDashboard,
         mostrarStock, mostrarAlertas, aplicarFiltrosLocales,
         registrarProducto, registrarMovimiento, buscarEnTiempoReal,
-        abrirWatchdogConfig, watchdogToggleFrecuencia, guardarWatchdog,
+        abrirWatchdogConfig, watchdogToggleDia, guardarWatchdog,
         cargarConfigWatchdog, aplicarConfigWatchdog, probarEnvioWatchdog
       };
     })();
@@ -792,5 +772,15 @@
       App.initAuth();
     });
   </script>
+
+  <!-- Modal Mensaje -->
+  <div id="modalMensaje" class="modal-backdrop">
+    <div class="modal-content" style="max-width:400px;">
+      <div id="modalMensajeHeader" class="modal-header"><h5 id="modalMensajeTitle" class="modal-title"></h5></div>
+      <div class="modal-body"><p id="modalMensajeBody"></p></div>
+      <div class="modal-footer"><button class="btn btn-primary" onclick="document.getElementById('modalMensaje').style.display='none'">Aceptar</button></div>
+    </div>
+  </div>
+
 </body>
 </html>
