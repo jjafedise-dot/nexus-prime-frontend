@@ -1,527 +1,787 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="theme-color" content="#1e3c72">
-  <title>NEXUS PRIME | Móvil</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: 'Poppins', sans-serif;
-      background: #F4F7F6;
-      padding-bottom: 70px;
-    }
-    :root {
-      --blue-dark: #1e3c72;
-      --blue-mid: #2a5298;
-      --green: #00b894;
-      --red: #d63031;
-      --orange: #e67e22;
-    }
-    .header {
-      background: linear-gradient(135deg, var(--blue-dark), var(--blue-mid));
-      color: white;
-      padding: 20px 16px;
-      text-align: center;
-      position: sticky;
-      top: 0;
-      z-index: 100;
-    }
-    .header h1 { font-size: 1.3rem; }
-    .container { padding: 16px; }
-    .card {
-      background: white;
-      border-radius: 16px;
-      padding: 16px;
-      margin-bottom: 16px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-    }
-    .card-title {
-      font-weight: 700;
-      color: var(--blue-dark);
-      margin-bottom: 12px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    input, select, textarea {
-      width: 100%;
-      padding: 12px;
-      border: 1px solid #ddd;
-      border-radius: 12px;
-      font-size: 16px;
-      margin-bottom: 12px;
-      font-family: inherit;
-    }
-    .btn {
-      padding: 12px 20px;
-      border: none;
-      border-radius: 12px;
-      font-weight: 600;
-      cursor: pointer;
-      width: 100%;
-      margin-bottom: 8px;
-      font-size: 16px;
-    }
-    .btn-primary { background: var(--blue-dark); color: white; }
-    .btn-success { background: var(--green); color: white; }
-    .btn-danger { background: var(--red); color: white; }
-    .btn-warning { background: var(--orange); color: white; }
-    .btn-info { background: #0984e3; color: white; }
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 12px;
-      margin-bottom: 16px;
-    }
-    .stat-card {
-      background: white;
-      padding: 16px;
-      border-radius: 16px;
-      text-align: center;
-      border-bottom: 3px solid var(--blue-dark);
-    }
-    .stat-value { font-size: 28px; font-weight: 700; color: var(--blue-dark); }
-    .stat-label { font-size: 12px; color: #666; margin-top: 4px; }
-    .badge {
-      display: inline-block;
-      padding: 4px 12px;
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: 600;
-    }
-    .badge-danger { background: #ffeaea; color: var(--red); }
-    .badge-warning { background: #fff3cd; color: #856404; }
-    .badge-success { background: #d4edda; color: #155724; }
-    table { width: 100%; }
-    td { padding: 8px 0; border-bottom: 1px solid #eee; }
-    .bottom-nav {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: white;
-      display: flex;
-      justify-content: space-around;
-      padding: 8px 0 20px;
-      border-top: 1px solid #eee;
-      box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
-    }
-    .nav-item {
-      text-align: center;
-      cursor: pointer;
-      padding: 6px 12px;
-      border-radius: 24px;
-      transition: all 0.2s;
-    }
-    .nav-item.active {
-      background: var(--blue-dark);
-      color: white;
-    }
-    .nav-item i { font-size: 22px; display: block; margin-bottom: 2px; }
-    .nav-item span { font-size: 11px; }
-    .hidden { display: none; }
-    .message {
-      padding: 12px;
-      border-radius: 12px;
-      margin-bottom: 12px;
-      font-size: 14px;
-    }
-    .message.success { background: #d4edda; color: #155724; }
-    .message.error { background: #ffeaea; color: var(--red); }
-    .message.info { background: #e3f2fd; color: #1565c0; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#1e3c72">
+    <title>NEXUS PRIME | Móvil</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #F4F7F6;
+            padding-bottom: 70px;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            color: white;
+            padding: 20px 16px;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 1.3rem;
+        }
+
+        .header p {
+            font-size: 0.7rem;
+            opacity: 0.8;
+        }
+
+        /* Container */
+        .container {
+            padding: 16px;
+        }
+
+        /* Cards */
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .card-title {
+            font-weight: 700;
+            color: #1e3c72;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.95rem;
+        }
+
+        /* Formulario */
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 6px;
+            color: #333;
+            font-size: 0.8rem;
+        }
+
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            font-family: inherit;
+            background: white;
+        }
+
+        /* Botones */
+        .btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-family: inherit;
+            margin-bottom: 10px;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            color: white;
+        }
+
+        .btn-primary:active {
+            transform: scale(0.98);
+        }
+
+        .btn-success {
+            background: #00b894;
+            color: white;
+        }
+
+        .btn-info {
+            background: #0984e3;
+            color: white;
+        }
+
+        .btn-danger {
+            background: #d63031;
+            color: white;
+        }
+
+        /* Toggle */
+        .toggle-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .toggle-btn {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+
+        .toggle-btn.active {
+            background: #00b894;
+            border-color: #00b894;
+            color: white;
+        }
+
+        /* Resumen */
+        .resumen {
+            background: #e8f0fe;
+            padding: 12px;
+            border-radius: 12px;
+            margin: 16px 0;
+            text-align: center;
+            font-size: 0.8rem;
+            color: #1e3c72;
+            font-weight: 500;
+        }
+
+        /* Badges */
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .badge-danger {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .badge-warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .badge-success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        /* Tabla */
+        table {
+            width: 100%;
+            font-size: 0.75rem;
+        }
+
+        td {
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 0 20px;
+            border-top: 1px solid #eee;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+        }
+
+        .nav-item {
+            text-align: center;
+            cursor: pointer;
+            padding: 6px 12px;
+            border-radius: 24px;
+            transition: all 0.2s;
+        }
+
+        .nav-item.active {
+            background: #1e3c72;
+            color: white;
+        }
+
+        .nav-item i {
+            font-size: 20px;
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        .nav-item span {
+            font-size: 10px;
+        }
+
+        /* Vistas */
+        .view {
+            display: block;
+        }
+
+        .view.hidden {
+            display: none;
+        }
+
+        /* Mensajes */
+        .message {
+            padding: 10px;
+            border-radius: 10px;
+            margin-top: 12px;
+            font-size: 0.8rem;
+            display: none;
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            display: block;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            display: block;
+        }
+
+        .message.info {
+            background: #e3f2fd;
+            color: #1565c0;
+            display: block;
+        }
+
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #888;
+        }
+
+        .fa-spinner {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+    </style>
 </head>
 <body>
 
-<div class="header">
-  <h1><i class="fas fa-boxes"></i> NEXUS PRIME</h1>
-  <p style="font-size: 12px; opacity: 0.9;">Control de Inventario Móvil</p>
-</div>
-
-<div class="container" id="appContainer">
-  <!-- Dashboard View -->
-  <div id="viewDashboard" class="view">
-    <div class="stats-grid" id="statsGrid"></div>
-    <div class="card">
-      <div class="card-title"><i class="fas fa-robot"></i> Watchdog</div>
-      <button class="btn btn-primary" onclick="App.abrirWatchdog()"><i class="fas fa-cog"></i> Configurar Alertas</button>
-      <button class="btn btn-info" onclick="App.probarEnvio()" style="margin-top:8px;"><i class="fas fa-envelope"></i> Probar Envío</button>
+    <div class="header">
+        <h1><i class="fas fa-robot"></i> NEXUS PRIME</h1>
+        <p>Watchdog - Control de Inventario</p>
     </div>
-    <div class="card">
-      <div class="card-title"><i class="fas fa-exclamation-triangle"></i> Alertas de Stock</div>
-      <div id="alertasLista">Cargando...</div>
+
+    <div class="container" id="appContainer">
+        <!-- Vista Dashboard -->
+        <div id="viewDashboard" class="view">
+            <!-- Estado -->
+            <div class="card">
+                <div class="card-title">
+                    <i class="fas fa-power-off"></i> Estado del Watchdog
+                </div>
+                <div class="toggle-group">
+                    <button class="toggle-btn active" onclick="MobileWatchdog.setEstado('activo')">
+                        <i class="fas fa-check-circle"></i> Activar
+                    </button>
+                    <button class="toggle-btn" onclick="MobileWatchdog.setEstado('inactivo')">
+                        <i class="fas fa-ban"></i> Desactivar
+                    </button>
+                </div>
+            </div>
+
+            <!-- Programación -->
+            <div class="card">
+                <div class="card-title">
+                    <i class="fas fa-calendar-alt"></i> Programación
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-calendar-day"></i> Día de envío</label>
+                    <select id="movilDia">
+                        <option value="1">Lunes</option>
+                        <option value="2">Martes</option>
+                        <option value="3">Miércoles</option>
+                        <option value="4">Jueves</option>
+                        <option value="5">Viernes</option>
+                        <option value="6">Sábado</option>
+                        <option value="0">Domingo</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-clock"></i> Hora de envío</label>
+                    <select id="movilHora">
+                        <option value="6">06:00</option>
+                        <option value="7">07:00</option>
+                        <option value="8" selected>08:00</option>
+                        <option value="9">09:00</option>
+                        <option value="10">10:00</option>
+                        <option value="11">11:00</option>
+                        <option value="12">12:00</option>
+                        <option value="13">13:00</option>
+                        <option value="14">14:00</option>
+                        <option value="15">15:00</option>
+                        <option value="16">16:00</option>
+                        <option value="17">17:00</option>
+                        <option value="18">18:00</option>
+                    </select>
+                </div>
+                <div id="movilResumen" class="resumen">
+                    <i class="fas fa-info-circle"></i> Informe los Lunes a las 08:00
+                </div>
+                <button class="btn btn-primary" onclick="MobileWatchdog.guardar()">
+                    <i class="fas fa-save"></i> Guardar
+                </button>
+                <button class="btn btn-info" onclick="MobileWatchdog.enviarPrueba()">
+                    <i class="fas fa-envelope"></i> Enviar Prueba
+                </button>
+            </div>
+
+            <!-- Alertas -->
+            <div class="card">
+                <div class="card-title">
+                    <i class="fas fa-exclamation-triangle"></i> Alertas Activas
+                </div>
+                <div id="movilAlertas">
+                    <div class="loading"><i class="fas fa-spinner fa-spin"></i> Cargando...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Vista Historial -->
+        <div id="viewHistorial" class="view hidden">
+            <div class="card">
+                <div class="card-title">
+                    <i class="fas fa-history"></i> Historial de Envíos
+                </div>
+                <div id="movilHistorial">
+                    <div class="loading"><i class="fas fa-spinner fa-spin"></i> Cargando...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Vista Configuración -->
+        <div id="viewConfig" class="view hidden">
+            <div class="card">
+                <div class="card-title">
+                    <i class="fas fa-user"></i> Mi Perfil
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-envelope"></i> Email para alertas</label>
+                    <input type="email" id="movilEmail" placeholder="admin@nexusprime.com" style="width:100%; padding:12px; border:1px solid #ddd; border-radius:12px;">
+                </div>
+                <button class="btn btn-primary" onclick="MobileWatchdog.guardarPerfil()">
+                    <i class="fas fa-save"></i> Guardar Perfil
+                </button>
+            </div>
+            <div class="card">
+                <div class="card-title">
+                    <i class="fas fa-info-circle"></i> Acerca de
+                </div>
+                <p style="font-size: 0.8rem; color: #666; line-height: 1.5;">
+                    Watchdog es un sistema automático de alertas que monitorea el inventario y envía reportes de stock bajo y sin stock al administrador.
+                </p>
+                <p style="font-size: 0.7rem; color: #888; margin-top: 10px;">
+                    Versión 1.0 - NEXUS PRIME
+                </p>
+            </div>
+        </div>
     </div>
-  </div>
 
-  <!-- Inventory View -->
-  <div id="viewInventario" class="view hidden">
-    <div class="card">
-      <div class="card-title"><i class="fas fa-search"></i> Buscar Producto</div>
-      <input type="text" id="searchInput" placeholder="Código o nombre..." onkeyup="App.buscarProducto(this.value)">
-      <div id="searchResults"></div>
+    <!-- Bottom Navigation -->
+    <div class="bottom-nav">
+        <div class="nav-item active" onclick="MobileWatchdog.showView('dashboard')">
+            <i class="fas fa-tachometer-alt"></i><span>Inicio</span>
+        </div>
+        <div class="nav-item" onclick="MobileWatchdog.showView('historial')">
+            <i class="fas fa-history"></i><span>Historial</span>
+        </div>
+        <div class="nav-item" onclick="MobileWatchdog.showView('config')">
+            <i class="fas fa-cog"></i><span>Config</span>
+        </div>
     </div>
-    <div class="card">
-      <div class="card-title"><i class="fas fa-warehouse"></i> Stock Actual</div>
-      <div id="stockLista">Cargando...</div>
-    </div>
-  </div>
 
-  <!-- Movements View -->
-  <div id="viewMovimientos" class="view hidden">
-    <div class="card">
-      <div class="card-title"><i class="fas fa-exchange-alt"></i> Registrar Movimiento</div>
-      <input type="text" id="movCodigo" placeholder="Código del producto">
-      <select id="movTipo">
-        <option value="INGRESO">📥 Ingreso</option>
-        <option value="SALIDA">📤 Salida</option>
-      </select>
-      <input type="number" id="movCantidad" placeholder="Cantidad" step="0.01">
-      <input type="text" id="movResponsable" placeholder="Responsable">
-      <textarea id="movObs" placeholder="Observaciones" rows="2"></textarea>
-      <button class="btn btn-success" onclick="App.guardarMovimiento()"><i class="fas fa-save"></i> Guardar</button>
-    </div>
-  </div>
+    <!-- Mensaje flotante -->
+    <div id="movilMessage" class="message" style="position: fixed; bottom: 80px; left: 16px; right: 16px; z-index: 1000; display: none;"></div>
 
-  <!-- Config View -->
-  <div id="viewConfig" class="view hidden">
-    <div class="card">
-      <div class="card-title"><i class="fas fa-user"></i> Mi Perfil</div>
-      <input type="text" id="perfilNombre" placeholder="Nombre completo">
-      <input type="email" id="perfilEmail" placeholder="Email" readonly>
-      <button class="btn btn-primary" onclick="App.guardarPerfil()">Guardar Perfil</button>
-    </div>
-    <div class="card">
-      <div class="card-title"><i class="fas fa-robot"></i> Watchdog</div>
-      <button class="btn btn-primary" onclick="App.abrirWatchdog()"><i class="fas fa-cog"></i> Configurar Alertas</button>
-      <button class="btn btn-info" onclick="App.probarEnvio()" style="margin-top:8px;"><i class="fas fa-envelope"></i> Probar Envío</button>
-    </div>
-  </div>
-</div>
+    <script>
+        // ============================================================
+        // WATCHDOG MÓVIL - NEXUS PRIME
+        // ============================================================
 
-<!-- Bottom Navigation -->
-<div class="bottom-nav">
-  <div class="nav-item active" onclick="App.showView('dashboard')">
-    <i class="fas fa-tachometer-alt"></i><span>Inicio</span>
-  </div>
-  <div class="nav-item" onclick="App.showView('inventario')">
-    <i class="fas fa-warehouse"></i><span>Inventario</span>
-  </div>
-  <div class="nav-item" onclick="App.showView('movimientos')">
-    <i class="fas fa-exchange-alt"></i><span>Mover</span>
-  </div>
-  <div class="nav-item" onclick="App.showView('config')">
-    <i class="fas fa-cog"></i><span>Config</span>
-  </div>
-</div>
+        const MobileWatchdog = (function() {
+            'use strict';
 
-<!-- Modal Watchdog (MEJORADO CON DÍA Y HORA) -->
-<div id="modalWatchdog" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:1000; align-items:center; justify-content:center; padding:20px;">
-  <div style="background:white; border-radius:20px; max-width:400px; width:100%; max-height:90vh; overflow-y:auto;">
-    <div style="padding:20px; background:linear-gradient(135deg,#1e3c72,#2a5298); color:white; border-radius:20px 20px 0 0;">
-      <h3><i class="fas fa-robot"></i> Configurar Watchdog</h3>
-      <button onclick="document.getElementById('modalWatchdog').style.display='none'" style="float:right; background:none; border:none; color:white; font-size:24px;">&times;</button>
-    </div>
-    <div style="padding:20px;">
-      <div class="message info">El Watchdog envía informes de stock bajo y sin stock automáticamente.</div>
-      
-      <label>Frecuencia del informe:</label>
-      <select id="wdModo" onchange="App.watchdogToggleDia()" style="margin:10px 0;">
-        <option value="diario">📅 Diario (todos los días)</option>
-        <option value="semanal">📆 Semanal (un día específico)</option>
-        <option value="mensual">📅 Mensual (día específico)</option>
-      </select>
-      
-      <div id="wdDiaGroup" style="display:none; margin:10px 0;">
-        <label>Día de la semana:</label>
-        <select id="wdDia">
-          <option value="2">Lunes</option><option value="3">Martes</option><option value="4">Miércoles</option>
-          <option value="5">Jueves</option><option value="6">Viernes</option><option value="7">Sábado</option>
-          <option value="1">Domingo</option>
-        </select>
-      </div>
-      
-      <div id="wdDiaMesGroup" style="display:none; margin:10px 0;">
-        <label>Día del mes:</label>
-        <select id="wdDiaMes">
-          <option value="1">Día 1</option><option value="5">Día 5</option><option value="10">Día 10</option>
-          <option value="15">Día 15</option><option value="20">Día 20</option><option value="25">Día 25</option>
-        </select>
-      </div>
-      
-      <label>Hora de envío:</label>
-      <select id="wdHora" style="margin:10px 0;">
-        <option value="6">06:00 AM</option><option value="7">07:00 AM</option>
-        <option value="8" selected>08:00 AM</option><option value="9">09:00 AM</option>
-        <option value="10">10:00 AM</option><option value="12">12:00 PM</option>
-        <option value="14">02:00 PM</option><option value="16">04:00 PM</option>
-        <option value="18">06:00 PM</option>
-      </select>
-      
-      <div id="wdResumen" style="background:#f0f4ff;border-radius:8px;padding:12px;margin:15px 0;font-size:0.85rem;color:#1e3c72;font-weight:600;border-left:4px solid #1e3c72;">
-        📋 El informe se enviará <b>todos los días a las 08:00 AM</b>
-      </div>
-      
-      <button class="btn btn-primary" onclick="App.guardarWatchdog()">Guardar Configuración</button>
-    </div>
-  </div>
-</div>
+            // Configuración
+            let config = {
+                activo: true,
+                dia: 1,
+                hora: 8
+            };
 
-<script>
-const App = {
-  stockData: [
-    { codigo: 'PROD-001', nombre: 'Laptop Dell', cantidad: 3, stockMin: 10, estado: 'CRÍTICO' },
-    { codigo: 'PROD-002', nombre: 'Mouse USB', cantidad: 0, stockMin: 5, estado: 'SIN STOCK' },
-    { codigo: 'PROD-003', nombre: 'Teclado', cantidad: 15, stockMin: 10, estado: 'OK' },
-    { codigo: 'PROD-004', nombre: 'Monitor 24"', cantidad: 2, stockMin: 8, estado: 'CRÍTICO' }
-  ],
+            let historial = [];
 
-  init: function() {
-    this.cargarPerfil();
-    this.cargarConfigWatchdog();
-    this.mostrarDashboard();
-    this.mostrarStock();
-  },
+            const diasNombres = {
+                0: 'Domingo', 1: 'Lunes', 2: 'Martes', 3: 'Miércoles',
+                4: 'Jueves', 5: 'Viernes', 6: 'Sábado'
+            };
 
-  showView: function(view) {
-    document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
-    document.getElementById(`view${view.charAt(0).toUpperCase() + view.slice(1)}`).classList.remove('hidden');
-    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-    event.target.closest('.nav-item').classList.add('active');
-    if (view === 'dashboard') this.mostrarDashboard();
-    if (view === 'inventario') this.mostrarStock();
-  },
+            // Datos de ejemplo
+            let productosCriticos = {
+                sinStock: [
+                    { codigo: 'PROD-001', nombre: 'Laptop Dell XPS', stockMin: 5 },
+                    { codigo: 'PROD-002', nombre: 'Mouse Logitech', stockMin: 10 }
+                ],
+                stockBajo: [
+                    { codigo: 'PROD-003', nombre: 'Teclado Mecánico', stock: 3, stockMin: 10 }
+                ]
+            };
 
-  mostrarDashboard: function() {
-    const sinStock = this.stockData.filter(p => p.cantidad <= 0).length;
-    const critico = this.stockData.filter(p => p.cantidad > 0 && p.cantidad <= p.stockMin).length;
-    const ok = this.stockData.length - sinStock - critico;
-    
-    document.getElementById('statsGrid').innerHTML = `
-      <div class="stat-card"><div class="stat-value">${this.stockData.length}</div><div class="stat-label">Productos</div></div>
-      <div class="stat-card"><div class="stat-value">${sinStock}</div><div class="stat-label">Sin Stock</div></div>
-      <div class="stat-card"><div class="stat-value">${critico}</div><div class="stat-label">Crítico</div></div>
-      <div class="stat-card"><div class="stat-value">${ok}</div><div class="stat-label">OK</div></div>
-    `;
-    
-    const alertas = this.stockData.filter(p => p.cantidad <= p.stockMin);
-    if (alertas.length === 0) {
-      document.getElementById('alertasLista').innerHTML = '<div class="message success">✅ No hay alertas activas</div>';
-    } else {
-      let html = '';
-      alertas.forEach(p => {
-        const badge = p.cantidad <= 0 ? 'danger' : 'warning';
-        const texto = p.cantidad <= 0 ? 'SIN STOCK' : 'Stock bajo';
-        html += `<div style="padding:10px 0; border-bottom:1px solid #eee;">
-          <strong>${p.codigo}</strong> - ${p.nombre}<br>
-          <span class="badge badge-${badge}">${texto}</span> Stock: ${p.cantidad} / Mín: ${p.stockMin}
-        </div>`;
-      });
-      document.getElementById('alertasLista').innerHTML = html;
-    }
-  },
+            // ============================================================
+            // INICIALIZACIÓN
+            // ============================================================
 
-  mostrarStock: function() {
-    const search = document.getElementById('searchInput')?.value.toLowerCase() || '';
-    const filtered = this.stockData.filter(p => p.codigo.toLowerCase().includes(search) || p.nombre.toLowerCase().includes(search));
-    
-    if (filtered.length === 0) {
-      document.getElementById('stockLista').innerHTML = '<div class="message info">No hay productos</div>';
-      return;
-    }
-    
-    let html = '<table>';
-    filtered.forEach(p => {
-      const badge = p.cantidad <= 0 ? 'danger' : (p.cantidad <= p.stockMin ? 'warning' : 'success');
-      const texto = p.cantidad <= 0 ? 'Sin Stock' : (p.cantidad <= p.stockMin ? 'Crítico' : 'OK');
-      html += `<tr>
-        <td><strong>${p.codigo}</strong><br><small>${p.nombre}</small></td>
-        <td style="text-align:right"><span class="badge badge-${badge}">${texto}</span><br>Stock: ${p.cantidad}</td>
-      </tr>`;
-    });
-    html += '</table>';
-    document.getElementById('stockLista').innerHTML = html;
-  },
+            function init() {
+                cargarConfiguracion();
+                cargarPerfil();
+                cargarHistorial();
+                actualizarUI();
+                renderizarAlertas();
+                iniciarVerificacion();
+            }
 
-  buscarProducto: function(val) {
-    if (val.length < 2) return;
-    const results = this.stockData.filter(p => p.codigo.toLowerCase().includes(val.toLowerCase()) || p.nombre.toLowerCase().includes(val.toLowerCase()));
-    const container = document.getElementById('searchResults');
-    if (!container) return;
-    if (results.length === 0) {
-      container.innerHTML = '<div class="message info">Sin resultados</div>';
-      return;
-    }
-    let html = '</table>';
-    results.forEach(p => {
-      html += `<tr><td><strong>${p.codigo}</strong><br>${p.nombre}</td><td>Stock: ${p.cantidad}</td></tr>`;
-    });
-    html += '</table>';
-    container.innerHTML = html;
-  },
+            function cargarConfiguracion() {
+                const guardada = localStorage.getItem('watchdog_config');
+                if (guardada) {
+                    try {
+                        const parsed = JSON.parse(guardada);
+                        config = { ...config, ...parsed };
+                    } catch(e) {}
+                }
+                
+                const diaSelect = document.getElementById('movilDia');
+                const horaSelect = document.getElementById('movilHora');
+                
+                if (diaSelect) diaSelect.value = config.dia;
+                if (horaSelect) horaSelect.value = config.hora;
+            }
 
-  guardarMovimiento: function() {
-    const codigo = document.getElementById('movCodigo').value;
-    const tipo = document.getElementById('movTipo').value;
-    const cantidad = parseFloat(document.getElementById('movCantidad').value);
-    
-    if (!codigo || !cantidad) {
-      alert('Complete todos los campos');
-      return;
-    }
-    
-    const producto = this.stockData.find(p => p.codigo === codigo);
-    if (producto) {
-      if (tipo === 'INGRESO') {
-        producto.cantidad += cantidad;
-      } else {
-        if (producto.cantidad < cantidad) {
-          alert('Stock insuficiente');
-          return;
-        }
-        producto.cantidad -= cantidad;
-      }
-      producto.estado = producto.cantidad <= 0 ? 'SIN STOCK' : (producto.cantidad <= producto.stockMin ? 'CRÍTICO' : 'OK');
-    }
-    
-    alert('Movimiento registrado');
-    document.getElementById('movCodigo').value = '';
-    document.getElementById('movCantidad').value = '';
-    this.mostrarDashboard();
-    this.mostrarStock();
-  },
+            function guardar() {
+                const diaSelect = document.getElementById('movilDia');
+                const horaSelect = document.getElementById('movilHora');
+                
+                config.dia = parseInt(diaSelect.value);
+                config.hora = parseInt(horaSelect.value);
+                
+                localStorage.setItem('watchdog_config', JSON.stringify(config));
+                
+                actualizarResumen();
+                mostrarMensaje('Configuración guardada', 'success');
+            }
 
-  // ============================================================
-  // WATCHDOG FUNCTIONS MEJORADAS (DÍA Y HORA)
-  // ============================================================
-  
-  abrirWatchdog: function() {
-    document.getElementById('modalWatchdog').style.display = 'flex';
-    this.watchdogToggleDia();
-    this.cargarConfigWatchdog();
-  },
+            function setEstado(estado) {
+                config.activo = (estado === 'activo');
+                
+                const btns = document.querySelectorAll('.toggle-btn');
+                btns.forEach(btn => {
+                    if ((estado === 'activo' && btn.textContent.includes('Activar')) ||
+                        (estado === 'inactivo' && btn.textContent.includes('Desactivar'))) {
+                        btn.classList.add('active');
+                    } else {
+                        btn.classList.remove('active');
+                    }
+                });
+                
+                guardar();
+                actualizarResumen();
+                mostrarMensaje(config.activo ? 'Watchdog activado' : 'Watchdog desactivado', 'success');
+            }
 
-  watchdogToggleDia: function() {
-    const modo = document.getElementById('wdModo').value;
-    const diaGroup = document.getElementById('wdDiaGroup');
-    const diaMesGroup = document.getElementById('wdDiaMesGroup');
-    const resumen = document.getElementById('wdResumen');
-    const horaSelect = document.getElementById('wdHora');
-    const hora = horaSelect.options[horaSelect.selectedIndex].text;
-    
-    if (modo === 'diario') {
-      diaGroup.style.display = 'none';
-      diaMesGroup.style.display = 'none';
-      resumen.innerHTML = `📋 El informe se enviará <b>TODOS LOS DÍAS</b> a las <b>${hora}</b>`;
-    } 
-    else if (modo === 'semanal') {
-      diaGroup.style.display = 'block';
-      diaMesGroup.style.display = 'none';
-      const dia = document.getElementById('wdDia');
-      const diaNombre = dia.options[dia.selectedIndex].text;
-      resumen.innerHTML = `📋 El informe se enviará <b>CADA ${diaNombre.toUpperCase()}</b> a las <b>${hora}</b>`;
-    }
-    else if (modo === 'mensual') {
-      diaGroup.style.display = 'none';
-      diaMesGroup.style.display = 'block';
-      const diaMes = document.getElementById('wdDiaMes');
-      const diaValor = diaMes.value;
-      resumen.innerHTML = `📋 El informe se enviará <b>EL DÍA ${diaValor} DE CADA MES</b> a las <b>${hora}</b>`;
-    }
-  },
+            // ============================================================
+            // UI
+            // ============================================================
 
-  guardarWatchdog: function() {
-    const modo = document.getElementById('wdModo').value;
-    const diaSemana = document.getElementById('wdDia').value;
-    const diaMes = document.getElementById('wdDiaMes').value;
-    const hora = document.getElementById('wdHora').value;
-    
-    let config = {
-      activo: true,
-      frecuencia: modo,
-      hora: parseInt(hora)
-    };
-    
-    if (modo === 'semanal') {
-      config.dia_semana = parseInt(diaSemana);
-    }
-    if (modo === 'mensual') {
-      config.dia_mes = parseInt(diaMes);
-    }
-    
-    localStorage.setItem('watchdog_config', JSON.stringify(config));
-    
-    alert('✅ Configuración guardada correctamente');
-    document.getElementById('modalWatchdog').style.display = 'none';
-  },
+            function actualizarUI() {
+                actualizarResumen();
+                
+                const btns = document.querySelectorAll('.toggle-btn');
+                if (config.activo) {
+                    if (btns[0]) btns[0].classList.add('active');
+                    if (btns[1]) btns[1].classList.remove('active');
+                } else {
+                    if (btns[0]) btns[0].classList.remove('active');
+                    if (btns[1]) btns[1].classList.add('active');
+                }
+            }
 
-  cargarConfigWatchdog: function() {
-    const localConfig = localStorage.getItem('watchdog_config');
-    if (localConfig) {
-      try {
-        const config = JSON.parse(localConfig);
-        this.aplicarConfigWatchdog(config);
-      } catch(e) {}
-    }
-  },
+            function actualizarResumen() {
+                const resumenDiv = document.getElementById('movilResumen');
+                if (!resumenDiv) return;
+                
+                const diaNombre = diasNombres[config.dia];
+                const hora = config.hora;
+                const hora12 = hora % 12 || 12;
+                const ampm = hora >= 12 ? 'PM' : 'AM';
+                
+                if (config.activo) {
+                    resumenDiv.innerHTML = `
+                        <i class="fas fa-check-circle" style="color: #00b894;"></i>
+                        Informe automático: ${diaNombre} a las ${hora12}:00 ${ampm}
+                    `;
+                } else {
+                    resumenDiv.innerHTML = `
+                        <i class="fas fa-ban" style="color: #d63031;"></i>
+                        Watchdog desactivado
+                    `;
+                }
+            }
 
-  aplicarConfigWatchdog: function(config) {
-    if (!config) return;
-    
-    const modoSelect = document.getElementById('wdModo');
-    if (modoSelect && config.frecuencia) {
-      modoSelect.value = config.frecuencia;
-    }
-    
-    const diaSelect = document.getElementById('wdDia');
-    if (diaSelect && config.dia_semana !== undefined) {
-      diaSelect.value = config.dia_semana.toString();
-    }
-    
-    const diaMesSelect = document.getElementById('wdDiaMes');
-    if (diaMesSelect && config.dia_mes !== undefined) {
-      diaMesSelect.value = config.dia_mes.toString();
-    }
-    
-    const horaSelect = document.getElementById('wdHora');
-    if (horaSelect && config.hora !== undefined) {
-      horaSelect.value = config.hora.toString();
-    }
-    
-    this.watchdogToggleDia();
-  },
+            function renderizarAlertas() {
+                const container = document.getElementById('movilAlertas');
+                if (!container) return;
+                
+                const { sinStock, stockBajo } = productosCriticos;
+                
+                if (sinStock.length === 0 && stockBajo.length === 0) {
+                    container.innerHTML = `
+                        <div style="text-align: center; padding: 20px; color: #00b894;">
+                            <i class="fas fa-check-circle"></i> Sin alertas activas
+                        </div>
+                    `;
+                    return;
+                }
+                
+                let html = '';
+                
+                if (sinStock.length > 0) {
+                    html += `<div style="margin-bottom: 12px; color: #d63031; font-weight: 600;">
+                        <i class="fas fa-times-circle"></i> Sin Stock (${sinStock.length})
+                    </div>`;
+                    sinStock.forEach(p => {
+                        html += `<div style="padding: 8px 0; border-bottom: 1px solid #eee;">
+                            <strong>${p.codigo}</strong> - ${p.nombre}<br>
+                            <span class="badge badge-danger">Mín: ${p.stockMin}</span>
+                        </div>`;
+                    });
+                }
+                
+                if (stockBajo.length > 0) {
+                    html += `<div style="margin: 12px 0 8px; color: #e67e22; font-weight: 600;">
+                        <i class="fas fa-exclamation-triangle"></i> Stock Bajo (${stockBajo.length})
+                    </div>`;
+                    stockBajo.forEach(p => {
+                        html += `<div style="padding: 8px 0; border-bottom: 1px solid #eee;">
+                            <strong>${p.codigo}</strong> - ${p.nombre}<br>
+                            <span class="badge badge-warning">Stock: ${p.stock}/${p.stockMin}</span>
+                        </div>`;
+                    });
+                }
+                
+                container.innerHTML = html;
+            }
 
-  probarEnvio: function() {
-    const config = JSON.parse(localStorage.getItem('watchdog_config') || '{}');
-    const email = localStorage.getItem('user_email') || 'admin@nexusprime.com';
-    alert('📧 Enviando informe de prueba a ' + email + '\n\nFrecuencia: ' + (config.frecuencia || 'semanal') + '\nHora: ' + (config.hora || 8) + ':00');
-  },
+            function renderizarHistorial() {
+                const container = document.getElementById('movilHistorial');
+                if (!container) return;
+                
+                if (historial.length === 0) {
+                    container.innerHTML = `
+                        <div style="text-align: center; padding: 20px; color: #888;">
+                            <i class="fas fa-inbox"></i> Sin envíos registrados
+                        </div>
+                    `;
+                    return;
+                }
+                
+                let html = '';
+                historial.forEach(item => {
+                    const fecha = new Date(item.fecha).toLocaleString('es-CL');
+                    html += `
+                        <div style="padding: 12px 0; border-bottom: 1px solid #eee;">
+                            <div><strong>${fecha}</strong></div>
+                            <div style="font-size: 0.75rem; color: #666;">
+                                ${item.sinStock || 0} sin stock, ${item.stockBajo || 0} stock bajo
+                            </div>
+                            <div><span class="badge badge-success">Enviado</span></div>
+                        </div>
+                    `;
+                });
+                
+                container.innerHTML = html;
+            }
 
-  cargarPerfil: function() {
-    const nombre = localStorage.getItem('user_nombre') || '';
-    const email = localStorage.getItem('user_email') || 'admin@nexusprime.com';
-    document.getElementById('perfilNombre').value = nombre;
-    document.getElementById('perfilEmail').value = email;
-  },
+            // ============================================================
+            // PERFIL
+            // ============================================================
 
-  guardarPerfil: function() {
-    const nombre = document.getElementById('perfilNombre').value;
-    if (nombre) {
-      localStorage.setItem('user_nombre', nombre);
-      alert('Perfil guardado');
-    }
-  }
-};
+            function cargarPerfil() {
+                const email = localStorage.getItem('watchdog_email') || '';
+                const emailInput = document.getElementById('movilEmail');
+                if (emailInput) emailInput.value = email;
+            }
 
-document.addEventListener('DOMContentLoaded', function() {
-  App.init();
-});
-</script>
+            function guardarPerfil() {
+                const emailInput = document.getElementById('movilEmail');
+                if (emailInput) {
+                    localStorage.setItem('watchdog_email', emailInput.value);
+                    mostrarMensaje('Perfil guardado', 'success');
+                }
+            }
+
+            // ============================================================
+            // HISTORIAL
+            // ============================================================
+
+            function cargarHistorial() {
+                const guardado = localStorage.getItem('watchdog_historial');
+                if (guardado) {
+                    try {
+                        historial = JSON.parse(guardado);
+                    } catch(e) {}
+                }
+                renderizarHistorial();
+            }
+
+            function registrarEnvio() {
+                const envio = {
+                    fecha: new Date().toISOString(),
+                    sinStock: productosCriticos.sinStock.length,
+                    stockBajo: productosCriticos.stockBajo.length
+                };
+                historial.unshift(envio);
+                if (historial.length > 20) historial.pop();
+                localStorage.setItem('watchdog_historial', JSON.stringify(historial));
+                renderizarHistorial();
+            }
+
+            // ============================================================
+            // VERIFICACIÓN Y ENVÍO
+            // ============================================================
+
+            function debeEnviar() {
+                if (!config.activo) return false;
+                const ahora = new Date();
+                const horaActual = ahora.getHours();
+                const diaActual = ahora.getDay();
+                return (horaActual === config.hora && diaActual === config.dia);
+            }
+
+            function enviarInforme() {
+                if (!config.activo) return;
+                
+                console.log('Enviando informe...', new Date());
+                
+                if (productosCriticos.sinStock.length === 0 && productosCriticos.stockBajo.length === 0) {
+                    console.log('Sin productos críticos');
+                    return;
+                }
+                
+                const email = localStorage.getItem('watchdog_email') || 'admin@nexusprime.com';
+                
+                // Simular envío
+                mostrarMensaje(`📧 Informe enviado a ${email}`, 'success');
+                registrarEnvio();
+            }
+
+            function enviarPrueba() {
+                const email = localStorage.getItem('watchdog_email') || 'admin@nexusprime.com';
+                mostrarMensaje(`📧 Enviando prueba a ${email}...`, 'info');
+                
+                setTimeout(() => {
+                    mostrarMensaje('✅ Prueba enviada correctamente', 'success');
+                }, 1500);
+            }
+
+            // Iniciar verificación automática
+            function iniciarVerificacion() {
+                setInterval(() => {
+                    if (debeEnviar()) {
+                        enviarInforme();
+                    }
+                }, 60000);
+            }
+
+            // ============================================================
+            // NAVEGACIÓN
+            // ============================================================
+
+            function showView(viewName) {
+                const views = ['dashboard', 'historial', 'config'];
+                views.forEach(v => {
+                    const el = document.getElementById(`view${v.charAt(0).toUpperCase() + v.slice(1)}`);
+                    if (el) el.classList.add('hidden');
+                });
+                
+                const viewEl = document.getElementById(`view${viewName.charAt(0).toUpperCase() + viewName.slice(1)}`);
+                if (viewEl) viewEl.classList.remove('hidden');
+                
+                const navItems = document.querySelectorAll('.nav-item');
+                navItems.forEach(item => item.classList.remove('active'));
+                event.target.closest('.nav-item').classList.add('active');
+                
+                if (viewName === 'historial') renderizarHistorial();
+                if (viewName === 'dashboard') renderizarAlertas();
+            }
+
+            function mostrarMensaje(texto, tipo) {
+                const msgDiv = document.getElementById('movilMessage');
+                if (!msgDiv) return;
+                
+                msgDiv.textContent = texto;
+                msgDiv.className = `message ${tipo}`;
+                msgDiv.style.display = 'block';
+                
+                setTimeout(() => {
+                    msgDiv.style.display = 'none';
+                }, 3000);
+            }
+
+            // ============================================================
+            // API PÚBLICA
+            // ============================================================
+
+            return {
+                init,
+                guardar,
+                setEstado,
+                enviarPrueba,
+                guardarPerfil,
+                showView,
+                debeEnviar,
+                enviarInforme
+            };
+
+        })();
+
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', function() {
+            MobileWatchdog.init();
+        });
+    </script>
 </body>
 </html>
