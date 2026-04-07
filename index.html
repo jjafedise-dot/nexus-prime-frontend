@@ -1,786 +1,321 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="NEXUS PRIME">
-  <meta name="theme-color" content="#1e3c72">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>NEXUS PRIME | Inventario</title>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-  <style>
-    /* ============================================================
-       NEXUS PRIME v3.0 — PROFESSIONAL STYLESHEET
-       ============================================================ */
-    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-    :root {
-      --blue-dark:  #1e3c72;
-      --blue-mid:   #2a5298;
-      --blue-light: #4b6cb7;
-      --green:      #00b894;
-      --red:        #d63031;
-      --orange:     #e67e22;
-      --yellow:     #fdcb6e;
-      --gray-bg:    #F4F7F6;
-      --gray-border:#e1e5ea;
-      --shadow-sm:  0 2px 8px rgba(0,0,0,0.06);
-      --shadow-md:  0 5px 20px rgba(0,0,0,0.08);
-      --shadow-lg:  0 15px 40px rgba(0,0,0,0.14);
-      --radius:     12px;
-      --radius-sm:  8px;
-    }
-    body { font-family: 'Poppins', sans-serif; background: var(--gray-bg); height: 100vh; overflow: hidden; color: #2d3436; }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>NEXUS PRIME | Watchdog</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    /* ── LOGIN ── */
-    #login-screen {
-      position: fixed; inset: 0;
-      background: linear-gradient(135deg, var(--blue-dark) 0%, var(--blue-mid) 100%);
-      display: flex; flex-direction: column; justify-content: center; align-items: center;
-      z-index: 9999; transition: opacity 0.3s;
-    }
-    .login-container {
-      background: rgba(255,255,255,0.97); padding: 50px 42px; border-radius: 20px;
-      box-shadow: var(--shadow-lg); width: 90%; max-width: 420px; text-align: center;
-      animation: slideUp 0.5s ease-out;
-    }
-    @keyframes slideUp { from { opacity: 0; transform: translateY(28px); } to { opacity: 1; transform: translateY(0); } }
-    .security-badge {
-      width: 80px; height: 80px; background: var(--blue-dark); color: white;
-      border-radius: 50%; display: flex; justify-content: center; align-items: center;
-      font-size: 2.4rem; margin: 0 auto 18px; box-shadow: 0 6px 18px rgba(30,60,114,0.35);
-    }
-    .login-title { font-size: 1.75rem; color: var(--blue-dark); font-weight: 700; letter-spacing: 1px; }
-    .login-subtitle { font-size: 0.88rem; color: #888; margin-bottom: 32px; }
-    .input-group { position: relative; margin-bottom: 18px; text-align: left; }
-    .input-group i { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--blue-dark); }
-    .login-input {
-      width: 100%; padding: 14px 14px 14px 42px; border: 2px solid var(--gray-border);
-      border-radius: var(--radius-sm); font-size: 0.93rem; transition: all 0.25s;
-      background: #f9f9f9; font-family: 'Poppins', sans-serif;
-    }
-    .login-input:focus { border-color: var(--blue-dark); background: white; outline: none; box-shadow: 0 0 0 4px rgba(30,60,114,0.1); }
-    .btn-login {
-      width: 100%; padding: 14px; background: var(--blue-dark); color: white; border: none;
-      border-radius: var(--radius-sm); font-size: 0.95rem; font-weight: 700; cursor: pointer;
-      transition: all 0.25s; margin-top: 8px; letter-spacing: 0.5px;
-      box-shadow: 0 4px 14px rgba(30,60,114,0.3);
-    }
-    .btn-login:hover { background: var(--blue-mid); transform: translateY(-2px); }
-    .btn-login:active { transform: translateY(0); }
-    .login-error {
-      color: var(--red); font-size: 0.83rem; margin-top: 14px;
-      padding: 10px 14px; background: #ffeaea; border-radius: var(--radius-sm);
-      display: none; border: 1px solid #ffcccc;
-    }
-    .login-footer { margin-top: 22px; font-size: 0.72rem; color: #aaa; }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
 
-    /* ── APP LAYOUT ── */
-    .app-container { display: none; height: 100vh; }
-    .sidebar {
-      width: 260px; background: var(--blue-dark); color: white; flex-shrink: 0;
-      overflow-y: auto; box-shadow: 4px 0 15px rgba(0,0,0,0.12);
-      display: flex; flex-direction: column;
-    }
-    .sidebar-header { padding: 22px 18px; background: rgba(0,0,0,0.15); border-bottom: 1px solid rgba(255,255,255,0.1); text-align: center; }
-    .sidebar-header h1 { font-size: 1.2rem; font-weight: 700; letter-spacing: 1px; line-height: 1.3; }
-    .sidebar-header p { font-size: 0.72rem; opacity: 0.7; margin-top: 4px; }
-    .nav-menu { list-style: none; padding: 16px 8px; flex: 1; }
-    .nav-item { margin: 4px 0; }
-    .nav-link {
-      display: flex; align-items: center; padding: 11px 18px; color: rgba(255,255,255,0.8);
-      text-decoration: none; border-radius: 10px; transition: all 0.25s ease;
-      cursor: pointer; font-size: 0.88rem; font-weight: 500; gap: 0;
-    }
-    .nav-link:hover { background: rgba(255,255,255,0.14); color: white; padding-left: 22px; }
-    .nav-link.active { background: var(--blue-light); color: white; font-weight: 600; box-shadow: 0 3px 10px rgba(0,0,0,0.2); }
-    .nav-icon { margin-right: 11px; font-size: 1rem; width: 22px; text-align: center; }
-    .sidebar-footer { padding: 18px; border-top: 1px solid rgba(255,255,255,0.1); text-align: center; }
-    .user-info { font-size: 0.75rem; opacity: 0.75; margin-bottom: 10px; }
-    #lblUserDisplay { font-weight: 600; color: white; font-size: 0.82rem; word-break: break-all; }
-    .btn-logout {
-      width: 100%; padding: 9px; background: rgba(214,48,49,0.18); border: 1px solid rgba(214,48,49,0.4);
-      color: #ffdddd; border-radius: var(--radius-sm); cursor: pointer; font-weight: 600;
-      transition: all 0.2s; font-size: 0.82rem; font-family: 'Poppins', sans-serif;
-    }
-    .btn-logout:hover { background: rgba(214,48,49,0.35); }
+        .container {
+            max-width: 500px;
+            width: 100%;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
 
-    /* ── MAIN CONTENT ── */
-    .main-content { flex: 1; overflow-y: auto; background: var(--gray-bg); position: relative; }
-    .content-header {
-      background: white; padding: 18px 36px; border-bottom: 1px solid var(--gray-border);
-      display: flex; justify-content: space-between; align-items: center;
-      box-shadow: var(--shadow-sm); position: sticky; top: 0; z-index: 10;
-    }
-    .content-header h2 { color: var(--blue-dark); font-size: 1.4rem; font-weight: 700; }
-    .content-body { padding: 28px 36px; }
-    .tab-content { display: none; animation: fadeIn 0.35s ease; }
-    .tab-content.active { display: block; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        .header {
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
 
-    /* ── CARDS ── */
-    .card {
-      background: white; border-radius: var(--radius); box-shadow: var(--shadow-sm);
-      margin-bottom: 22px; overflow: hidden; border: 1px solid var(--gray-border);
-      transition: box-shadow 0.25s;
-    }
-    .card:hover { box-shadow: var(--shadow-md); }
-    .card-header {
-      padding: 16px 22px; background: white; border-bottom: 2px solid var(--gray-bg);
-      font-weight: 700; color: var(--blue-dark); font-size: 0.95rem;
-      display: flex; align-items: center; gap: 10px;
-    }
-    .card-header i { color: var(--blue-light); }
-    .card-body { padding: 22px; }
+        .header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+        }
 
-    /* ── FORMS ── */
-    .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 20px; margin-bottom: 22px; }
-    .form-group { display: flex; flex-direction: column; }
-    .form-group label { margin-bottom: 7px; font-weight: 600; color: var(--blue-dark); font-size: 0.82rem; letter-spacing: 0.3px; }
-    input, select, textarea {
-      padding: 11px 13px; border: 2px solid var(--gray-border); border-radius: var(--radius-sm);
-      font-size: 0.88rem; transition: border-color 0.2s, box-shadow 0.2s; background: #fdfdfd;
-      font-family: 'Poppins', sans-serif; width: 100%;
-    }
-    input:focus, select:focus, textarea:focus {
-      outline: none; border-color: var(--blue-light); background: white;
-      box-shadow: 0 0 0 3px rgba(75,108,183,0.12);
-    }
-    input[type="file"] { padding: 8px 10px; font-size: 0.8rem; cursor: pointer; }
-    input[disabled], input[readonly] { background: #f0f2f5; color: #888; cursor: default; }
+        .header p {
+            opacity: 0.9;
+            font-size: 0.85rem;
+        }
 
-    /* ── BUTTONS ── */
-    .btn {
-      padding: 10px 22px; border: none; border-radius: var(--radius-sm); font-size: 0.87rem;
-      font-weight: 600; cursor: pointer; transition: all 0.2s ease; display: inline-flex;
-      align-items: center; justify-content: center; gap: 7px; font-family: 'Poppins', sans-serif;
-      white-space: nowrap; text-decoration: none;
-    }
-    .btn:disabled { cursor: not-allowed; opacity: 0.55; transform: none !important; }
-    .btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.12); }
-    .btn:active:not(:disabled) { transform: translateY(0); }
-    .btn-sm { padding: 6px 12px; font-size: 0.78rem; }
-    .btn-icon { padding: 7px 10px; }
-    .btn-primary   { background: var(--blue-dark);  color: white; }
-    .btn-success   { background: var(--green);       color: white; }
-    .btn-danger    { background: var(--red);         color: white; }
-    .btn-warning   { background: var(--yellow);      color: #2d3436; }
-    .btn-secondary { background: #636e72;            color: white; }
-    .btn-info      { background: #0984e3;            color: white; }
-    .btn-dark      { background: #2d3436;            color: white; }
-    .btn-orange    { background: var(--orange);      color: white; }
-    .actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 4px; }
+        .body {
+            padding: 25px;
+        }
 
-    /* ── TABLES ── */
-    .table-container { overflow-x: auto; border-radius: var(--radius-sm); border: 1px solid var(--gray-border); }
-    table { width: 100%; border-collapse: collapse; background: white; font-size: 0.87rem; }
-    th, td { padding: 13px 16px; text-align: left; border-bottom: 1px solid #f1f1f1; vertical-align: middle; }
-    th { background: #f8f9fa; font-weight: 700; color: var(--blue-dark); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.4px; }
-    tr:last-child td { border-bottom: none; }
-    tbody tr:hover { background: #fafbfc; }
-    .status-zero { background: #fff0f0 !important; border-left: 4px solid var(--red); }
-    .status-low  { background: #fffbf0 !important; border-left: 4px solid var(--orange); }
+        .card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
 
-    /* ── STATUS BADGES ── */
-    .badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.3px; }
-    .badge-danger  { background: #ffeaea; color: var(--red); }
-    .badge-warning { background: #fff3cd; color: #856404; }
-    .badge-success { background: #d4edda; color: #155724; }
-    .badge-info    { background: #d1ecf1; color: #0c5460; }
+        .card-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #1e3c72;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
 
-    /* ── MESSAGES ── */
-    .message { padding: 14px 18px; border-radius: var(--radius-sm); margin: 16px 0; font-weight: 500; display: flex; align-items: center; gap: 10px; font-size: 0.88rem; }
-    .message.success { background: #e8f8ee; color: #1a7a30; border-left: 4px solid var(--green); }
-    .message.error   { background: #ffeaea; color: var(--red);   border-left: 4px solid var(--red); }
-    .message.warning { background: #fff8e1; color: #8a6000;      border-left: 4px solid var(--yellow); }
-    .message.info    { background: #e3f2fd; color: #1565c0;      border-left: 4px solid #1976d2; }
+        .form-group {
+            margin-bottom: 20px;
+        }
 
-    /* ── STATS ── */
-    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 18px; margin-bottom: 28px; }
-    .stat-card {
-      background: white; padding: 22px 20px; border-radius: var(--radius);
-      text-align: center; box-shadow: var(--shadow-sm); border-bottom: 4px solid var(--blue-dark);
-      transition: transform 0.25s, box-shadow 0.25s; border: 1px solid var(--gray-border);
-    }
-    .stat-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
-    .stat-card.danger { border-bottom-color: var(--red); }
-    .stat-card.warning { border-bottom-color: var(--orange); }
-    .stat-card.success { border-bottom-color: var(--green); }
-    .stat-value { font-size: 2.1rem; font-weight: 700; color: var(--blue-dark); line-height: 1.1; }
-    .stat-card.danger  .stat-value { color: var(--red); }
-    .stat-card.warning .stat-value { color: var(--orange); }
-    .stat-card.success .stat-value { color: var(--green); }
-    .stat-label { color: #888; font-size: 0.78rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.7px; margin-top: 6px; }
+        label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: #333;
+            font-size: 0.85rem;
+        }
 
-    /* ── AUTOCOMPLETE ── */
-    .autocomplete-container { position: relative; }
-    .autocomplete-dropdown {
-      position: absolute; top: 100%; left: 0; right: 0; background: white;
-      border: 1px solid var(--gray-border); border-top: none; border-radius: 0 0 var(--radius-sm) var(--radius-sm);
-      max-height: 210px; overflow-y: auto; z-index: 1000; display: none;
-      box-shadow: var(--shadow-md);
-    }
-    .autocomplete-item { padding: 11px 14px; cursor: pointer; border-bottom: 1px solid #f5f5f5; transition: background 0.15s; }
-    .autocomplete-item:hover { background: #f0f4ff; }
-    .autocomplete-code { font-weight: 700; color: var(--blue-dark); font-size: 0.88rem; }
-    .autocomplete-name { color: #777; font-size: 0.78rem; margin-top: 2px; }
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-family: inherit;
+            background: white;
+            cursor: pointer;
+        }
 
-    /* ── MODALS ── */
-    .modal-backdrop {
-      position: fixed; z-index: 1040; inset: 0; background: rgba(0,0,0,0.55);
-      display: none; backdrop-filter: blur(4px); align-items: center; justify-content: center;
-    }
-    .modal-backdrop[style*="block"] { display: flex !important; }
-    .modal-content {
-      background: white; border-radius: 16px; max-width: 600px; width: 94%;
-      box-shadow: var(--shadow-lg); overflow-y: auto; max-height: 92vh;
-      animation: slideUp 0.28s ease-out;
-    }
-    .modal-header { padding: 18px 26px; border-bottom: 1px solid #f0f0f0; display: flex; justify-content: space-between; align-items: center; }
-    .modal-header.success { background: #e8f8ee; color: #1a7a30; }
-    .modal-header.error   { background: #ffeaea; color: var(--red); }
-    .modal-title { margin: 0; font-size: 1.1rem; font-weight: 700; }
-    .modal-body { padding: 26px; }
-    .modal-footer { padding: 18px 26px; text-align: right; border-top: 1px solid #f0f0f0; background: #fafafa; border-radius: 0 0 16px 16px; display: flex; gap: 10px; justify-content: flex-end; }
-    .close-modal { cursor: pointer; font-size: 1.4rem; border: none; background: none; color: #aaa; transition: color 0.2s; line-height: 1; }
-    .close-modal:hover { color: #333; }
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
 
-    /* ── NET STATUS ── */
-    .net-status {
-      position: fixed; bottom: 20px; right: 20px; background: white;
-      padding: 9px 18px; border-radius: 50px; box-shadow: var(--shadow-md);
-      font-size: 0.8rem; font-weight: 700; display: flex; align-items: center;
-      gap: 9px; z-index: 2000; transition: all 0.3s; border: 2px solid transparent;
-    }
-    .net-status.online  { border-color: var(--green); color: var(--green); }
-    .net-status.offline { border-color: var(--red);   color: var(--red);   background: #fff5f5; }
-    .status-dot { width: 9px; height: 9px; border-radius: 50%; }
-    .net-status.online  .status-dot { background: var(--green); box-shadow: 0 0 8px var(--green); }
-    .net-status.offline .status-dot { background: var(--red);   animation: pulse 1s infinite; }
-    @keyframes pulse { 50% { opacity: 0.4; } }
+        .btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: inherit;
+            margin-bottom: 10px;
+        }
 
-    /* ── TOOLBAR ── */
-    .inventory-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-bottom: 18px; }
-    .inventory-toolbar .btn, .inventory-toolbar select, .inventory-toolbar input { height: 40px; }
-    .inventory-toolbar select, .inventory-toolbar input[type="text"] { min-width: 160px; flex-grow: 1; max-width: 260px; }
+        .btn-primary {
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            color: white;
+        }
 
-    /* ── LOADING ── */
-    .loading { display: none; text-align: center; padding: 22px; color: var(--blue-dark); font-weight: 600; }
-    .loading i { margin-right: 8px; }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(30,60,114,0.3);
+        }
 
-    /* ── RESPONSIVE ── */
-    @media (max-width: 768px) {
-      .content-header { padding: 14px 16px; }
-      .content-body { padding: 14px; }
-      .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
-      .stat-value { font-size: 1.6rem; }
-      .form-grid { grid-template-columns: 1fr; }
-      .actions { flex-direction: column; }
-      .actions .btn { width: 100%; justify-content: center; }
-      .sidebar { position: fixed; left: -280px; transition: left 0.3s; z-index: 1000; }
-      .sidebar.open { left: 0; }
-      #hamburger { display: flex; position: fixed; top: 14px; left: 14px; z-index: 1001; background: var(--blue-dark); color: white; border: none; border-radius: 10px; width: 44px; height: 44px; align-items: center; justify-content: center; cursor: pointer; }
-      #sidebarOverlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 999; display: none; }
-      #sidebarOverlay.active { display: block; }
-    }
-    #hamburger { display: none; }
-    #sidebarOverlay { display: none; }
-  </style>
+        .btn-success {
+            background: #00b894;
+            color: white;
+        }
+
+        .btn-info {
+            background: #0984e3;
+            color: white;
+        }
+
+        .toggle-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .toggle-btn {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            background: white;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .toggle-btn.active {
+            background: #00b894;
+            border-color: #00b894;
+            color: white;
+        }
+
+        .resumen {
+            background: #e8f0fe;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: center;
+            font-size: 0.85rem;
+            color: #1e3c72;
+            font-weight: 500;
+        }
+
+        .message {
+            padding: 12px;
+            border-radius: 10px;
+            margin-top: 15px;
+            display: none;
+            font-size: 0.85rem;
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            display: block;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            display: block;
+        }
+
+        .footer {
+            background: #f8f9fa;
+            padding: 15px;
+            text-align: center;
+            font-size: 0.7rem;
+            color: #888;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .badge-success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .badge-warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .badge-danger {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        table {
+            width: 100%;
+            font-size: 0.8rem;
+        }
+
+        td {
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+    </style>
 </head>
 <body>
-
-  <button id="hamburger" onclick="document.querySelector('.sidebar').classList.toggle('open'); document.getElementById('sidebarOverlay').classList.toggle('active');">
-    <i class="fas fa-bars"></i>
-  </button>
-  <div id="sidebarOverlay" onclick="document.querySelector('.sidebar').classList.remove('open'); this.classList.remove('active');"></div>
-
-  <!-- LOGIN SCREEN -->
-  <div id="login-screen">
-    <div class="login-container">
-      <div class="security-badge"><i class="fas fa-shield-alt"></i></div>
-      <div class="login-title">NEXUS PRIME</div>
-      <div class="login-subtitle">Sistema de Control de Inventario</div>
-      <form onsubmit="App.doLogin(event)">
-        <div class="input-group">
-          <i class="fas fa-envelope"></i>
-          <input type="email" id="loginEmail" class="login-input" placeholder="Correo corporativo" required>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-robot"></i> Watchdog</h1>
+            <p>Alertas por Email - Informe de inventario</p>
         </div>
-        <div class="input-group">
-          <i class="fas fa-lock"></i>
-          <input type="password" id="loginPass" class="login-input" placeholder="Contraseña" required>
-        </div>
-        <button type="submit" class="btn-login">INICIAR SESIÓN</button>
-        <div id="loginError" class="login-error">Credenciales incorrectas</div>
-      </form>
-    </div>
-  </div>
 
-  <!-- APP CONTAINER -->
-  <div class="app-container" id="appContainer">
-    <!-- SIDEBAR -->
-    <nav class="sidebar">
-      <div class="sidebar-header">
-        <h1>NEXUS PRIME</h1>
-        <p>Control de Inventario</p>
-      </div>
-      <ul class="nav-menu">
-        <li class="nav-item"><a class="nav-link active" onclick="App.showTab('dashboard', this)"><span class="nav-icon"><i class="fas fa-tachometer-alt"></i></span> Dashboard</a></li>
-        <li class="nav-item"><a class="nav-link" onclick="App.showTab('productos', this)"><span class="nav-icon"><i class="fas fa-plus-circle"></i></span> Nuevo Producto</a></li>
-        <li class="nav-item"><a class="nav-link" onclick="App.showTab('movimientos', this)"><span class="nav-icon"><i class="fas fa-exchange-alt"></i></span> Movimientos</a></li>
-        <li class="nav-item"><a class="nav-link" onclick="App.showTab('inventario', this)"><span class="nav-icon"><i class="fas fa-warehouse"></i></span> Inventario</a></li>
-        <li class="nav-item"><a class="nav-link" onclick="App.showTab('buscar', this)"><span class="nav-icon"><i class="fas fa-search"></i></span> Buscar</a></li>
-        <li class="nav-item" id="menuConfig"><a class="nav-link" onclick="App.showTab('configuracion', this)"><span class="nav-icon"><i class="fas fa-cog"></i></span> Configuración</a></li>
-      </ul>
-      <div class="sidebar-footer">
-        <div class="user-info">Usuario:</div>
-        <div id="lblUserDisplay">...</div>
-        <button class="btn-logout" onclick="App.doLogout(false)">Cerrar Sesión</button>
-      </div>
-    </nav>
+        <div class="body">
+            <!-- Estado -->
+            <div class="toggle-group">
+                <button class="toggle-btn active" onclick="Watchdog.setEstado('activo')">
+                    <i class="fas fa-check-circle"></i> Activar
+                </button>
+                <button class="toggle-btn" onclick="Watchdog.setEstado('inactivo')">
+                    <i class="fas fa-ban"></i> Desactivar
+                </button>
+            </div>
 
-    <!-- MAIN CONTENT -->
-    <div class="main-content">
-      <!-- DASHBOARD TAB -->
-      <div id="dashboard" class="tab-content active">
-        <div class="content-header"><h2>Dashboard General</h2><button class="btn btn-primary btn-sm" onclick="App.loadDashboard(true)"><i class="fas fa-sync-alt"></i> Actualizar</button></div>
-        <div class="content-body">
-          <div class="stats-grid" id="statsGrid"></div>
-          <div class="card"><div class="card-header">Semáforo de Stock</div><div class="card-body"><canvas id="chartSemaforo" style="height:300px"></canvas></div></div>
-        </div>
-      </div>
+            <!-- Día -->
+            <div class="form-group">
+                <label><i class="fas fa-calendar-day"></i> Día de envío</label>
+                <select id="wdDia">
+                    <option value="1">Lunes</option>
+                    <option value="2">Martes</option>
+                    <option value="3">Miércoles</option>
+                    <option value="4">Jueves</option>
+                    <option value="5">Viernes</option>
+                    <option value="6">Sábado</option>
+                    <option value="0">Domingo</option>
+                </select>
+            </div>
 
-      <!-- PRODUCTOS TAB -->
-      <div id="productos" class="tab-content">
-        <div class="content-header"><h2>Gestión de Productos</h2></div>
-        <div class="content-body">
-          <div class="card">
-            <div class="card-header">Registrar Producto</div>
-            <div class="card-body">
-              <form id="formProducto" onsubmit="App.registrarProducto(event)">
-                <div class="form-grid">
-                  <div class="form-group"><label>Código *</label><input id="codigoProd" type="text" required></div>
-                  <div class="form-group"><label>Nombre *</label><input id="nombreProd" type="text" required></div>
-                  <div class="form-group"><label>Unidad</label><select id="unidadProd"><option>unidad</option><option>kg</option><option>litro</option></select></div>
-                  <div class="form-group"><label>Grupo</label><select id="grupoProd"><option>General</option></select></div>
-                  <div class="form-group"><label>Stock Mínimo</label><input id="stockMinProd" type="number" value="0"></div>
+            <!-- Hora -->
+            <div class="form-group">
+                <label><i class="fas fa-clock"></i> Hora de envío</label>
+                <select id="wdHora">
+                    <option value="6">06:00 AM</option>
+                    <option value="7">07:00 AM</option>
+                    <option value="8" selected>08:00 AM</option>
+                    <option value="9">09:00 AM</option>
+                    <option value="10">10:00 AM</option>
+                    <option value="11">11:00 AM</option>
+                    <option value="12">12:00 PM</option>
+                    <option value="13">01:00 PM</option>
+                    <option value="14">02:00 PM</option>
+                    <option value="15">03:00 PM</option>
+                    <option value="16">04:00 PM</option>
+                    <option value="17">05:00 PM</option>
+                    <option value="18">06:00 PM</option>
+                    <option value="19">07:00 PM</option>
+                    <option value="20">08:00 PM</option>
+                </select>
+            </div>
+
+            <!-- Resumen -->
+            <div class="resumen" id="wdResumen">
+                <i class="fas fa-info-circle"></i> El informe se enviará los <strong>Lunes</strong> a las <strong>08:00 AM</strong>
+            </div>
+
+            <!-- Botones -->
+            <button class="btn btn-primary" onclick="Watchdog.guardar()">
+                <i class="fas fa-save"></i> Guardar configuración
+            </button>
+            <button class="btn btn-info" onclick="Watchdog.enviarPrueba()">
+                <i class="fas fa-envelope"></i> Enviar informe ahora
+            </button>
+
+            <!-- Productos críticos -->
+            <div class="card" style="margin-top: 20px;">
+                <div class="card-title">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    Productos Críticos
                 </div>
-                <div class="actions"><button type="submit" class="btn btn-success">Registrar</button></div>
-              </form>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- MOVIMIENTOS TAB -->
-      <div id="movimientos" class="tab-content">
-        <div class="content-header"><h2>Registro de Movimientos</h2></div>
-        <div class="content-body">
-          <div class="card">
-            <div class="card-header">Nuevo Movimiento</div>
-            <div class="card-body">
-              <form id="formMovimiento" onsubmit="App.registrarMovimiento(event)">
-                <div class="form-grid">
-                  <div class="form-group"><label>Código *</label><input id="codigoMov" type="text" required></div>
-                  <div class="form-group"><label>Fecha</label><input id="fechaMov" type="date"></div>
-                  <div class="form-group"><label>Tipo</label><select id="tipoMov"><option value="INGRESO">Ingreso</option><option value="SALIDA">Salida</option></select></div>
-                  <div class="form-group"><label>Cantidad *</label><input id="cantMov" type="number" step="0.01" required></div>
-                  <div class="form-group"><label>Responsable</label><input id="respMov" type="text"></div>
-                  <div class="form-group"><label>Observaciones</label><textarea id="obsMov" rows="2"></textarea></div>
+                <div id="productosCriticos">
+                    <div style="text-align: center; padding: 20px; color: #888;">
+                        <i class="fas fa-spinner fa-spin"></i> Cargando...
+                    </div>
                 </div>
-                <div class="actions"><button type="submit" class="btn btn-success">Guardar</button></div>
-              </form>
             </div>
-          </div>
-        </div>
-      </div>
 
-      <!-- INVENTARIO TAB -->
-      <div id="inventario" class="tab-content">
-        <div class="content-header"><h2>Control de Inventario</h2></div>
-        <div class="content-body">
-          <div class="card">
-            <div class="card-header">Stock Actual</div>
-            <div class="card-body">
-              <div class="inventory-toolbar">
-                <button class="btn btn-primary btn-sm" onclick="App.mostrarStock()">Todo</button>
-                <button class="btn btn-danger btn-sm" onclick="App.mostrarAlertas()">Alertas</button>
-                <input id="busquedaInventario" type="text" placeholder="Buscar..." onkeyup="App.aplicarFiltrosLocales()">
-              </div>
-              <div id="stockTable"></div>
-            </div>
-          </div>
+            <div id="wdMessage" class="message"></div>
         </div>
-      </div>
 
-      <!-- BUSCAR TAB -->
-      <div id="buscar" class="tab-content">
-        <div class="content-header"><h2>Búsqueda de Productos</h2></div>
-        <div class="content-body">
-          <div class="card">
-            <div class="card-body">
-              <input id="searchInput" type="text" placeholder="Código o nombre..." style="width:100%; margin-bottom:10px;" onkeyup="App.buscarEnTiempoReal(this.value)">
-              <div id="searchResults"></div>
-            </div>
-          </div>
+        <div class="footer">
+            <i class="fas fa-shield-alt"></i> NEXUS PRIME - Sistema de Control de Inventario
         </div>
-      </div>
-
-      <!-- CONFIGURACIÓN TAB -->
-      <div id="configuracion" class="tab-content">
-        <div class="content-header"><h2>Configuración</h2></div>
-        <div class="content-body">
-          <div class="card">
-            <div class="card-header">Watchdog - Alertas por Email</div>
-            <div class="card-body">
-              <button class="btn btn-dark" onclick="App.abrirWatchdogConfig()"><i class="fas fa-robot"></i> Configurar Watchdog</button>
-              <button class="btn btn-info" onclick="App.probarEnvioWatchdog()" style="margin-top:10px;"><i class="fas fa-envelope"></i> Probar Envío</button>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
-  </div>
 
-  <!-- ============================================================ -->
-  <!-- MODAL WATCHDOG CONFIGURACIÓN (MEJORADO CON DÍA Y HORA)       -->
-  <!-- ============================================================ -->
-  <div id="modalWatchdog" class="modal-backdrop">
-    <div class="modal-content" style="max-width:480px;">
-      <div class="modal-header" style="background:linear-gradient(135deg,#1e3c72,#2a5298);">
-        <h5 class="modal-title" style="color:white;"><i class="fas fa-robot"></i> Configurar Watchdog</h5>
-        <button class="close-modal" onclick="document.getElementById('modalWatchdog').style.display='none'" style="color:white;">&times;</button>
-      </div>
-      <div class="modal-body">
-        <div class="message info" style="margin-bottom:18px;">
-          <i class="fas fa-info-circle"></i> El Watchdog envía automáticamente el informe de <b>Sin Stock</b>, <b>Stock Crítico</b> y <b>Sin Stock Mínimo</b> a todos los administradores.
-        </div>
-        <div class="form-group" style="margin-bottom:16px;">
-          <label><i class="fas fa-calendar-alt"></i> Frecuencia del informe</label>
-          <select id="wdModo" onchange="App.watchdogToggleDia()" style="margin-top:6px;">
-            <option value="diario">📅 Diario (todos los días)</option>
-            <option value="semanal">📆 Semanal (un día específico)</option>
-            <option value="mensual">📅 Mensual (día específico)</option>
-          </select>
-        </div>
-        <div class="form-group" id="wdDiaGroup" style="margin-bottom:16px; display:none;">
-          <label><i class="fas fa-calendar-day"></i> Día de la semana</label>
-          <select id="wdDia" style="margin-top:6px;">
-            <option value="2">Lunes</option>
-            <option value="3">Martes</option>
-            <option value="4">Miércoles</option>
-            <option value="5">Jueves</option>
-            <option value="6">Viernes</option>
-            <option value="7">Sábado</option>
-            <option value="1">Domingo</option>
-          </select>
-        </div>
-        <div class="form-group" id="wdDiaMesGroup" style="margin-bottom:16px; display:none;">
-          <label><i class="fas fa-calendar-day"></i> Día del mes</label>
-          <select id="wdDiaMes" style="margin-top:6px;">
-            <option value="1">Día 1</option><option value="2">Día 2</option><option value="3">Día 3</option>
-            <option value="4">Día 4</option><option value="5">Día 5</option><option value="6">Día 6</option>
-            <option value="7">Día 7</option><option value="8">Día 8</option><option value="9">Día 9</option>
-            <option value="10">Día 10</option><option value="11">Día 11</option><option value="12">Día 12</option>
-            <option value="13">Día 13</option><option value="14">Día 14</option><option value="15">Día 15</option>
-            <option value="16">Día 16</option><option value="17">Día 17</option><option value="18">Día 18</option>
-            <option value="19">Día 19</option><option value="20">Día 20</option><option value="21">Día 21</option>
-            <option value="22">Día 22</option><option value="23">Día 23</option><option value="24">Día 24</option>
-            <option value="25">Día 25</option><option value="26">Día 26</option><option value="27">Día 27</option>
-            <option value="28">Día 28</option><option value="29">Día 29</option><option value="30">Día 30</option>
-            <option value="31">Día 31</option>
-          </select>
-        </div>
-        <div class="form-group" style="margin-bottom:16px;">
-          <label><i class="fas fa-clock"></i> Hora de envío</label>
-          <select id="wdHora" style="margin-top:6px;">
-            <option value="6">06:00 AM</option>
-            <option value="7">07:00 AM</option>
-            <option value="8" selected>08:00 AM</option>
-            <option value="9">09:00 AM</option>
-            <option value="10">10:00 AM</option>
-            <option value="12">12:00 PM</option>
-            <option value="14">02:00 PM</option>
-            <option value="16">04:00 PM</option>
-            <option value="18">06:00 PM</option>
-          </select>
-        </div>
-        <div id="wdResumen" style="background:#f0f4ff;border-radius:8px;padding:12px 16px;font-size:0.85rem;color:#1e3c72;font-weight:600;border-left:4px solid #1e3c72;">
-          📋 El informe se enviará <b>todos los días a las 08:00 AM</b>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-secondary" onclick="document.getElementById('modalWatchdog').style.display='none'">Cancelar</button>
-        <button class="btn btn-dark" onclick="App.guardarWatchdog(this)"><i class="fas fa-robot"></i> Activar Watchdog</button>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    // ============================================================
-    // APP PRINCIPAL
-    // ============================================================
-    const App = (function() {
-      let CURRENT_USER = null;
-
-      function initAuth() {
-        const stored = localStorage.getItem('nexus_session');
-        if (stored) {
-          try {
-            const session = JSON.parse(stored);
-            CURRENT_USER = session.user;
-            document.getElementById('login-screen').style.display = 'none';
-            document.getElementById('appContainer').style.display = 'flex';
-            document.getElementById('lblUserDisplay').textContent = session.user.nombre || session.user.email;
-            loadDashboard();
-            cargarConfigWatchdog();
-          } catch(e) { localStorage.removeItem('nexus_session'); }
-        }
-      }
-
-      function doLogin(e) {
-        e.preventDefault();
-        const email = document.getElementById('loginEmail').value;
-        const pass = document.getElementById('loginPass').value;
-        if (email && pass) {
-          CURRENT_USER = { email: email, nombre: email.split('@')[0], rol: 'ADMIN' };
-          localStorage.setItem('nexus_session', JSON.stringify({ user: CURRENT_USER, timestamp: Date.now() }));
-          document.getElementById('login-screen').style.display = 'none';
-          document.getElementById('appContainer').style.display = 'flex';
-          document.getElementById('lblUserDisplay').textContent = CURRENT_USER.nombre;
-          loadDashboard();
-          cargarConfigWatchdog();
-        } else {
-          document.getElementById('loginError').style.display = 'block';
-        }
-      }
-
-      function doLogout() {
-        localStorage.removeItem('nexus_session');
-        location.reload();
-      }
-
-      function showTab(tabId, el) {
-        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-        document.getElementById(tabId).classList.add('active');
-        document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-        if (el) el.classList.add('active');
-        if (tabId === 'inventario') mostrarStock();
-      }
-
-      function loadDashboard() {
-        document.getElementById('statsGrid').innerHTML = `
-          <div class="stat-card"><div class="stat-value">128</div><div class="stat-label">Productos</div></div>
-          <div class="stat-card danger"><div class="stat-value">12</div><div class="stat-label">Sin Stock</div></div>
-          <div class="stat-card warning"><div class="stat-value">8</div><div class="stat-label">Stock Bajo</div></div>
-        `;
-      }
-
-      let stockData = [];
-      function mostrarStock() {
-        stockData = [
-          { codigo: 'PROD-001', nombre: 'Producto 1', cantidad: 5, stockMin: 10, unidad: 'unidad', grupo: 'General' },
-          { codigo: 'PROD-002', nombre: 'Producto 2', cantidad: 0, stockMin: 5, unidad: 'unidad', grupo: 'General' },
-          { codigo: 'PROD-003', nombre: 'Producto 3', cantidad: 15, stockMin: 10, unidad: 'unidad', grupo: 'General' }
-        ];
-        aplicarFiltrosLocales();
-      }
-
-      function mostrarAlertas() {
-        const alertas = stockData.filter(p => p.cantidad <= p.stockMin);
-        displayStockTable(alertas, document.getElementById('stockTable'));
-      }
-
-      function aplicarFiltrosLocales() {
-        const search = document.getElementById('busquedaInventario')?.value.toLowerCase() || '';
-        const filtered = stockData.filter(p => p.codigo.toLowerCase().includes(search) || p.nombre.toLowerCase().includes(search));
-        displayStockTable(filtered, document.getElementById('stockTable'));
-      }
-
-      function displayStockTable(data, container) {
-        if (!container) return;
-        if (!data.length) { container.innerHTML = '<div class="message info">No hay productos</div>'; return; }
-        let html = '<table><thead><tr><th>Código</th><th>Nombre</th><th>Stock</th><th>Mínimo</th><th>Estado</th></tr></thead><tbody>';
-        data.forEach(p => {
-          const estado = p.cantidad <= 0 ? 'SIN STOCK' : (p.cantidad <= p.stockMin ? 'CRÍTICO' : 'OK');
-          const color = p.cantidad <= 0 ? 'danger' : (p.cantidad <= p.stockMin ? 'warning' : 'success');
-          html += `<tr><td>${p.codigo}</td><td>${p.nombre}</td><td>${p.cantidad}</td><td>${p.stockMin}</td><td><span class="badge badge-${color}">${estado}</span></td></tr>`;
-        });
-        html += '</tbody></table>';
-        container.innerHTML = html;
-      }
-
-      function registrarProducto(e) {
-        e.preventDefault();
-        alert('Producto registrado (demo)');
-      }
-
-      function registrarMovimiento(e) {
-        e.preventDefault();
-        alert('Movimiento registrado (demo)');
-      }
-
-      function buscarEnTiempoReal(val) {
-        if (val.length < 2) return;
-        const results = stockData.filter(p => p.codigo.includes(val.toUpperCase()) || p.nombre.toLowerCase().includes(val.toLowerCase()));
-        const container = document.getElementById('searchResults');
-        if (!container) return;
-        if (!results.length) { container.innerHTML = '<div class="message info">Sin resultados</div>'; return; }
-        let html = '<table><thead><tr><th>Código</th><th>Nombre</th><th>Stock</th></tr></thead><tbody>';
-        results.forEach(p => html += `<tr><td>${p.codigo}</td><td>${p.nombre}</td><td>${p.cantidad}</td></tr>`);
-        html += '</tbody></table>';
-        container.innerHTML = html;
-      }
-
-      // ============================================================
-      // WATCHDOG FUNCTIONS MEJORADAS (DÍA Y HORA)
-      // ============================================================
-      
-      function abrirWatchdogConfig() {
-        document.getElementById('modalWatchdog').style.display = 'flex';
-        watchdogToggleDia();
-        cargarConfigWatchdog();
-      }
-
-      function watchdogToggleDia() {
-        const modo = document.getElementById('wdModo').value;
-        const diaGroup = document.getElementById('wdDiaGroup');
-        const diaMesGroup = document.getElementById('wdDiaMesGroup');
-        const resumen = document.getElementById('wdResumen');
-        const horaSelect = document.getElementById('wdHora');
-        const hora = horaSelect.options[horaSelect.selectedIndex].text;
-        
-        if (modo === 'diario') {
-          diaGroup.style.display = 'none';
-          diaMesGroup.style.display = 'none';
-          resumen.innerHTML = `📋 El informe se enviará <b>TODOS LOS DÍAS</b> a las <b>${hora}</b>`;
-        } 
-        else if (modo === 'semanal') {
-          diaGroup.style.display = 'block';
-          diaMesGroup.style.display = 'none';
-          const dia = document.getElementById('wdDia');
-          const diaNombre = dia.options[dia.selectedIndex].text;
-          resumen.innerHTML = `📋 El informe se enviará <b>CADA ${diaNombre.toUpperCase()}</b> a las <b>${hora}</b>`;
-        }
-        else if (modo === 'mensual') {
-          diaGroup.style.display = 'none';
-          diaMesGroup.style.display = 'block';
-          const diaMes = document.getElementById('wdDiaMes');
-          const diaValor = diaMes.value;
-          resumen.innerHTML = `📋 El informe se enviará <b>EL DÍA ${diaValor} DE CADA MES</b> a las <b>${hora}</b>`;
-        }
-      }
-
-      function guardarWatchdog(btn) {
-        const modo = document.getElementById('wdModo').value;
-        const diaSemana = document.getElementById('wdDia').value;
-        const diaMes = document.getElementById('wdDiaMes').value;
-        const hora = document.getElementById('wdHora').value;
-        
-        let config = {
-          activo: true,
-          frecuencia: modo,
-          hora: parseInt(hora)
-        };
-        
-        if (modo === 'semanal') {
-          config.dia_semana = parseInt(diaSemana);
-        }
-        if (modo === 'mensual') {
-          config.dia_mes = parseInt(diaMes);
-        }
-        
-        // Guardar en localStorage
-        localStorage.setItem('watchdog_config', JSON.stringify(config));
-        
-        mostrarMensajeModal('✅ Watchdog', 'Configuración guardada correctamente.', 'success');
-        document.getElementById('modalWatchdog').style.display = 'none';
-      }
-
-      function cargarConfigWatchdog() {
-        const localConfig = localStorage.getItem('watchdog_config');
-        if (localConfig) {
-          try {
-            const config = JSON.parse(localConfig);
-            aplicarConfigWatchdog(config);
-          } catch(e) {}
-        }
-      }
-
-      function aplicarConfigWatchdog(config) {
-        if (!config) return;
-        
-        const modoSelect = document.getElementById('wdModo');
-        if (modoSelect && config.frecuencia) {
-          modoSelect.value = config.frecuencia;
-        }
-        
-        const diaSelect = document.getElementById('wdDia');
-        if (diaSelect && config.dia_semana !== undefined) {
-          diaSelect.value = config.dia_semana.toString();
-        }
-        
-        const diaMesSelect = document.getElementById('wdDiaMes');
-        if (diaMesSelect && config.dia_mes !== undefined) {
-          diaMesSelect.value = config.dia_mes.toString();
-        }
-        
-        const horaSelect = document.getElementById('wdHora');
-        if (horaSelect && config.hora !== undefined) {
-          horaSelect.value = config.hora.toString();
-        }
-        
-        watchdogToggleDia();
-      }
-
-      function probarEnvioWatchdog() {
-        const config = JSON.parse(localStorage.getItem('watchdog_config') || '{}');
-        const email = CURRENT_USER ? CURRENT_USER.email : 'admin@nexusprime.com';
-        mostrarMensajeModal('📧 Enviando', `Enviando informe de prueba a ${email}...\n\nFrecuencia: ${config.frecuencia || 'semanal'}\nHora: ${config.hora || 8}:00`, 'info');
-        setTimeout(() => {
-          mostrarMensajeModal('✅ Enviado', `Informe de prueba enviado a ${email}`, 'success');
-        }, 1500);
-      }
-
-      function mostrarMensajeModal(titulo, mensaje, tipo) {
-        const modal = document.getElementById('modalMensaje');
-        if (!modal) {
-          alert(mensaje);
-          return;
-        }
-        document.getElementById('modalMensajeTitle').textContent = titulo;
-        document.getElementById('modalMensajeBody').textContent = mensaje;
-        modal.style.display = 'flex';
-        setTimeout(() => {
-          modal.style.display = 'none';
-        }, 3000);
-      }
-
-      return {
-        initAuth, doLogin, doLogout, showTab, loadDashboard,
-        mostrarStock, mostrarAlertas, aplicarFiltrosLocales,
-        registrarProducto, registrarMovimiento, buscarEnTiempoReal,
-        abrirWatchdogConfig, watchdogToggleDia, guardarWatchdog,
-        cargarConfigWatchdog, aplicarConfigWatchdog, probarEnvioWatchdog
-      };
-    })();
-
-    document.addEventListener('DOMContentLoaded', function() {
-      App.initAuth();
-    });
-  </script>
-
-  <!-- Modal Mensaje -->
-  <div id="modalMensaje" class="modal-backdrop">
-    <div class="modal-content" style="max-width:400px;">
-      <div id="modalMensajeHeader" class="modal-header"><h5 id="modalMensajeTitle" class="modal-title"></h5></div>
-      <div class="modal-body"><p id="modalMensajeBody"></p></div>
-      <div class="modal-footer"><button class="btn btn-primary" onclick="document.getElementById('modalMensaje').style.display='none'">Aceptar</button></div>
-    </div>
-  </div>
-
+    <script src="index.js"></script>
 </body>
 </html>
